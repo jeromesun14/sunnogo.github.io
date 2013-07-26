@@ -1,0 +1,9 @@
+---
+layout: post
+title: "Hello, octopress!"
+date: 2013-07-27 03:56
+comments: true
+categories: test octopress
+---
+又蛋疼到凌晨4点了，拥抱octopress！想睡了。。
+

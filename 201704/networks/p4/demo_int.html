@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="p4factory 样例 app int 跑通的过程记录。">
+<meta name="keywords" content="p4,int,inband network telemetry,in-band network telemetry,带内遥测,p4factory,demo,ubuntu,16.04,3.19,kernel,linux,webui,success,成功,docker,webui,iperf,failed,网页,失败,vxlan,mininet,CLI,gcc,dockerfile,版本,tshark,ping,connection refuse">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跑通 p4factory app int">
+<meta property="og:url" content="http://sunyongfeng.com/201704/networks/p4/demo_int.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="p4factory 样例 app int 跑通的过程记录。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/run.png">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/traffic.png">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/webui.png">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/multi-flow.png">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/latency.png">
+<meta property="og:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/notification.png">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.071Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跑通 p4factory app int">
+<meta name="twitter:description" content="p4factory 样例 app int 跑通的过程记录。">
+<meta name="twitter:image" content="http://sunyongfeng.com/images/networks/p4/int_demo/run.png">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/networks/p4/demo_int">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>跑通 p4factory app int | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/networks/p4/demo_int.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">跑通 p4factory app int
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-18 16:45:20" itemprop="dateCreated datePublished" datetime="2017-04-18T16:45:20+08:00">2017-04-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/p4/" itemprop="url" rel="index"><span itemprop="name">p4</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/networks/p4/demo_int.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/networks/p4/demo_int.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">p4factory 样例 app int 跑通的过程记录。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="运行环境"><a href="#运行环境" class="headerlink" title="运行环境"></a>运行环境</h2><p>ubuntu 16.04 + linux kernel 3.19</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>详见：</p>
+<ul>
+<li><a href="https://github.com/p4lang/p4factory/tree/master/apps/int" target="_blank" rel="noopener">app/int/readme</a></li>
+<li><a href="https://github.com/p4lang/p4factory" target="_blank" rel="noopener">p4factory readme</a></li>
+<li><a href="https://github.com/p4lang/switch" target="_blank" rel="noopener">switch readme</a></li>
+</ul>
+<p>问题 fix 见下文。</p>
+<h2 id="运行成功图示"><a href="#运行成功图示" class="headerlink" title="运行成功图示"></a>运行成功图示</h2><ul>
+<li>执行 <code>int_ref_topology.py</code></li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/run.png" alt="执行命令"></p>
+<ul>
+<li>iperf 打流</li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/traffic.png" alt="打流"></p>
+<ul>
+<li>webui - 拓扑</li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/webui.png" alt="拓扑"></p>
+<ul>
+<li>webui - flows</li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/multi-flow.png" alt="multi-flow"></p>
+<ul>
+<li>webui - 时延</li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/latency.png" alt="latency"></p>
+<ul>
+<li>webui - notification</li>
+</ul>
+<p><img src="/images/networks/p4/int_demo/notification.png" alt="notifcation"></p>
+<h2 id="问题解决记录"><a href="#问题解决记录" class="headerlink" title="问题解决记录"></a>问题解决记录</h2><h3 id="内核版本切换为-3-19"><a href="#内核版本切换为-3-19" class="headerlink" title="内核版本切换为 3.19"></a>内核版本切换为 3.19</h3><p>目前 vxlan-gpe 的内核模块基于内核 3.19，而目前常用 Linux 发行版的内核版本都在 4.2 以上，不切换则编译不过。<strong>更好的办法是，直接使用内核版本为 3.19 的 Linux 发行版</strong>。</p>
+<p>详见 <a href="https://github.com/p4lang/p4factory/issues/136" target="_blank" rel="noopener">p4factory issue 136</a><br>用于支持内核版本 3.19。详见另一篇文章 <a href="http://sunyongfeng.com/201704/linux/startup_with_old_kernel.html">ubuntu 用回旧版内核</a></p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-<span class="type">OptiPlex</span>-<span class="number">380</span>:~/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe$ make</span><br><span class="line">make -<span class="type">C</span> /lib/modules/<span class="number">4.4</span>.<span class="number">0</span>-<span class="number">72</span>-generic/build <span class="type">M</span>=/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe modules</span><br><span class="line">make[<span class="number">1</span>]: <span class="type">Entering</span> directory <span class="string">'/usr/src/linux-headers-4.4.0-72-generic'</span></span><br><span class="line">  <span class="type">CC</span> [<span class="type">M</span>]  /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.o</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">94</span>:<span class="number">7</span>: error: redefinition <span class="keyword">of</span> ‘union vxlan_addr’</span><br><span class="line"> union vxlan_addr &#123;</span><br><span class="line">       ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">44</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/vxlan.h:<span class="number">119</span>:<span class="number">7</span>: note: originally defined here</span><br><span class="line"> union vxlan_addr &#123;</span><br><span class="line">       ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">100</span>:<span class="number">8</span>: error: redefinition <span class="keyword">of</span> ‘<span class="keyword">struct</span> vxlan_rdst’</span><br><span class="line"> <span class="keyword">struct</span> vxlan_rdst &#123;</span><br><span class="line">        ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">44</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/vxlan.h:<span class="number">125</span>:<span class="number">8</span>: note: originally defined here</span><br><span class="line"> <span class="keyword">struct</span> vxlan_rdst &#123;</span><br><span class="line">        ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">122</span>:<span class="number">8</span>: error: redefinition <span class="keyword">of</span> ‘<span class="keyword">struct</span> vxlan_dev’</span><br><span class="line"> <span class="keyword">struct</span> vxlan_dev &#123;</span><br><span class="line">        ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">44</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/vxlan.h:<span class="number">152</span>:<span class="number">8</span>: note: originally defined here</span><br><span class="line"> <span class="keyword">struct</span> vxlan_dev &#123;</span><br><span class="line">        ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_fdb_info’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">423</span>:<span class="number">9</span>: error: void <span class="keyword">value</span> not ignored <span class="keyword">as</span> it ought <span class="keyword">to</span> be</span><br><span class="line">  return nlmsg_end(skb, nlh);</span><br><span class="line">         ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_udp_encap_recv’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1255</span>:<span class="number">4</span>: error: ‘<span class="keyword">struct</span> vxlan_sock’ has no member named ‘rcv’</span><br><span class="line">  vs-&gt;rcv(vs, skb, vxh-&gt;vx_vni);</span><br><span class="line">    ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan6_xmit_skb’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1681</span>:<span class="number">7</span>: error: implicit declaration <span class="keyword">of</span> <span class="keyword">function</span> ‘vlan_tx_tag_present’ [-<span class="type">Werror</span>=implicit-<span class="keyword">function</span>-declaration]</span><br><span class="line">    + (vlan_tx_tag_present(skb) ? <span class="type">VLAN_HLEN</span> : <span class="number">0</span>);</span><br><span class="line">       ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1708</span>:<span class="number">23</span>: warning:passing argument <span class="number">1</span> <span class="keyword">of</span> ‘udp_tunnel6_xmit_skb’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">  udp_tunnel6_xmit_skb(vs-&gt;sock, dst, skb, dev, saddr, daddr, prio,</span><br><span class="line">                       ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">87</span>:<span class="number">5</span>: note: expected ‘<span class="keyword">struct</span> dst_entry *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> socket *’</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel6_xmit_skb(<span class="keyword">struct</span> dst_entry *dst, <span class="keyword">struct</span> sock *sk,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1708</span>:<span class="number">33</span>: warning:passing argument <span class="number">2</span> <span class="keyword">of</span> ‘udp_tunnel6_xmit_skb’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">  udp_tunnel6_xmit_skb(vs-&gt;sock, dst, skb, dev, saddr, daddr, prio,</span><br><span class="line">                                 ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">87</span>:<span class="number">5</span>: note: expected ‘<span class="keyword">struct</span> sock *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> dst_entry *’</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel6_xmit_skb(<span class="keyword">struct</span> dst_entry *dst, <span class="keyword">struct</span> sock *sk,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1708</span>:<span class="number">2</span>: error: too few arguments <span class="keyword">to</span> <span class="keyword">function</span> ‘udp_tunnel6_xmit_skb’</span><br><span class="line">  udp_tunnel6_xmit_skb(vs-&gt;sock, dst, skb, dev, saddr, daddr, prio,</span><br><span class="line">  ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">87</span>:<span class="number">5</span>: note: declared here</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel6_xmit_skb(<span class="keyword">struct</span> dst_entry *dst, <span class="keyword">struct</span> sock *sk,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_xmit_skb’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1787</span>:<span class="number">29</span>: warning:passing argument <span class="number">1</span> <span class="keyword">of</span> ‘udp_tunnel_xmit_skb’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">  return udp_tunnel_xmit_skb(vs-&gt;sock, rt, skb, src, dst, tos,</span><br><span class="line">                             ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">81</span>:<span class="number">5</span>: note: expected ‘<span class="keyword">struct</span> rtable *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> socket *’</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel_xmit_skb(<span class="keyword">struct</span> rtable *rt, <span class="keyword">struct</span> sock *sk, <span class="keyword">struct</span> sk_buff *skb,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1787</span>:<span class="number">39</span>: warning:passing argument <span class="number">2</span> <span class="keyword">of</span> ‘udp_tunnel_xmit_skb’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">  return udp_tunnel_xmit_skb(vs-&gt;sock, rt, skb, src, dst, tos,</span><br><span class="line">                                       ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">81</span>:<span class="number">5</span>: note: expected ‘<span class="keyword">struct</span> sock *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> rtable *’</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel_xmit_skb(<span class="keyword">struct</span> rtable *rt, <span class="keyword">struct</span> sock *sk, <span class="keyword">struct</span> sk_buff *skb,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1787</span>:<span class="number">9</span>: error: too few arguments <span class="keyword">to</span> <span class="keyword">function</span> ‘udp_tunnel_xmit_skb’</span><br><span class="line">  return udp_tunnel_xmit_skb(vs-&gt;sock, rt, skb, src, dst, tos,</span><br><span class="line">         ^</span><br><span class="line"><span class="type">In</span> file included from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">37</span>:<span class="number">0</span>:</span><br><span class="line"><span class="keyword">include</span>/net/udp_tunnel.h:<span class="number">81</span>:<span class="number">5</span>: note: declared here</span><br><span class="line"> <span class="built_in">int</span> udp_tunnel_xmit_skb(<span class="keyword">struct</span> rtable *rt, <span class="keyword">struct</span> sock *sk, <span class="keyword">struct</span> sk_buff *skb,</span><br><span class="line">     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_xmit_one’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">34</span>: warning:passing argument <span class="number">1</span> <span class="keyword">of</span> ‘ipv6_stub-&gt;ipv6_dst_lookup’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">   <span class="keyword">if</span> (ipv6_stub-&gt;ipv6_dst_lookup(sk, &amp;ndst, &amp;fl6)) &#123;</span><br><span class="line">                                  ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">34</span>: note: expected ‘<span class="keyword">struct</span> net *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> sock *’</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">38</span>: warning:passing argument <span class="number">2</span> <span class="keyword">of</span> ‘ipv6_stub-&gt;ipv6_dst_lookup’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">   <span class="keyword">if</span> (ipv6_stub-&gt;ipv6_dst_lookup(sk, &amp;ndst, &amp;fl6)) &#123;</span><br><span class="line">                                      ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">38</span>: note: expected ‘<span class="keyword">struct</span> sock *’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> dst_entry **’</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">45</span>: warning:passing argument <span class="number">3</span> <span class="keyword">of</span> ‘ipv6_stub-&gt;ipv6_dst_lookup’ from incompatible pointer <span class="keyword">type</span> [-<span class="type">Wincompatible</span>-pointer-types]</span><br><span class="line">   <span class="keyword">if</span> (ipv6_stub-&gt;ipv6_dst_lookup(sk, &amp;ndst, &amp;fl6)) &#123;</span><br><span class="line">                                             ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">45</span>: note: expected ‘<span class="keyword">struct</span> dst_entry **’ but argument is <span class="keyword">of</span> <span class="keyword">type</span> ‘<span class="keyword">struct</span> flowi6 *’</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1941</span>:<span class="number">7</span>: error: too few arguments <span class="keyword">to</span> <span class="keyword">function</span> ‘ipv6_stub-&gt;ipv6_dst_lookup’</span><br><span class="line">   <span class="keyword">if</span> (ipv6_stub-&gt;ipv6_dst_lookup(sk, &amp;ndst, &amp;fl6)) &#123;</span><br><span class="line">       ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">At</span> top level:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2468</span>:<span class="number">12</span>: error: unknown <span class="keyword">type</span> name ‘vxlan_rcv_t’</span><br><span class="line">            vxlan_rcv_t *rcv, void *data,</span><br><span class="line">            ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2520</span>:<span class="number">7</span>: error: unknown <span class="keyword">type</span> name ‘vxlan_rcv_t’</span><br><span class="line">       vxlan_rcv_t *rcv, void *data,</span><br><span class="line">       ^</span><br><span class="line"><span class="type">In</span> file included from <span class="keyword">include</span>/linux/linkage.h:<span class="number">6</span>:<span class="number">0</span>,</span><br><span class="line">                 from <span class="keyword">include</span>/linux/kernel.h:<span class="number">6</span>,</span><br><span class="line">                 from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">14</span>:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2546</span>:<span class="number">19</span>: error: ‘vxlan_sock_add’ undeclared here (not <span class="keyword">in</span> a <span class="keyword">function</span>)</span><br><span class="line"> <span class="type">EXPORT_SYMBOL_GPL</span>(vxlan_sock_add);</span><br><span class="line">                   ^</span><br><span class="line"><span class="keyword">include</span>/linux/export.h:<span class="number">57</span>:<span class="number">16</span>: note: <span class="keyword">in</span> definition <span class="keyword">of</span> macro ‘__EXPORT_SYMBOL’</span><br><span class="line">  extern typeof(sym) sym;     \</span><br><span class="line">                ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2546</span>:<span class="number">1</span>: note: <span class="keyword">in</span> expansion <span class="keyword">of</span> macro ‘<span class="type">EXPORT_SYMBOL_GPL</span>’</span><br><span class="line"> <span class="type">EXPORT_SYMBOL_GPL</span>(vxlan_sock_add);</span><br><span class="line"> ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_sock_work’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2557</span>:<span class="number">8</span>: error: called <span class="keyword">object</span> ‘vxlan_sock_add’ is not a <span class="keyword">function</span> <span class="keyword">or</span> <span class="keyword">function</span> pointer</span><br><span class="line">  nvs = vxlan_sock_add(net, port, vxlan_rcv, <span class="type">NULL</span>, <span class="literal">false</span>, vxlan-&gt;flags);</span><br><span class="line">        ^</span><br><span class="line"><span class="type">In</span> file included from <span class="keyword">include</span>/linux/linkage.h:<span class="number">6</span>:<span class="number">0</span>,</span><br><span class="line">                 from <span class="keyword">include</span>/linux/kernel.h:<span class="number">6</span>,</span><br><span class="line">                 from /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">14</span>:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2546</span>:<span class="number">19</span>: note: declared here</span><br><span class="line"> <span class="type">EXPORT_SYMBOL_GPL</span>(vxlan_sock_add);</span><br><span class="line">                   ^</span><br><span class="line"><span class="keyword">include</span>/linux/export.h:<span class="number">57</span>:<span class="number">21</span>: note: <span class="keyword">in</span> definition <span class="keyword">of</span> macro ‘__EXPORT_SYMBOL’</span><br><span class="line">  extern typeof(sym) sym;     \</span><br><span class="line">                     ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2546</span>:<span class="number">1</span>: note: <span class="keyword">in</span> expansion <span class="keyword">of</span> macro ‘<span class="type">EXPORT_SYMBOL_GPL</span>’</span><br><span class="line"> <span class="type">EXPORT_SYMBOL_GPL</span>(vxlan_sock_add);</span><br><span class="line"> ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">At</span> top level:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">604</span>:<span class="number">25</span>: warning: vxlan_gro_receive’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static <span class="keyword">struct</span> sk_buff **vxlan_gro_receive(<span class="keyword">struct</span> sk_buff **head, <span class="keyword">struct</span> sk_buff *</span><br><span class="line">                         ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">669</span>:<span class="number">12</span>: warning: vxlan_gro_complete’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static <span class="built_in">int</span> vxlan_gro_complete(<span class="keyword">struct</span> sk_buff *skb, <span class="built_in">int</span> nhoff)</span><br><span class="line">            ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">692</span>:<span class="number">13</span>: warning: vxlan_notify_add_rx_port’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static void vxlan_notify_add_rx_port(<span class="keyword">struct</span> vxlan_sock *vs)</span><br><span class="line">             ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1219</span>:<span class="number">12</span>: warning:‘vxlan_udp_encap_recv’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static <span class="built_in">int</span> vxlan_udp_encap_recv(<span class="keyword">struct</span> sock *sk, <span class="keyword">struct</span> sk_buff *skb)</span><br><span class="line">            ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2427</span>:<span class="number">13</span>: warning:‘vxlan_del_work’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static void vxlan_del_work(<span class="keyword">struct</span> work_struct *work)</span><br><span class="line">             ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">2434</span>:<span class="number">23</span>: warning:‘vxlan_create_sock’ defined but not used [-<span class="type">Wunused</span>-<span class="keyword">function</span>]</span><br><span class="line"> static <span class="keyword">struct</span> socket *vxlan_create_sock(<span class="keyword">struct</span> net *net, <span class="built_in">bool</span> ipv6,</span><br><span class="line">                       ^</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c: <span class="type">In</span> <span class="keyword">function</span> ‘vxlan_xmit_skb’:</span><br><span class="line">/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.c:<span class="number">1789</span>:<span class="number">1</span>: warning: control reaches <span class="keyword">end</span> <span class="keyword">of</span> non-void <span class="keyword">function</span> [-<span class="type">Wreturn</span>-<span class="keyword">type</span>]</span><br><span class="line"> &#125;</span><br><span class="line"> ^</span><br><span class="line">cc1: some warnings being treated <span class="keyword">as</span> errors</span><br><span class="line">scripts/<span class="type">Makefile</span>.build:<span class="number">264</span>: recipe <span class="keyword">for</span> target <span class="string">'/home/sunyongfeng/workshop/p4factory/apps/int/vxlan-gpe/vxlan.o'</span> failed</span><br><span class="line">make[<span class="number">2</span>]: *** [/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/vxlan.o] <span class="type">Error</span> <span class="number">1</span></span><br><span class="line"><span class="type">Makefile</span>:<span class="number">1420</span>: recipe <span class="keyword">for</span> target <span class="symbol">'_module_</span>/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe' failed</span><br><span class="line">make[<span class="number">1</span>]: *** [_module_/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe] <span class="type">Error</span> <span class="number">2</span></span><br><span class="line">make[<span class="number">1</span>]: <span class="type">Leaving</span> directory <span class="string">'/usr/src/linux-headers-4.4.0-72-generic'</span></span><br><span class="line"><span class="type">Makefile</span>:<span class="number">4</span>: recipe <span class="keyword">for</span> target <span class="symbol">'all'</span> failed</span><br><span class="line">make: *** [all] <span class="type">Error</span> <span class="number">2</span></span><br><span class="line">sunyongfeng@openswitch-<span class="type">OptiPlex</span>-<span class="number">380</span>:~/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe$ make clean</span><br><span class="line">make -<span class="type">C</span> /lib/modules/<span class="number">4.4</span>.<span class="number">0</span>-<span class="number">72</span>-generic/build <span class="type">M</span>=/home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe clean</span><br><span class="line">make[<span class="number">1</span>]: <span class="type">Entering</span> directory <span class="string">'/usr/src/linux-headers-4.4.0-72-generic'</span></span><br><span class="line">  <span class="type">CLEAN</span>   /home/sunyongfeng/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe/.tmp_versions</span><br><span class="line">make[<span class="number">1</span>]: <span class="type">Leaving</span> directory <span class="string">'/usr/src/linux-headers-4.4.0-72-generic'</span></span><br><span class="line">sunyongfeng@openswitch-<span class="type">OptiPlex</span>-<span class="number">380</span>:~/workshop/p4factory/apps/<span class="built_in">int</span>/vxlan-gpe$</span><br></pre></td></tr></table></figure>
+<h3 id="解决-Linux-内核到-3-19-后，docker-无法运行"><a href="#解决-Linux-内核到-3-19-后，docker-无法运行" class="headerlink" title="解决 Linux 内核到 3.19 后，docker 无法运行"></a>解决 Linux 内核到 3.19 后，docker 无法运行</h3><p>详见另一篇文章 <a href="http://sunyongfeng.com/201704/linux/docker_failed_after_update_kernel.html">Linux升级内核后 docker 不可用</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4factory/makefiles$ sudo service docker <span class="keyword">start</span></span><br><span class="line">Job <span class="keyword">for</span> docker.service <span class="keyword">failed</span> because the control process exited <span class="keyword">with</span> <span class="keyword">error</span> code. See <span class="string">"systemctl status docker.service"</span> <span class="keyword">and</span> <span class="string">"journalctl -xe"</span> <span class="keyword">for</span> details.</span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4factory/makefiles$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4factory/makefiles$ sudo systemctl <span class="keyword">status</span> docker.service</span><br><span class="line">● docker.service - Docker Application <span class="keyword">Container</span> <span class="keyword">Engine</span></span><br><span class="line">   Loaded: loaded (/lib/systemd/<span class="keyword">system</span>/docker.service; enabled; vendor preset: enabled)</span><br><span class="line">   Active: failed (Result: exit-code) since 二 2017-04-18 16:38:26 CST; 9s ago</span><br><span class="line">     Docs: https://docs.docker.com</span><br><span class="line">  Process: 3058 ExecStart=/usr/bin/dockerd -H fd:// (code=exited, status=1/FAILURE)</span><br><span class="line"> Main PID: 3058 (code=exited, status=1/FAILURE)</span><br><span class="line"></span><br><span class="line">4月 18 16:38:25 openswitch-OptiPlex-380 systemd[1]: Starting Docker Application Container Engine...</span><br><span class="line">4月 18 16:38:25 openswitch-OptiPlex-380 dockerd[3058]: time="2017-04-18T16:38:25.914144290+08:00" level=info msg="libcontainerd: new containerd process, pid: 3064"</span><br><span class="line">4月 18 16:38:26 openswitch-OptiPlex-380 dockerd[3058]: time="2017-04-18T16:38:26.962727971+08:00" level=error msg="[graphdriver] prior storage driver \"aufs\" failed:</span><br><span class="line">4月 18 16:38:26 openswitch-OptiPlex-380 dockerd[3058]: time="2017-04-18T16:38:26.962806596+08:00" level=fatal msg="Error starting daemon: error initializing graphdriv</span><br><span class="line">4月 18 16:38:26 openswitch-OptiPlex-380 systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE</span><br><span class="line">4月 18 16:38:26 openswitch-OptiPlex-380 systemd[1]: Failed to <span class="keyword">start</span> Docker Application <span class="keyword">Container</span> Engine.</span><br><span class="line"><span class="number">4</span>月 <span class="number">18</span> <span class="number">16</span>:<span class="number">38</span>:<span class="number">26</span> openswitch-OptiPlex<span class="number">-380</span> systemd[<span class="number">1</span>]: docker.service: Unit entered <span class="keyword">failed</span> state.</span><br><span class="line"><span class="number">4</span>月 <span class="number">18</span> <span class="number">16</span>:<span class="number">38</span>:<span class="number">26</span> openswitch-OptiPlex<span class="number">-380</span> systemd[<span class="number">1</span>]: docker.service: <span class="keyword">Failed</span> <span class="keyword">with</span> <span class="keyword">result</span> <span class="string">'exit-code'</span>.</span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4factory/makefiles$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4factory/makefiles$ sudo systemctl <span class="keyword">start</span> docker</span><br><span class="line">Job <span class="keyword">for</span> docker.service <span class="keyword">failed</span> because the control process exited <span class="keyword">with</span> <span class="keyword">error</span> code. See <span class="string">"systemctl status docker.service"</span> <span class="keyword">and</span> <span class="string">"journalctl -xe"</span> <span class="keyword">for</span> details.</span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4factory/makefiles$ docker <span class="comment">--version</span></span><br><span class="line">Docker <span class="keyword">version</span> <span class="number">1.12</span><span class="number">.3</span>, <span class="keyword">build</span> <span class="number">6</span>b644ec</span><br></pre></td></tr></table></figure>
+<h3 id="解决-int-ref-topology-py-失败问题"><a href="#解决-int-ref-topology-py-失败问题" class="headerlink" title="解决 int_ref_topology.py 失败问题"></a>解决 int_ref_topology.py 失败问题</h3><h4 id="docker-node-py-运行失败"><a href="#docker-node-py-运行失败" class="headerlink" title="docker_node.py 运行失败"></a>docker_node.py 运行失败</h4><p>详见 <a href="https://github.com/p4lang/p4factory/issues/193" target="_blank" rel="noopener">p4factory issue 193</a></p>
+<p>执行 mininet 起 docker 起不来。<a href="http://stackoverflow.com/questions/28006027/valueerror-invalid-literal-for-int-with-base-10-n" target="_blank" rel="noopener">解决</a>:</p>
+<blockquote>
+<p>replace :</p>
+<p><code>start = int(line)</code> </p>
+<p>to</p>
+<p><code>start = int(line.strip())   # strip will chop the &#39;\n&#39;</code></p>
+</blockquote>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4factory/mininet</span>$ sudo ./int_ref_topology.py --model-dir=$P4HOME/install               </span><br><span class="line">Adding switch spine1</span><br><span class="line">Traceback (most recent call last)<span class="symbol">:</span></span><br><span class="line">  File <span class="string">"./int_ref_topology.py"</span>, line <span class="number">131</span>, <span class="keyword">in</span> &lt;<span class="class"><span class="keyword">module</span>&gt;</span></span><br><span class="line">    run_cfg(model_dir)</span><br><span class="line">  File <span class="string">"./int_ref_topology.py"</span>, line <span class="number">91</span>, <span class="keyword">in</span> run_cfg</span><br><span class="line">    net = mgr.setupAndStartNetwork()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/int_cfg.py"</span>, line <span class="number">140</span>, <span class="keyword">in</span> setupAndStartNetwork</span><br><span class="line">    <span class="keyword">self</span>.addSwitches()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/int_cfg.py"</span>, line <span class="number">177</span>, <span class="keyword">in</span> addSwitches</span><br><span class="line">    pps = s.pps, qdepth = s.qdepth )</span><br><span class="line">  File <span class="string">"/usr/lib/python2.7/dist-packages/mininet/net.py"</span>, line <span class="number">240</span>, <span class="keyword">in</span> addSwitch</span><br><span class="line">    sw = cls( name, **defaults )</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/docker/p4model.py"</span>, line <span class="number">55</span>, <span class="keyword">in</span> __init_<span class="number">_</span></span><br><span class="line">    DockerSwitch.__init_<span class="number">_</span>( <span class="keyword">self</span>, name, **kwargs )</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/docker/docker_node.py"</span>, line <span class="number">30</span>, <span class="keyword">in</span> __init_<span class="number">_</span></span><br><span class="line">    Node.__init_<span class="number">_</span>( <span class="keyword">self</span>, name, **kwargs )</span><br><span class="line">  File <span class="string">"/usr/lib/python2.7/dist-packages/mininet/node.py"</span>, line <span class="number">106</span>, <span class="keyword">in</span> __init_<span class="number">_</span></span><br><span class="line">    <span class="keyword">self</span>.startShell()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/docker/docker_node.py"</span>, line <span class="number">119</span>, <span class="keyword">in</span> startShell</span><br><span class="line">    <span class="keyword">self</span>.pid = int(ps_out[<span class="number">0</span>])</span><br><span class="line"><span class="symbol">ValueError:</span> invalid literal <span class="keyword">for</span> int() with base <span class="number">10</span>: <span class="string">"'21431'\n"</span></span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4factory/mininet</span>$</span><br></pre></td></tr></table></figure>
+<p>ps_out 的结果 <code>[&quot;&#39;22326&#39;\n&quot;]</code>，因此 L119 应改为：</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.pid = <span class="keyword">int</span>((ps_out[<span class="number">0</span>].<span class="keyword">strip</span>()).<span class="keyword">strip</span>(<span class="string">'\''</span>))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a href="http://www.runoob.com/python/att-string-strip.html" target="_blank" rel="noopener">链接</a>：Python strip() 方法用于移除字符串头尾指定的字符（默认为空格）。</p>
+</blockquote>
+<h4 id="解决-docker-内-bmv2-无法运行的问题"><a href="#解决-docker-内-bmv2-无法运行的问题" class="headerlink" title="解决 docker 内 bmv2 无法运行的问题"></a>解决 docker 内 bmv2 无法运行的问题</h4><p>非必需。</p>
+<p>原因：ubuntu 16.04 默认 gcc 版为 5.4.0，而 bmv2 docker ubuntu 版本为 14.04，其默认 gcc 为 4.8。因此升级 docker 中的 ubuntu 版本为 16.04</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4factory/mininet$ sudo ./int_ref_topology.py <span class="attribute">--model-dir</span>=<span class="variable">$P4HOME</span>/install               </span><br><span class="line">Adding switch spine1</span><br><span class="line">Adding switch spine2</span><br><span class="line">Adding switch leaf1</span><br><span class="line">Adding switch leaf2</span><br><span class="line"></span><br><span class="line">Waiting 10 seconds <span class="keyword">for</span> switches <span class="keyword">to</span> intialize<span class="built_in">..</span>.</span><br><span class="line">INT<span class="built_in"> Config </span> spine1</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"./int_ref_topology.py"</span>, line 131, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    run_cfg(model_dir)</span><br><span class="line">  File <span class="string">"./int_ref_topology.py"</span>, line 91, <span class="keyword">in</span> run_cfg</span><br><span class="line">    net = mgr.setupAndStartNetwork()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/int_cfg.py"</span>, line 147, <span class="keyword">in</span> setupAndStartNetwork</span><br><span class="line">    self.configSwitches()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/int_cfg.py"</span>, line 237, <span class="keyword">in</span> configSwitches</span><br><span class="line">    self.configSwitch(s)</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/mininet/int_cfg.py"</span>, line 251, <span class="keyword">in</span> configSwitch</span><br><span class="line">    client.switcht_api_init( device )</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/submodules/switch/switchapi/switch_api_thrift/switch_api_rpc.py"</span>, line 1565, <span class="keyword">in</span> switcht_api_init</span><br><span class="line">    return self.recv_switcht_api_init()</span><br><span class="line">  File <span class="string">"/home/sunyongfeng/workshop/p4factory/submodules/switch/switchapi/switch_api_thrift/switch_api_rpc.py"</span>, line 1577, <span class="keyword">in</span> recv_switcht_api_init</span><br><span class="line">    (fname, mtype, rseqid) = iprot.readMessageBegin()</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/thrift/protocol/TBinaryProtocol.py"</span>, line 134, <span class="keyword">in</span> readMessageBegin</span><br><span class="line">    sz = self.readI32()</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/thrift/protocol/TBinaryProtocol.py"</span>, line 217, <span class="keyword">in</span> readI32</span><br><span class="line">    buff = self.trans.readAll(4)</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/thrift/transport/TTransport.py"</span>, line 60, <span class="keyword">in</span> readAll</span><br><span class="line">    chunk = self.read(sz - have)</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/thrift/transport/TTransport.py"</span>, line 161, <span class="keyword">in</span> read</span><br><span class="line">    self.__rbuf = BufferIO(self.__trans.read(max(sz, self.__rbuf_size)))</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/thrift/transport/TSocket.py"</span>, line 117, <span class="keyword">in</span> read</span><br><span class="line">    buff = self.handle.recv(sz)</span><br><span class="line">socket.error: [Errno 104]<span class="built_in"> Connection </span>reset by peer</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4factory/mininet$</span><br></pre></td></tr></table></figure>
+<p>根本原因为工具链问题，gcc 版本不一致。</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~<span class="regexp">/workshop/p</span>4factory/mininet$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                               NAMES</span><br><span class="line"><span class="number">50</span>b20ec98aac        p4dockerswitch_bmv2   <span class="string">"/bin/sh -c /bin/bash"</span>   <span class="number">47</span> seconds ago      Up <span class="number">45</span> seconds       <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">26001</span>-&gt;<span class="number">9091</span>/tcp, <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">27001</span>-&gt;<span class="number">10001</span>/tcp   leaf2</span><br><span class="line">d04a024c559e        p4dockerswitch_bmv2   <span class="string">"/bin/sh -c /bin/bash"</span>   <span class="number">48</span> seconds ago      Up <span class="number">46</span> seconds       <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">26000</span>-&gt;<span class="number">9091</span>/tcp, <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">27000</span>-&gt;<span class="number">10001</span>/tcp   leaf1</span><br><span class="line"><span class="number">4678</span>cbfe6b2b        p4dockerswitch_bmv2   <span class="string">"/bin/sh -c /bin/bash"</span>   <span class="number">49</span> seconds ago      Up <span class="number">47</span> seconds       <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">26003</span>-&gt;<span class="number">9091</span>/tcp, <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">27003</span>-&gt;<span class="number">10001</span>/tcp   spine2</span><br><span class="line"><span class="number">701</span>da5748dc9        p4dockerswitch_bmv2   <span class="string">"/bin/sh -c /bin/bash"</span>   <span class="number">50</span> seconds ago      Up <span class="number">48</span> seconds       <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">26002</span>-&gt;<span class="number">9091</span>/tcp, <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">27002</span>-&gt;<span class="number">10001</span>/tcp   spine1</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~<span class="regexp">/workshop/p</span>4factory/mininet$ docker attach <span class="number">701</span>da5748dc9</span><br><span class="line">bin      dev   <span class="class"><span class="keyword">lib</span>    <span class="title">mnt</span>                   <span class="title">nnpy</span>       <span class="title">proc</span>  <span class="title">sbin</span>  <span class="title">third</span>-<span class="title">party</span>          <span class="title">tmp</span></span></span><br><span class="line">boot     etc   lib64  nanomsg-<span class="number">1.0</span>.<span class="number">0</span>         opt        root  srv   thrift-<span class="number">0.9</span>.<span class="number">2</span>         usr</span><br><span class="line">configs  home  media  nanomsg-<span class="number">1.0</span>.<span class="number">0</span>.tar.gz  p4factory  run   sys   thrift-<span class="number">0.9</span>.<span class="number">2</span>.tar.gz  var</span><br><span class="line">bmv2_driver.log  bmv2_model.log  start.sh</span><br><span class="line"><span class="symbol">cat:</span> /tmp/<span class="symbol">dmvdr:</span> No such file or directory</span><br><span class="line">bin      dev   <span class="class"><span class="keyword">lib</span>    <span class="title">mnt</span>                   <span class="title">nnpy</span>       <span class="title">proc</span>  <span class="title">sbin</span>  <span class="title">third</span>-<span class="title">party</span>          <span class="title">tmp</span></span></span><br><span class="line">boot     etc   lib64  nanomsg-<span class="number">1.0</span>.<span class="number">0</span>         opt        root  srv   thrift-<span class="number">0.9</span>.<span class="number">2</span>         usr</span><br><span class="line">configs  home  media  nanomsg-<span class="number">1.0</span>.<span class="number">0</span>.tar.gz  p4factory  run   sys   thrift-<span class="number">0.9</span>.<span class="number">2</span>.tar.gz  var</span><br><span class="line">bmv2_driver.log  bmv2_model.log  start.sh</span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.20' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">bmpd</span>/<span class="title">switch</span>/<span class="title">libpd</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">CXXABI_1</span>.3.8' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">bmpd</span>/<span class="title">switch</span>/<span class="title">libpd</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">bmpd</span>/<span class="title">switch</span>/<span class="title">libpd</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">bmpd</span>/<span class="title">switch</span>/<span class="title">libpdthrift</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">libbmpdfixed</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">libbmpdfixedthrift</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">libruntimestubs</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">bmswitchp4_drivers:</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">x86_64</span>-<span class="title">linux</span>-<span class="title">gnu</span>/<span class="title">libstdc</span>++.<span class="title">so</span>.6: <span class="title">version</span> `<span class="title">GLIBCXX_3</span>.4.21' <span class="title">not</span> <span class="title">found</span> (<span class="title">required</span> <span class="title">by</span> /<span class="title">home</span>/<span class="title">sunyongfeng</span>/<span class="title">workshop</span>/<span class="title">p4</span>/<span class="title">install</span>/<span class="title">lib</span>/<span class="title">libsimpleswitch_thrift</span>.<span class="title">so</span>.0)</span></span><br><span class="line">/home/sunyongfeng/workshop/p4/install/bin/<span class="symbol">simple_switch:</span> error <span class="keyword">while</span> loading shared <span class="symbol">libraries:</span> libboost_system.so.<span class="number">1.58</span>.<span class="number">0</span>: cannot open shared object <span class="symbol">file:</span> No such file or directory</span><br></pre></td></tr></table></figure>
+<p>更新后的 Dockerfile patch:</p>
+<figure class="highlight patch"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/docker/Dockerfile b/docker/Dockerfile</span><br><span class="line">old mode 100644</span><br><span class="line">new mode 100755</span><br><span class="line">index 42c87af..e9003fc</span><br><span class="line"><span class="comment">--- a/docker/Dockerfile</span></span><br><span class="line"><span class="comment">+++ b/docker/Dockerfile</span></span><br><span class="line"><span class="meta">@@ -1,4 +1,4 @@</span></span><br><span class="line"><span class="deletion">-FROM      ubuntu:14.04</span></span><br><span class="line"><span class="addition">+FROM      ubuntu:16.04</span></span><br><span class="line"> MAINTAINER Antonin Bas &lt;antonin@barefootnetworks.com&gt;</span><br><span class="line"> </span><br><span class="line"> RUN apt-get update</span><br><span class="line">@@ -41,7 +41,6 @@ RUN apt-get install -y \</span><br><span class="line">     redis-server \</span><br><span class="line">     redis-tools \</span><br><span class="line">     subversion \</span><br><span class="line"><span class="deletion">-    tshark \</span></span><br><span class="line">     xterm</span><br><span class="line"> </span><br><span class="line"> RUN pip install tenjin</span><br><span class="line">@@ -84,7 +83,7 @@ RUN mkdir -p /tmp/install_tmp ; \</span><br><span class="line">     wget -c http://archive.apache.org/dist/thrift/0.9.2/thrift-0.9.2.tar.gz ; \</span><br><span class="line">     tar zxvf thrift-0.9.2.tar.gz ; \</span><br><span class="line">     cd thrift-0.9.2 ; \</span><br><span class="line"><span class="deletion">-    ./configure --with-cpp=yes --with-c_glib=no --with-java=no --with-ruby=no --with-erlang=no --with-go=no --with-nodejs=no ; \</span></span><br><span class="line"><span class="addition">+    ./configure ; \</span></span><br><span class="line">     make -j4 ; \</span><br><span class="line">     make install ; \</span><br><span class="line">     ldconfig ; \</span><br></pre></td></tr></table></figure>
+<h4 id="DockerFile-解决-tshark-卡在-yes-no"><a href="#DockerFile-解决-tshark-卡在-yes-no" class="headerlink" title="DockerFile 解决 tshark 卡在 yes/no"></a>DockerFile 解决 tshark 卡在 yes/no</h4><p>DockerFile 的改造，tshark 无法直接配置通过，卡在 yes/no。详见上一小节 Dockerfile，先不安装 tshark，等 bmv2 docker image 打好后，再进去安装、重新 commit docker image。</p>
+<h4 id="在-docker-内使用-simple-switch-CLI"><a href="#在-docker-内使用-simple-switch-CLI" class="headerlink" title="在 docker 内使用 simple_switch_CLI"></a>在 docker 内使用 simple_switch_CLI</h4><p>非必需，仅用于确认表项是否正常下发。</p>
+<p>leaf/spine docker 内无法使用 simple_switch_CLI：</p>
+<ul>
+<li>改 Dockerfile 的 thrift 配置为默认配置，不简化 docker 内的 thrift</li>
+<li>在 docker 内通过 pip 安装 thrift，<code>pip install --upgrade thrift</code></li>
+<li>通过命令访问 simple_switch_CLI，<code>/home/sunyongfeng/workshop/p4/install/bin/simple_switch_CLI --json /home/sunyongfeng/workshop/p4/install/share/bmpd/switch/switch.json --thrift-port 10001</code></li>
+</ul>
+<p>没有安装好 thrift 的问题：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@leaf1:/home/sunyongfeng<span class="comment"># /home/sunyongfeng/workshop/p4/install/bin/simple_switch_CLI</span></span><br><span class="line">Traceback (most recent <span class="keyword">call</span> <span class="keyword">last</span>):</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/p4/install/bin/simple_switch_CLI"</span>, line <span class="number">30</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">import</span> sswitch_CLI</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/p4/install/lib/python2.7/site-packages/sswitch_CLI.py"</span>, line <span class="number">23</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">import</span> runtime_CLI</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/p4/install/lib/python2.7/site-packages/runtime_CLI.py"</span>, line <span class="number">30</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">import</span> bmpy_utils <span class="keyword">as</span> utils</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/p4/install/lib/python2.7/site-packages/bmpy_utils.py"</span>, line <span class="number">30</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">from</span> thrift.protocol <span class="keyword">import</span> TMultiplexedProtocol</span><br><span class="line">ImportError: cannot <span class="keyword">import</span> <span class="keyword">name</span> TMultiplexedProtocol</span><br></pre></td></tr></table></figure>
+<p>一开始不知道 simple_switch thrift 开放的端口是多少，通过 netstat -anp 确认为 10001。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">root@leaf1:/<span class="comment"># /home/sunyongfeng/workshop/p4/install/bin/simple_switch_CLI --json /home/sunyongfeng/workshop/p4/install/share/bmpd/switch/switch.json </span></span><br><span class="line">Error when requesting config md5 sum from switch</span><br><span class="line">root@leaf1:/<span class="comment"># netstat -anp                                                  </span></span><br><span class="line">Active Internet connections (servers and established)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>0.0.0.0:9090            0.0.0.0:*               LISTEN      81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>0.0.0.0:9091            0.0.0.0:*               LISTEN      81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>0.0.0.0:9092            0.0.0.0:*               LISTEN      81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:2601          0.0.0.0:*               LISTEN      114/zebra       </span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:2605          0.0.0.0:*               LISTEN      118/bgpd        </span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>0.0.0.0:10001           0.0.0.0:*               LISTEN      67/simple_switch</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>0.0.0.0:179             0.0.0.0:*               LISTEN      118/bgpd        </span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:10001         127.0.0.1:40983         ESTABLISHED 67/simple_switch</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:40984         127.0.0.1:10001         ESTABLISHED 81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:10001         127.0.0.1:40985         ESTABLISHED 67/simple_switch</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:10001         127.0.0.1:40984         ESTABLISHED 67/simple_switch</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:40983         127.0.0.1:10001         ESTABLISHED 81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:9090          127.0.0.1:46833         TIME_WAIT   -               </span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:40985         127.0.0.1:10001         ESTABLISHED 81/bmswitchp4_drive</span><br><span class="line">tcp       <span class="number"> 0 </span>    <span class="number"> 0 </span>127.0.0.1:9090          127.0.0.1:46829         TIME_WAIT   -               </span><br><span class="line">tcp6      <span class="number"> 0 </span>    <span class="number"> 0 </span>:::179                  :::*                    LISTEN      118/bgpd        </span><br><span class="line">raw6      <span class="number"> 0 </span>    <span class="number"> 0 </span>:::58                   :::*                   <span class="number"> 7 </span>          114/zebra       </span><br><span class="line">Active UNIX domain sockets (servers and established)</span><br><span class="line">Proto RefCnt Flags       Type       State         I-Node   PID/Program name    Path</span><br><span class="line">unix <span class="number"> 2 </span>     [ ACC ]     STREAM     LISTENING    <span class="number"> 576586 </span>  118/bgpd            /var/run/quagga/bgpd.vty</span><br><span class="line">unix <span class="number"> 2 </span>     [ ACC ]     STREAM     LISTENING    <span class="number"> 575606 </span>  114/zebra           /var/run/quagga/zserv.api</span><br><span class="line">unix <span class="number"> 2 </span>     [ ACC ]     STREAM     LISTENING    <span class="number"> 575609 </span>  114/zebra           /var/run/quagga/zebra.vty</span><br><span class="line">unix <span class="number"> 2 </span>     [ ACC ]     STREAM     LISTENING    <span class="number"> 574079 </span>  67/simple_switch    /tmp/bmv2-0-notifications.ipc</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 574211 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575248 </span>  67/simple_switch    </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 576590 </span>  118/bgpd            </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 574212 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 574218 </span>  67/simple_switch    /tmp/bmv2-0-notifications.ipc</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575295 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575841 </span>  123/watchquagga     </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575271 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 576591 </span>  114/zebra           /var/run/quagga/zserv.api</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 576807 </span>  118/bgpd            /var/run/quagga/bgpd.vty</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 578621 </span>  114/zebra           /var/run/quagga/zebra.vty</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575296 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 576589 </span>  114/zebra           /var/run/quagga/zserv.api</span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 576588 </span>  118/bgpd            </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 575247 </span>  67/simple_switch    </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 574344 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 574345 </span>  81/bmswitchp4_drive </span><br><span class="line">unix <span class="number"> 3 </span>     [ ]         STREAM     CONNECTED    <span class="number"> 578620 </span>  123/watchquagga     </span><br><span class="line">root@leaf1:/<span class="comment"># /home/sunyongfeng/workshop/p4/install/bin/simple_switch_CLI --json /home/sunyongfeng/workshop/p4/install/share/bmpd/switch/switch.json --thrift-port 10001</span></span><br><span class="line">Control utility for runtime P4 table manipulation</span><br><span class="line">RuntimeCmd:</span><br></pre></td></tr></table></figure>
+<p>查看 <code>ipv4_fib</code> 和 <code>ipv4_fib_lpm</code> 表，确认表项安装 OK。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br></pre></td><td class="code"><pre><span class="line">RuntimeCmd: show_tables</span><br><span class="line">acl_stats                      [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">adjust_lkp_fields              [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1)]</span><br><span class="line">bd_flood                       [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), l2_metadata.lkp_pkt_type(exact, 3)]</span><br><span class="line">compute_ipv4_hashes            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.drop_flag(exact, 1)]</span><br><span class="line">compute_ipv6_hashes            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.drop_flag(exact, 1)]</span><br><span class="line">compute_non_ip_hashes          [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.drop_flag(exact, 1)]</span><br><span class="line">compute_other_hashes           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=hash_metadata.hash1(exact, 16)]</span><br><span class="line">dmac                           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), l2_metadata.lkp_mac_da(exact, 48)]</span><br><span class="line">drop_stats                     [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">ecmp_group                     [<span class="attribute">implementation</span>=ecmp_action_profile, <span class="attribute">mk</span>=l3_metadata.nexthop_index(exact, 16)]</span><br><span class="line">egress_bd_map                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=egress_metadata.bd(exact, 16)]</span><br><span class="line">egress_bd_stats                [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=egress_metadata.bd(exact, 16),  l2_metadata.lkp_pkt_type(exact, 3)]</span><br><span class="line">egress_filter                  [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">egress_filter_drop             [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">egress_ip_acl                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.egress_if_label(ternary, 16),      acl_metadata.egress_bd_label(ternary, 16),      ipv4.srcAddr(ternary, 32),   ipv4.dstAddr(ternary, 32),      ipv4.protocol(ternary, 8),      acl_metadata.egress_src_port_range_id(exact, 8),        acl_metadata.egress_dst_port_range_id(exact, 8)]</span><br><span class="line">egress_ipv6_acl                [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.egress_if_label(ternary, 16),      acl_metadata.egress_bd_label(ternary, 16),      ipv6.srcAddr(ternary, 128),  ipv6.dstAddr(ternary, 128),     ipv6.nextHdr(ternary, 8),       acl_metadata.egress_src_port_range_id(exact, 8),        acl_metadata.egress_dst_port_range_id(exact, 8)]</span><br><span class="line">egress_l4_dst_port             [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.egress_l4_dport(range, 16)]</span><br><span class="line">egress_l4_src_port             [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.egress_l4_sport(range, 16)]</span><br><span class="line">egress_l4port_fields           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tcp_valid(valid, 1),    udp_valid(valid, 1),    icmp_valid(valid, 1)]</span><br><span class="line">egress_mac_acl                 [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.egress_if_label(ternary, 16),      acl_metadata.egress_bd_label(ternary, 16),      ethernet.srcAddr(ternary, 48),       ethernet.dstAddr(ternary, 48),  ethernet.etherType(ternary, 16)]</span><br><span class="line">egress_nat                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=nat_metadata.nat_rewrite_index(exact, 14)]</span><br><span class="line">egress_port_mapping            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=standard_metadata.egress_port(exact, 9)]</span><br><span class="line">egress_qos_map                 [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=qos_metadata.egress_qos_group(ternary, 5),      qos_metadata.lkp_tc(ternary, 8)]</span><br><span class="line">egress_system_acl              [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=fabric_metadata.reason_code(ternary, 16),       standard_metadata.egress_port(ternary, 9),      intrinsic_metadata.deflection_flag(ternary, 1),      l3_metadata.l3_mtu_check(ternary, 16),  acl_metadata.acl_deny(ternary, 1)]</span><br><span class="line">egress_vlan_xlate              [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=egress_metadata.ifindex(exact, 16),     egress_metadata.bd(exact, 16)]</span><br><span class="line">egress_vni                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=egress_metadata.bd(exact, 16),  tunnel_metadata.egress_tunnel_type(exact, 5)]</span><br><span class="line">fabric_ingress_dst_lkp         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=fabric_header.dstDevice(exact, 8)]</span><br><span class="line">fabric_ingress_src_lkp         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=fabric_header_multicast.ingressIfindex(exact, 16)]</span><br><span class="line">fabric_lag                     [<span class="attribute">implementation</span>=fabric_lag_action_profile, <span class="attribute">mk</span>=fabric_metadata.dst_device(exact, 8)]</span><br><span class="line">fwd_result                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l2_metadata.l2_redirect(ternary, 1),    acl_metadata.acl_redirect(ternary, 1),  acl_metadata.racl_redirect(ternary, 1),      l3_metadata.rmac_hit(ternary, 1),       l3_metadata.fib_hit(ternary, 1),        nat_metadata.nat_hit(ternary, 1),       l2_metadata.lkp_pkt_type(ternary, 3),        l3_metadata.lkp_ip_type(ternary, 2),    multicast_metadata.igmp_snooping_enabled(ternary, 1),   multicast_metadata.mld_snooping_enabled(ternary, 1),multicast_metadata.mcast_route_hit(ternary, 1),  multicast_metadata.mcast_bridge_hit(ternary, 1),        multicast_metadata.mcast_rpf_group(ternary, 16),        multicast_metadata.mcast_mode(ternary, 2)]</span><br><span class="line">ingress_bd_stats               [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">ingress_l4_dst_port            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.lkp_l4_dport(range, 16)]</span><br><span class="line">ingress_l4_src_port            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.lkp_l4_sport(range, 16)]</span><br><span class="line">ingress_port_mapping           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=standard_metadata.ingress_port(exact, 9)]</span><br><span class="line">ingress_port_properties        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=standard_metadata.ingress_port(exact, 9)]</span><br><span class="line">ingress_qos_map_dscp           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=qos_metadata.ingress_qos_group(ternary, 5),     l3_metadata.lkp_dscp(ternary, 8)]</span><br><span class="line">ingress_qos_map_pcp            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=qos_metadata.ingress_qos_group(ternary, 5),     l2_metadata.lkp_pcp(ternary, 3)]</span><br><span class="line">int_bos                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header.total_hop_cnt(ternary, 8),   int_header.instruction_mask_0003(ternary, 4),   int_header.instruction_mask_0407(ternary, 4),        int_header.instruction_mask_0811(ternary, 4),   int_header.instruction_mask_1215(ternary, 4)]</span><br><span class="line">int_insert                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_metadata_i2e.source(ternary, 1),    int_metadata_i2e.sink(ternary, 1),      int_header_valid(valid, 1)]</span><br><span class="line">int_inst_0003                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header.instruction_mask_0003(exact, 4)]</span><br><span class="line">int_inst_0407                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header.instruction_mask_0407(exact, 4)]</span><br><span class="line">int_inst_0811                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header.instruction_mask_0811(exact, 4)]</span><br><span class="line">int_inst_1215                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header.instruction_mask_1215(exact, 4)]</span><br><span class="line">int_meta_header_update         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_metadata.insert_cnt(ternary, 8)]</span><br><span class="line">int_outer_encap                [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   vxlan_gpe_valid(valid, 1),      int_metadata_i2e.source(exact, 1),      tunnel_metadata.egress_tunnel_type(ternary, 5)]</span><br><span class="line">int_sink_update_outer          [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=vxlan_gpe_int_header_valid(valid, 1),   ipv4_valid(valid, 1),   int_metadata_i2e.sink(exact, 1)]</span><br><span class="line">int_source                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header_valid(valid, 1),     ipv4_valid(valid, 1),   ipv4_metadata.lkp_ipv4_da(ternary, 32), ipv4_metadata.lkp_ipv4_sa(ternary, 32),      inner_ipv4_valid(valid, 1),     inner_ipv4.dstAddr(ternary, 32),        inner_ipv4.srcAddr(ternary, 32)]</span><br><span class="line">int_terminate                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=int_header_valid(valid, 1),     vxlan_gpe_int_header_valid(valid, 1),   ipv4_valid(valid, 1),   ipv4_metadata.lkp_ipv4_da(ternary, 32),      inner_ipv4_valid(valid, 1),     inner_ipv4.dstAddr(ternary, 32)]</span><br><span class="line">ip_acl                         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.if_label(ternary, 16),     acl_metadata.bd_label(ternary, 16),     ipv4_metadata.lkp_ipv4_sa(ternary, 32),      ipv4_metadata.lkp_ipv4_da(ternary, 32), l3_metadata.lkp_ip_proto(ternary, 8),   acl_metadata.ingress_src_port_range_id(exact, 8),       acl_metadata.ingress_dst_port_range_id(exact, 8),    tcp.flags(ternary, 8),  l3_metadata.lkp_ip_ttl(ternary, 8)]</span><br><span class="line">ipsg                           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.ifindex(exact, 16),    ingress_metadata.bd(exact, 16), l2_metadata.lkp_mac_sa(exact, 48),  ipv4_metadata.lkp_ipv4_sa(exact, 32)]</span><br><span class="line">ipsg_permit_special            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.lkp_ip_proto(ternary, 8),   l3_metadata.lkp_l4_dport(ternary, 16),  ipv4_metadata.lkp_ipv4_da(ternary, 32)]</span><br><span class="line">ipv4_dest_vtep                 [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4.dstAddr(exact, 32),        tunnel_metadata.ingress_tunnel_type(exact, 5)]</span><br><span class="line">ipv4_fib                       [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_da(exact, 32)]</span><br><span class="line">ipv4_fib_lpm                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_da(lpm, 32)]</span><br><span class="line">ipv4_multicast_bridge          [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), ipv4_metadata.lkp_ipv4_sa(exact, 32),   ipv4_metadata.lkp_ipv4_da(exact, 32)]</span><br><span class="line">ipv4_multicast_bridge_star_g   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), ipv4_metadata.lkp_ipv4_da(exact, 32)]</span><br><span class="line">ipv4_multicast_route           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_sa(exact, 32),   ipv4_metadata.lkp_ipv4_da(exact, 32)]</span><br><span class="line">ipv4_multicast_route_star_g    [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_da(exact, 32)]</span><br><span class="line">ipv4_racl                      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.bd_label(ternary, 16),     ipv4_metadata.lkp_ipv4_sa(ternary, 32), ipv4_metadata.lkp_ipv4_da(ternary, 32),      l3_metadata.lkp_ip_proto(ternary, 8),   acl_metadata.ingress_src_port_range_id(exact, 8),       acl_metadata.ingress_dst_port_range_id(exact, 8)]</span><br><span class="line">ipv4_src_vtep                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4.srcAddr(exact, 32),        tunnel_metadata.ingress_tunnel_type(exact, 5)]</span><br><span class="line">ipv4_urpf                      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_sa(exact, 32)]</span><br><span class="line">ipv4_urpf_lpm                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_sa(lpm, 32)]</span><br><span class="line">ipv6_acl                       [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.if_label(ternary, 16),     acl_metadata.bd_label(ternary, 16),     ipv6_metadata.lkp_ipv6_sa(ternary, 128),     ipv6_metadata.lkp_ipv6_da(ternary, 128),        l3_metadata.lkp_ip_proto(ternary, 8),   acl_metadata.ingress_src_port_range_id(exact, 8),       acl_metadata.ingress_dst_port_range_id(exact, 8),    tcp.flags(ternary, 8),  l3_metadata.lkp_ip_ttl(ternary, 8)]</span><br><span class="line">ipv6_dest_vtep                 [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6.dstAddr(exact, 128),       tunnel_metadata.ingress_tunnel_type(exact, 5)]</span><br><span class="line">ipv6_fib                       [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_da(exact, 128)]</span><br><span class="line">ipv6_fib_lpm                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_da(lpm, 128)]</span><br><span class="line">ipv6_multicast_bridge          [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), ipv6_metadata.lkp_ipv6_sa(exact, 128),  ipv6_metadata.lkp_ipv6_da(exact, 128)]</span><br><span class="line">ipv6_multicast_bridge_star_g   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), ipv6_metadata.lkp_ipv6_da(exact, 128)]</span><br><span class="line">ipv6_multicast_route           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_sa(exact, 128),  ipv6_metadata.lkp_ipv6_da(exact, 128)]</span><br><span class="line">ipv6_multicast_route_star_g    [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_da(exact, 128)]</span><br><span class="line">ipv6_racl                      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.bd_label(ternary, 16),     ipv6_metadata.lkp_ipv6_sa(ternary, 128),        ipv6_metadata.lkp_ipv6_da(ternary, 128),     l3_metadata.lkp_ip_proto(ternary, 8),   acl_metadata.ingress_src_port_range_id(exact, 8),       acl_metadata.ingress_dst_port_range_id(exact, 8)]</span><br><span class="line">ipv6_src_vtep                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6.srcAddr(exact, 128),       tunnel_metadata.ingress_tunnel_type(exact, 5)]</span><br><span class="line">ipv6_urpf                      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_sa(exact, 128)]</span><br><span class="line">ipv6_urpf_lpm                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv6_metadata.lkp_ipv6_sa(lpm, 128)]</span><br><span class="line">l3_rewrite                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1),   mpls[0]_valid(valid, 1),        ipv4.dstAddr(ternary, 32),  ipv6.dstAddr(ternary, 128)]</span><br><span class="line">lag_group                      [<span class="attribute">implementation</span>=lag_action_profile, <span class="attribute">mk</span>=ingress_metadata.egress_ifindex(exact, 16)]</span><br><span class="line">learn_notify                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l2_metadata.l2_src_miss(ternary, 1),    l2_metadata.l2_src_move(ternary, 16),   l2_metadata.stp_state(ternary, 3)]</span><br><span class="line">mac_acl                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.if_label(ternary, 16),     acl_metadata.bd_label(ternary, 16),     l2_metadata.lkp_mac_sa(ternary, 48), l2_metadata.lkp_mac_da(ternary, 48),    l2_metadata.lkp_mac_type(ternary, 16)]</span><br><span class="line">meter_action                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=meter_metadata.packet_color(exact, 2),  meter_metadata.meter_index(exact, 16)]</span><br><span class="line">meter_index                    [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=meter_metadata.meter_index(exact, 16)]</span><br><span class="line">mirror                         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=i2e_metadata.mirror_session_id(exact, 16)]</span><br><span class="line">mpls                           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.mpls_label(exact, 20),  inner_ipv4_valid(valid, 1),     inner_ipv6_valid(valid, 1)]</span><br><span class="line">mtu                            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.mtu_index(exact, 8),        ipv4_valid(valid, 1),   ipv6_valid(valid, 1)]</span><br><span class="line">nat_dst                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_da(exact, 32),   l3_metadata.lkp_ip_proto(exact, 8), l3_metadata.lkp_l4_dport(exact, 16)]</span><br><span class="line">nat_flow                       [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(ternary, 16),   ipv4_metadata.lkp_ipv4_sa(ternary, 32), ipv4_metadata.lkp_ipv4_da(ternary, 32),      l3_metadata.lkp_ip_proto(ternary, 8),   l3_metadata.lkp_l4_sport(ternary, 16),  l3_metadata.lkp_l4_dport(ternary, 16)]</span><br><span class="line">nat_src                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_sa(exact, 32),   l3_metadata.lkp_ip_proto(exact, 8), l3_metadata.lkp_l4_sport(exact, 16)]</span><br><span class="line">nat_twice                      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.vrf(exact, 16),     ipv4_metadata.lkp_ipv4_sa(exact, 32),   ipv4_metadata.lkp_ipv4_da(exact, 32)l3_metadata.lkp_ip_proto(exact, 8),      l3_metadata.lkp_l4_sport(exact, 16),    l3_metadata.lkp_l4_dport(exact, 16)]</span><br><span class="line">native_packet_over_fabric      [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1)]</span><br><span class="line">nexthop                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.nexthop_index(exact, 16)]</span><br><span class="line">outer_ipv4_multicast           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=multicast_metadata.ipv4_mcast_key_type(exact, 1),       multicast_metadata.ipv4_mcast_key(exact, 16),   ipv4.srcAddr(exact, 32),     ipv4.dstAddr(exact, 32)]</span><br><span class="line">outer_ipv4_multicast_star_g    [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=multicast_metadata.ipv4_mcast_key_type(exact, 1),       multicast_metadata.ipv4_mcast_key(exact, 16),   ipv4.dstAddr(ternary, 32)]</span><br><span class="line">outer_ipv6_multicast           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=multicast_metadata.ipv6_mcast_key_type(exact, 1),       multicast_metadata.ipv6_mcast_key(exact, 16),   ipv6.srcAddr(exact, 128),    ipv6.dstAddr(exact, 128)]</span><br><span class="line">outer_ipv6_multicast_star_g    [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=multicast_metadata.ipv6_mcast_key_type(exact, 1),       multicast_metadata.ipv6_mcast_key(exact, 16),   ipv6.dstAddr(ternary, 128)]</span><br><span class="line">outer_rmac                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.rmac_group(exact, 10),      ethernet.dstAddr(exact, 48)]</span><br><span class="line">port_vlan_mapping              [<span class="attribute">implementation</span>=bd_action_profile, <span class="attribute">mk</span>=ingress_metadata.ifindex(exact, 16),       vlan_tag_[0]_valid(valid, 1),   vlan_tag_[0].vid(exact, 12), vlan_tag_[1]_valid(valid, 1),   vlan_tag_[1].vid(exact, 12)]</span><br><span class="line">replica_type                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=multicast_metadata.replica(exact, 1),   egress_metadata.same_bd_check(ternary, 16)]</span><br><span class="line">rewrite                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.nexthop_index(exact, 16)]</span><br><span class="line">rewrite_multicast              [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1),   ipv4.dstAddr(ternary, 32),      ipv6.dstAddr(ternary, 128)]</span><br><span class="line">rid                            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=intrinsic_metadata.egress_rid(exact, 16)]</span><br><span class="line">rmac                           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.rmac_group(exact, 10),      l2_metadata.lkp_mac_da(exact, 48)]</span><br><span class="line">sflow_ing_take_sample          [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.sflow_take_sample(ternary, 32),        sflow_metadata.sflow_session_id(exact, 16)]</span><br><span class="line">sflow_ingress                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.ifindex(ternary, 16),  ipv4_metadata.lkp_ipv4_sa(ternary, 32), ipv4_metadata.lkp_ipv4_da(ternary, 32),      sflow_valid(valid, 1)]</span><br><span class="line">smac                           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.bd(exact, 16), l2_metadata.lkp_mac_sa(exact, 48)]</span><br><span class="line">smac_rewrite                   [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=egress_metadata.smac_idx(exact, 9)]</span><br><span class="line">spanning_tree                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ingress_metadata.ifindex(exact, 16),    l2_metadata.stp_group(exact, 10)]</span><br><span class="line">storm_control                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=standard_metadata.ingress_port(exact, 9),       l2_metadata.lkp_pkt_type(ternary, 3)]</span><br><span class="line">storm_control_stats            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=meter_metadata.packet_color(exact, 2),  standard_metadata.ingress_port(exact, 9)]</span><br><span class="line">switch_config_params           [<span class="attribute">implementation</span>=None, mk=]</span><br><span class="line">system_acl                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=acl_metadata.if_label(ternary, 16),     acl_metadata.bd_label(ternary, 16),     ingress_metadata.ifindex(ternary, 16),       l2_metadata.lkp_mac_type(ternary, 16),  l2_metadata.port_vlan_mapping_miss(ternary, 1), security_metadata.ipsg_check_fail(ternary, 1),  acl_metadata.acl_deny(ternary, 1),   acl_metadata.racl_deny(ternary, 1),     l3_metadata.urpf_check_fail(ternary, 1),        ingress_metadata.drop_flag(ternary, 1), l3_metadata.l3_copy(ternary, 1),     l3_metadata.rmac_hit(ternary, 1),       l3_metadata.routed(ternary, 1), ipv6_metadata.ipv6_src_is_link_local(ternary, 1),       l2_metadata.same_if_check(ternary, 16),      tunnel_metadata.tunnel_if_check(ternary, 1),    l3_metadata.same_bd_check(ternary, 16), l3_metadata.lkp_ip_ttl(ternary, 8),     l2_metadata.stp_state(ternary, 3),   ingress_metadata.control_frame(ternary, 1),     ipv4_metadata.ipv4_unicast_enabled(ternary, 1), ipv6_metadata.ipv6_unicast_enabled(ternary, 1),      ingress_metadata.egress_ifindex(ternary, 16),   fabric_metadata.reason_code(ternary, 16)]</span><br><span class="line">traffic_class                  [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=qos_metadata.tc_qos_group(ternary, 5),  qos_metadata.lkp_tc(ternary, 8)]</span><br><span class="line">tunnel                         [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_vni(exact, 24),  tunnel_metadata.ingress_tunnel_type(exact, 5),  inner_ipv4_valid(valid, 1),  inner_ipv6_valid(valid, 1)]</span><br><span class="line">tunnel_decap_process_inner     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=inner_tcp_valid(valid, 1),      inner_udp_valid(valid, 1),      inner_icmp_valid(valid, 1)]</span><br><span class="line">tunnel_decap_process_outer     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.ingress_tunnel_type(exact, 5),  inner_ipv4_valid(valid, 1),     inner_ipv6_valid(valid, 1)]</span><br><span class="line">tunnel_dmac_rewrite            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_dmac_index(exact, 14)]</span><br><span class="line">tunnel_dst_rewrite             [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_dst_index(exact, 14)]</span><br><span class="line">tunnel_encap_process_inner     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1),   tcp_valid(valid, 1),    udp_valid(valid, 1),    icmp_valid(valid, 1)]</span><br><span class="line">tunnel_encap_process_outer     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.egress_tunnel_type(exact, 5),   tunnel_metadata.egress_header_count(exact, 4),  multicast_metadata.replica(exact, 1)]</span><br><span class="line">tunnel_lookup_miss             [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4_valid(valid, 1),   ipv6_valid(valid, 1)]</span><br><span class="line">tunnel_mtu                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_index(exact, 14)]</span><br><span class="line">tunnel_rewrite                 [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_index(exact, 14)]</span><br><span class="line">tunnel_smac_rewrite            [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_smac_index(exact, 9)]</span><br><span class="line">tunnel_src_rewrite             [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=tunnel_metadata.tunnel_src_index(exact, 9)]</span><br><span class="line">urpf_bd                        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l3_metadata.urpf_bd_group(exact, 16),   ingress_metadata.bd(exact, 16)]</span><br><span class="line">validate_mpls_packet           [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=mpls[0].label(ternary, 20),     mpls[0].bos(ternary, 1),        mpls[0]_valid(valid, 1),        mpls[1].label(ternary, 20),  mpls[1].bos(ternary, 1),        mpls[1]_valid(valid, 1),        mpls[2].label(ternary, 20),     mpls[2].bos(ternary, 1),        mpls[2]_valid(valid, 1)]</span><br><span class="line">validate_outer_ethernet        [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ethernet.srcAddr(ternary, 48),  ethernet.dstAddr(ternary, 48),  vlan_tag_[0]_valid(valid, 1),   vlan_tag_[1]_valid(valid, 1)]</span><br><span class="line">validate_outer_ipv4_packet     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv4.version(ternary, 4),       ipv4.ttl(ternary, 8),   ipv4.srcAddr(ternary, 32)]</span><br><span class="line">validate_outer_ipv6_packet     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=ipv6.version(ternary, 4),       ipv6.hopLimit(ternary, 8),      ipv6.srcAddr(ternary, 128)]</span><br><span class="line">validate_packet                [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=l2_metadata.lkp_mac_sa(ternary, 48),    l2_metadata.lkp_mac_da(ternary, 48),    l3_metadata.lkp_ip_type(ternary, 2), l3_metadata.lkp_ip_ttl(ternary, 8),     l3_metadata.lkp_ip_version(ternary, 4), ipv4_metadata.lkp_ipv4_sa(ternary, 32), ipv6_metadata.lkp_ipv6_sa(ternary, 128)]</span><br><span class="line">vlan_decap                     [<span class="attribute">implementation</span>=None, <span class="attribute">mk</span>=vlan_tag_[0]_valid(valid, 1),   vlan_tag_[1]_valid(valid, 1)]</span><br><span class="line">RuntimeCmd: table_dump ipv4_fib</span><br><span class="line">==========</span><br><span class="line">TABLE ENTRIES</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x0</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     00000000</span><br><span class="line">Action entry: fib_hit_nexthop - 06</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x1</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a000164</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x2</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a000264</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x3</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a010b01</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x4</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a010c01</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x1000005</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a000202</span><br><span class="line">Action entry: fib_hit_nexthop - 07</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x3000006</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a010c02</span><br><span class="line">Action entry: fib_hit_nexthop - 08</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x7</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: EXACT     0a000101</span><br><span class="line">Action entry: fib_hit_nexthop - 09</span><br><span class="line">==========</span><br><span class="line">Dumping<span class="built_in"> default </span>entry</span><br><span class="line">Action entry: on_miss - </span><br><span class="line">==========</span><br><span class="line">RuntimeCmd: table_dump ipv4_fib_lpm</span><br><span class="line">==========</span><br><span class="line">TABLE ENTRIES</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x0</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       7f000000/8</span><br><span class="line">Action entry: fib_hit_nexthop - 05</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x1</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       00000000/0</span><br><span class="line">Action entry: fib_hit_nexthop - 06</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x2</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       0a000164/24</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x3</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       0a000264/24</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x4</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       0a010b01/24</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">**********</span><br><span class="line">Dumping entry 0x5</span><br><span class="line">Match key:</span><br><span class="line">* l3_metadata.vrf          : EXACT     0001</span><br><span class="line">* ipv4_metadata.lkp_ipv4_da: LPM       0a010c01/24</span><br><span class="line">Action entry: fib_hit_nexthop - 03</span><br><span class="line">==========</span><br><span class="line">Dumping<span class="built_in"> default </span>entry</span><br><span class="line">Action entry: on_miss - </span><br><span class="line">==========</span><br><span class="line">RuntimeCmd: </span><br><span class="line">root@leaf1:/#</span><br></pre></td></tr></table></figure>
+<h3 id="解决-mininet-起来后-host-间无法互-Ping"><a href="#解决-mininet-起来后-host-间无法互-Ping" class="headerlink" title="解决 mininet 起来后 host 间无法互 Ping"></a>解决 mininet 起来后 host 间无法互 Ping</h3><p>原因：docker 的物理端口配置问题，实际拓扑使用 leaf1-eth1，但是配置却配到 swp1。</p>
+<p>详见 <a href="https://github.com/p4lang/p4factory/issues/194" target="_blank" rel="noopener">p4factory issue 194</a></p>
+<p>patch 如下：</p>
+<figure class="highlight patch"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/mininet/configs/leaf1/l3_int_ref_topo/startup_config.sh b/mininet/configs/leaf1/l3_int_ref_topo/startup_config.sh</span><br><span class="line">index 6432a4c..5d34e05 100755</span><br><span class="line"><span class="comment">--- a/mininet/configs/leaf1/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="comment">+++ b/mininet/configs/leaf1/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="meta">@@ -2,15 +2,15 @@</span></span><br><span class="line"> </span><br><span class="line"> stty -echo; set +m</span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip link set dev swp1 address 00:01:00:00:00:01</span></span><br><span class="line"><span class="deletion">-ip link set dev swp2 address 00:01:00:00:00:02</span></span><br><span class="line"><span class="deletion">-ip link set dev swp3 address 00:01:00:00:00:03</span></span><br><span class="line"><span class="deletion">-ip link set dev swp4 address 00:01:00:00:00:04</span></span><br><span class="line"><span class="addition">+ip link set dev leaf1-eth1 address 00:01:00:00:00:01</span></span><br><span class="line"><span class="addition">+ip link set dev leaf1-eth2 address 00:01:00:00:00:02</span></span><br><span class="line"><span class="addition">+ip link set dev leaf1-eth3 address 00:01:00:00:00:03</span></span><br><span class="line"><span class="addition">+ip link set dev leaf1-eth4 address 00:01:00:00:00:04</span></span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip address add 10.0.1.100/24 broadcast + dev swp1</span></span><br><span class="line"><span class="deletion">-ip address add 10.0.2.100/24 broadcast + dev swp2</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.11.1/24 broadcast + dev swp3</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.12.1/24 broadcast + dev swp4</span></span><br><span class="line"><span class="addition">+ip address add 10.0.1.100/24 broadcast + dev leaf1-eth1</span></span><br><span class="line"><span class="addition">+ip address add 10.0.2.100/24 broadcast + dev leaf1-eth2</span></span><br><span class="line"><span class="addition">+ip address add 10.1.11.1/24 broadcast + dev leaf1-eth3</span></span><br><span class="line"><span class="addition">+ip address add 10.1.12.1/24 broadcast + dev leaf1-eth4</span></span><br><span class="line"> </span><br><span class="line"> cp /configs/quagga/* /etc/quagga/</span><br><span class="line"> chown quagga.quagga /etc/quagga/*</span><br><span class="line">diff --git a/mininet/configs/leaf2/l3_int_ref_topo/startup_config.sh b/mininet/configs/leaf2/l3_int_ref_topo/startup_config.sh</span><br><span class="line">index 0a5637f..7562c72 100755</span><br><span class="line"><span class="comment">--- a/mininet/configs/leaf2/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="comment">+++ b/mininet/configs/leaf2/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="meta">@@ -2,15 +2,15 @@</span></span><br><span class="line"> </span><br><span class="line"> stty -echo; set +m</span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip link set dev swp1 address 00:02:00:00:00:01</span></span><br><span class="line"><span class="deletion">-ip link set dev swp2 address 00:02:00:00:00:02</span></span><br><span class="line"><span class="deletion">-ip link set dev swp3 address 00:02:00:00:00:03</span></span><br><span class="line"><span class="deletion">-ip link set dev swp4 address 00:02:00:00:00:04</span></span><br><span class="line"><span class="addition">+ip link set dev leaf2-eth1 address 00:02:00:00:00:01</span></span><br><span class="line"><span class="addition">+ip link set dev leaf2-eth2 address 00:02:00:00:00:02</span></span><br><span class="line"><span class="addition">+ip link set dev leaf2-eth3 address 00:02:00:00:00:03</span></span><br><span class="line"><span class="addition">+ip link set dev leaf2-eth4 address 00:02:00:00:00:04</span></span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip address add 10.0.3.100/24 broadcast + dev swp1</span></span><br><span class="line"><span class="deletion">-ip address add 10.0.4.100/24 broadcast + dev swp2</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.21.1/24 broadcast + dev swp3</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.22.1/24 broadcast + dev swp4</span></span><br><span class="line"><span class="addition">+ip address add 10.0.3.100/24 broadcast + dev leaf2-eth1</span></span><br><span class="line"><span class="addition">+ip address add 10.0.4.100/24 broadcast + dev leaf2-eth2</span></span><br><span class="line"><span class="addition">+ip address add 10.1.21.1/24 broadcast + dev leaf2-eth3</span></span><br><span class="line"><span class="addition">+ip address add 10.1.22.1/24 broadcast + dev leaf2-eth4</span></span><br><span class="line"> </span><br><span class="line"> cp /configs/quagga/* /etc/quagga/</span><br><span class="line"> chown quagga.quagga /etc/quagga/*</span><br><span class="line">diff --git a/mininet/configs/spine1/l3_int_ref_topo/startup_config.sh b/mininet/configs/spine1/l3_int_ref_topo/startup_config.sh</span><br><span class="line">index f2ecfc0..33f4878 100755</span><br><span class="line"><span class="comment">--- a/mininet/configs/spine1/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="comment">+++ b/mininet/configs/spine1/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="meta">@@ -2,11 +2,11 @@</span></span><br><span class="line"> </span><br><span class="line"> stty -echo; set +m</span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip link set dev swp1 address 00:03:00:00:00:01</span></span><br><span class="line"><span class="deletion">-ip link set dev swp2 address 00:03:00:00:00:02</span></span><br><span class="line"><span class="addition">+ip link set dev spine1-eth1 address 00:03:00:00:00:01</span></span><br><span class="line"><span class="addition">+ip link set dev spine1-eth2 address 00:03:00:00:00:02</span></span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip address add 10.1.11.2/24 broadcast + dev swp1</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.21.2/24 broadcast + dev swp2</span></span><br><span class="line"><span class="addition">+ip address add 10.1.11.2/24 broadcast + dev spine1-eth1</span></span><br><span class="line"><span class="addition">+ip address add 10.1.21.2/24 broadcast + dev spine2-eth2</span></span><br><span class="line"> </span><br><span class="line"> cp /configs/quagga/* /etc/quagga/</span><br><span class="line"> chown quagga.quagga /etc/quagga/*</span><br><span class="line">diff --git a/mininet/configs/spine2/l3_int_ref_topo/startup_config.sh b/mininet/configs/spine2/l3_int_ref_topo/startup_config.sh</span><br><span class="line">index 7a28663..be95656 100755</span><br><span class="line"><span class="comment">--- a/mininet/configs/spine2/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="comment">+++ b/mininet/configs/spine2/l3_int_ref_topo/startup_config.sh</span></span><br><span class="line"><span class="meta">@@ -2,11 +2,11 @@</span></span><br><span class="line"> </span><br><span class="line"> stty -echo; set +m</span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip link set dev swp1 address 00:04:00:00:00:01</span></span><br><span class="line"><span class="deletion">-ip link set dev swp2 address 00:04:00:00:00:02</span></span><br><span class="line"><span class="addition">+ip link set dev spine2-eth1 address 00:04:00:00:00:01</span></span><br><span class="line"><span class="addition">+ip link set dev spine2-eth2 address 00:04:00:00:00:02</span></span><br><span class="line"> </span><br><span class="line"><span class="deletion">-ip address add 10.1.12.2/24 broadcast + dev swp1</span></span><br><span class="line"><span class="deletion">-ip address add 10.1.22.2/24 broadcast + dev swp2</span></span><br><span class="line"><span class="addition">+ip address add 10.1.12.2/24 broadcast + dev spine2-eth1</span></span><br><span class="line"><span class="addition">+ip address add 10.1.22.2/24 broadcast + dev spine2-eth2</span></span><br><span class="line"> </span><br><span class="line"> cp /configs/quagga/* /etc/quagga/</span><br><span class="line"> chown quagga.quagga /etc/quagga/*</span><br></pre></td></tr></table></figure>
+<h3 id="iperf-提示拒绝连接"><a href="#iperf-提示拒绝连接" class="headerlink" title="iperf 提示拒绝连接"></a>iperf 提示拒绝连接</h3><p>非必需，仅出现过一次，默认每个 host 的 iperf server 都会启动。<br>h3 iperf 似乎默认没有启动。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> root  ~  workshop  p4factory  mininet  iperf -c 10.2.1.3 -t 60</span><br><span class="line">connect failed:<span class="built_in"> Connection </span>refused</span><br></pre></td></tr></table></figure>
+<p>在 h3 中启动：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> root  ~  workshop  p4factory  mininet  iperf -s</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">Server listening on TCP<span class="built_in"> port </span>5001</span><br><span class="line">TCP window size: 85.3 KByte (default)</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">[ 18] local 10.2.1.3<span class="built_in"> port </span>5001 connected with 10.2.1.1<span class="built_in"> port </span>45594</span><br></pre></td></tr></table></figure>
+<p>在 h1 中 运行 iperf 客户端：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> root  ~  workshop  p4factory  mininet  iperf -c 10.2.1.3 -t 6000000</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">Client connecting <span class="keyword">to</span> 10.2.1.3, TCP<span class="built_in"> port </span>5001</span><br><span class="line">TCP window size: 85.3 KByte (default)</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">[ 17] local 10.2.1.1<span class="built_in"> port </span>45594 connected with 10.2.1.3<span class="built_in"> port </span>5001</span><br><span class="line">^C[ ID] Interval       Transfer     Bandwidth</span><br><span class="line">[ 17]  0.0-639.1 sec   341 MBytes  4.47 Mbits/sec</span><br></pre></td></tr></table></figure>
+<h3 id="monitor-网页无法显示正在运行的流"><a href="#monitor-网页无法显示正在运行的流" class="headerlink" title="monitor 网页无法显示正在运行的流"></a>monitor 网页无法显示正在运行的流</h3><p>目前在 h1 iperf h3 的时候，可以通过在 leaf1 中 <code>tshark -i leaf1-eth1</code> 确认输入报文，<code>tshark -i leaf1-eth4</code> 确认输出报文。<br>可看到报文是 vxlan-gpe 封装（UDP port 4790），但是目前 monitor client 网页上还无法看到 INT 汇总会的图表以及正在运行的流。</p>
+<ul>
+<li>问题原因：bridge 过滤掉 UDP 报文，具体为哪条过滤表项目前还未细究。</li>
+</ul>
+<blockquote>
+<p>Okay. The solution to this lies in the quirks of how linux bridges get filtered. Essentially, you need to go in disable all the filters so that the UDP packets can get through. Details here: <a href="https://wiki.linuxfoundation.org/networking/bridge" target="_blank" rel="noopener">https://wiki.linuxfoundation.org/networking/bridge</a></p>
+</blockquote>
+<ul>
+<li>解决方法：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">cd</span> /proc/sys/net/bridge</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">for</span> f <span class="keyword">in</span> bridge-nf-*; <span class="keyword">do</span> <span class="built_in">echo</span> 0 &gt; <span class="variable">$f</span>; <span class="keyword">done</span></span></span><br></pre></td></tr></table></figure>
+<p>详见 p4-dev 邮件列表，<a href="http://lists.p4.org/pipermail/p4-dev_lists.p4.org/2017-May/001061.html" target="_blank" rel="noopener">INT demo issue - Bad UDP checksum for packets headed    to monitor</a>。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/p4/" rel="tag"># p4</a>
+          
+            <a href="/tags/int/" rel="tag"># int</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/linux/startup_with_old_kernel.html" rel="next" title="ubuntu 用回旧版内核">
+                <i class="fa fa-chevron-left"></i> ubuntu 用回旧版内核
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/linux/docker_failed_after_update_kernel.html" rel="prev" title="Linux升级内核后 docker 不可用">
+                Linux升级内核后 docker 不可用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#运行环境"><span class="nav-number">1.</span> <span class="nav-text">运行环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#步骤"><span class="nav-number">2.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行成功图示"><span class="nav-number">3.</span> <span class="nav-text">运行成功图示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题解决记录"><span class="nav-number">4.</span> <span class="nav-text">问题解决记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内核版本切换为-3-19"><span class="nav-number">4.1.</span> <span class="nav-text">内核版本切换为 3.19</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决-Linux-内核到-3-19-后，docker-无法运行"><span class="nav-number">4.2.</span> <span class="nav-text">解决 Linux 内核到 3.19 后，docker 无法运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决-int-ref-topology-py-失败问题"><span class="nav-number">4.3.</span> <span class="nav-text">解决 int_ref_topology.py 失败问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#docker-node-py-运行失败"><span class="nav-number">4.3.1.</span> <span class="nav-text">docker_node.py 运行失败</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决-docker-内-bmv2-无法运行的问题"><span class="nav-number">4.3.2.</span> <span class="nav-text">解决 docker 内 bmv2 无法运行的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DockerFile-解决-tshark-卡在-yes-no"><span class="nav-number">4.3.3.</span> <span class="nav-text">DockerFile 解决 tshark 卡在 yes/no</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在-docker-内使用-simple-switch-CLI"><span class="nav-number">4.3.4.</span> <span class="nav-text">在 docker 内使用 simple_switch_CLI</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决-mininet-起来后-host-间无法互-Ping"><span class="nav-number">4.4.</span> <span class="nav-text">解决 mininet 起来后 host 间无法互 Ping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iperf-提示拒绝连接"><span class="nav-number">4.5.</span> <span class="nav-text">iperf 提示拒绝连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#monitor-网页无法显示正在运行的流"><span class="nav-number">4.6.</span> <span class="nav-text">monitor 网页无法显示正在运行的流</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/networks/p4/demo_int.html";
+    this.page.identifier = "201704/networks/p4/demo_int.html";
+    this.page.title = '跑通 p4factory app int';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

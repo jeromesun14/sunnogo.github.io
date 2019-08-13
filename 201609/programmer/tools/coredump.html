@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="linux core 文件配置与如何进行调试使用。">
+<meta name="keywords" content="linux,c,gcc,coredump,gdb,异常退出,进程,调试,core,crashed,路径,文件名,配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Coredump文件简易指南">
+<meta property="og:url" content="http://sunyongfeng.com/201609/programmer/tools/coredump.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="linux core 文件配置与如何进行调试使用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.084Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Coredump文件简易指南">
+<meta name="twitter:description" content="linux core 文件配置与如何进行调试使用。">
+  <link rel="canonical" href="http://sunyongfeng.com/201609/programmer/tools/coredump">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Coredump文件简易指南 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201609/programmer/tools/coredump.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Coredump文件简易指南
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-09-14 22:22:14" itemprop="dateCreated datePublished" datetime="2016-09-14T22:22:14+08:00">2016-09-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201609/programmer/tools/coredump.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201609/programmer/tools/coredump.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">linux core 文件配置与如何进行调试使用。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="coredump简介"><a href="#coredump简介" class="headerlink" title="coredump简介"></a>coredump简介</h2><p>通常情况下，coredump（亦称为core文件）文件包含程序运行时的内存信息，含寄存器状态、堆栈指针、内存管理信息、操作系统flags及其他信息，可以理解为把程序工作的当前状态存储成一个文件。Coredump文件通常于程序异常终止（crashed）时自动生成，常用于辅助分析和解决bug，可通过 coredump 文件进行栈回溯和反汇编。</p>
+<p>Coredump文件在不同的操作系统上文件类型不一，在目前的Unix-like操作系统中，使用ELF类型保存coredump文件，如下所示。目前常见阅读coredump文件的工具有BFD（GNU Binutils Binary File Descriptor library），以及使用这个库的GDB（GNU Debugger）和objdump。下文使用GDB阅读coredump文件。<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rj<span class="variable">@rj</span><span class="symbol">:~/test/coredump</span><span class="variable">$ </span>file core-cd_test-<span class="number">1359224646</span></span><br><span class="line">core-cd_test-<span class="number">1359224646</span>: ELF <span class="number">32</span>-bit LSB core file Intel <span class="number">80386</span>, version <span class="number">1</span> (SYSV), SVR4-style, from <span class="string">'./cd_test'</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="产生原因"><a href="#产生原因" class="headerlink" title="产生原因"></a>产生原因</h2><p>产生coredump文件的原因有很多，主要为低级bug中的内存访问越界、使用空指针、堆栈溢出等。用coredump文件来查找此类bug效率极高。</p>
+<h2 id="coredump相关系统设置"><a href="#coredump相关系统设置" class="headerlink" title="coredump相关系统设置"></a>coredump相关系统设置</h2><p>以Ubuntu 12.04为例。</p>
+<h3 id="系统是否允许产生coredump文件"><a href="#系统是否允许产生coredump文件" class="headerlink" title="系统是否允许产生coredump文件"></a>系统是否允许产生coredump文件</h3><p>Coredump也是类似消息队列，属于系统资源。使用“ulimit –a”查看系统资源限制，如图1所示。对于coredump文件，使用“ulimit -c”查看其限制，如果为0，表示系统不会产生coredump文件。</p>
+<p>Ubuntu系统可查看/etc/security/limits.conf查看系统资源限制相关的单位。如下所示，可在这进行长久的设置，因其他系统资源项也是平时我们需要注意的，因此在此把整个limits.conf文件copy过来。可用“ulimit -c your-size”进行临时设置，不过重启后无效。<br><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sunnogo@R04220:~$ uname -a</span><br><span class="line">Linux R04220 <span class="number">4.4</span><span class="number">.0</span><span class="number">-36</span>-generic #<span class="number">55</span>-Ubuntu SMP Thu Aug <span class="number">11</span> <span class="number">18</span>:<span class="number">01</span>:<span class="number">55</span> UTC <span class="number">2016</span> x86_64 x86_64 x86_64 GNU/Linux</span><br><span class="line">sunnogo@R04220:~$ ulimit -a</span><br><span class="line">core <span class="keyword">file</span> <span class="keyword">size</span>          (blocks, -c) <span class="number">0</span></span><br><span class="line">data seg <span class="keyword">size</span>           (kbytes, -d) unlimited</span><br><span class="line">scheduling priority             (-e) <span class="number">0</span></span><br><span class="line"><span class="keyword">file</span> <span class="keyword">size</span>               (blocks, -f) unlimited</span><br><span class="line">pending signals                 (-i) <span class="number">15232</span></span><br><span class="line"><span class="keyword">max</span> locked <span class="keyword">memory</span>       (kbytes, -l) <span class="number">64</span></span><br><span class="line"><span class="keyword">max</span> <span class="keyword">memory</span> <span class="keyword">size</span>         (kbytes, -m) unlimited</span><br><span class="line">open files                      (-n) <span class="number">1024</span></span><br><span class="line">pipe <span class="keyword">size</span>            (<span class="number">512</span> bytes, -p) <span class="number">8</span></span><br><span class="line">POSIX message queues     (bytes, -q) <span class="number">819200</span></span><br><span class="line">real-time priority              (-r) <span class="number">0</span></span><br><span class="line">stack <span class="keyword">size</span>              (kbytes, -s) <span class="number">8192</span></span><br><span class="line">cpu time               (seconds, -t) unlimited</span><br><span class="line"><span class="keyword">max</span> user processes              (-u) <span class="number">15232</span></span><br><span class="line">virtual <span class="keyword">memory</span>          (kbytes, -v) unlimited</span><br><span class="line"><span class="keyword">file</span> locks                      (-x) unlimited</span><br></pre></td></tr></table></figure></p>
+<p>配置文件limits.conf：<br><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">sunnogo@R04220:~$ cat /etc/security/limits.conf</span><br><span class="line"><span class="meta"># /etc/security/limits.conf</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#Each line describes a limit for a user in the form:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#&lt;domain&gt;        &lt;type&gt;  &lt;item&gt;  &lt;value&gt;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#Where:</span></span><br><span class="line"><span class="meta">#&lt;domain&gt; can be:</span></span><br><span class="line"><span class="meta">#        - a user name</span></span><br><span class="line"><span class="meta">#        - a group name, with @group syntax</span></span><br><span class="line"><span class="meta">#        - the wildcard *, for default entry</span></span><br><span class="line"><span class="meta">#        - the wildcard %, can be also used with %group syntax,</span></span><br><span class="line"><span class="meta">#                 for maxlogin limit</span></span><br><span class="line"><span class="meta">#        - NOTE: group and wildcard limits are not applied to root.</span></span><br><span class="line"><span class="meta">#          To apply a limit to the root user, &lt;domain&gt; must be</span></span><br><span class="line"><span class="meta">#          the literal username root.</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#&lt;type&gt; can have the two values:</span></span><br><span class="line"><span class="meta">#        - "soft" for enforcing the soft limits</span></span><br><span class="line"><span class="meta">#        - "hard" for enforcing hard limits</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#&lt;item&gt; can be one of the following:</span></span><br><span class="line"><span class="meta">#        - core - limits the core file size (KB)</span></span><br><span class="line"><span class="meta">#        - data - max data size (KB)</span></span><br><span class="line"><span class="meta">#        - fsize - maximum filesize (KB)</span></span><br><span class="line"><span class="meta">#        - memlock - max locked-in-memory address space (KB)</span></span><br><span class="line"><span class="meta">#        - nofile - max number of open files</span></span><br><span class="line"><span class="meta">#        - rss - max resident set size (KB)</span></span><br><span class="line"><span class="meta">#        - stack - max stack size (KB)</span></span><br><span class="line"><span class="meta">#        - cpu - max CPU time (MIN)</span></span><br><span class="line"><span class="meta">#        - nproc - max number of processes</span></span><br><span class="line"><span class="meta">#        - as - address space limit (KB)</span></span><br><span class="line"><span class="meta">#        - maxlogins - max number of logins for this user</span></span><br><span class="line"><span class="meta">#        - maxsyslogins - max number of logins on the system</span></span><br><span class="line"><span class="meta">#        - priority - the priority to run user process with</span></span><br><span class="line"><span class="meta">#        - locks - max number of file locks the user can hold</span></span><br><span class="line"><span class="meta">#        - sigpending - max number of pending signals</span></span><br><span class="line"><span class="meta">#        - msgqueue - max memory used by POSIX message queues (bytes)</span></span><br><span class="line"><span class="meta">#        - nice - max nice priority allowed to raise to values: [-20, 19]</span></span><br><span class="line"><span class="meta">#        - rtprio - max realtime priority</span></span><br><span class="line"><span class="meta">#        - chroot - change root to directory (Debian-specific)</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#&lt;domain&gt;      &lt;type&gt;  &lt;item&gt;         &lt;value&gt;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#*               soft    core            0</span></span><br><span class="line"><span class="meta">#root            hard    core            100000</span></span><br><span class="line"><span class="meta">#*               hard    rss             10000</span></span><br><span class="line"><span class="meta">#@student        hard    nproc           20</span></span><br><span class="line"><span class="meta">#@faculty        soft    nproc           20</span></span><br><span class="line"><span class="meta">#@faculty        hard    nproc           50</span></span><br><span class="line"><span class="meta">#ftp             hard    nproc           0</span></span><br><span class="line"><span class="meta">#ftp             -       chroot          /ftp</span></span><br><span class="line"><span class="meta">#@student        -       maxlogins       4</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># End of file</span></span><br><span class="line">sunnogo@R04220:~$</span><br></pre></td></tr></table></figure></p>
+<h3 id="coredump文件的保存路径和文件名格式"><a href="#coredump文件的保存路径和文件名格式" class="headerlink" title="coredump文件的保存路径和文件名格式"></a>coredump文件的保存路径和文件名格式</h3><p>本节内容完全来自<a href="http://www.ms2006.com/archives/151" target="_blank" rel="noopener">这里</a>。</p>
+<p>查看正在使用的core文件路径和格式【more /proc/sys/kernel/core_pattern】。自动添加pid的配置是在【more /proc/sys/kernel/core_uses_pid】里面配置的，如果为1就是自动添加。</p>
+<p>修改/etc/sysctl.conf文件【vi /etc/sysctl.conf】，添加需要保存的路径【kernel.core_pattern = /tmp/corefile/core.%e.%t】，需要注意的是该路径必须应用有写的权限，不然core文件是不会生成的。再执行命令【sysctl -p】即可生效。关于core_users_pid默认在sysctl文件里面已经存在，不需要更改，pid还是很重要的信息。</p>
+<p>附上core文件支持的格式列表：<br><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%p</span> – <span class="keyword">insert</span> pid <span class="keyword">into</span> filename 【pid】</span><br><span class="line"><span class="meta">%u</span> – <span class="keyword">insert</span> current uid <span class="keyword">into</span> filename 【uid】</span><br><span class="line"><span class="meta">%g</span> – <span class="keyword">insert</span> current gid <span class="keyword">into</span> filename 【gid】</span><br><span class="line"><span class="meta">%s</span> – <span class="keyword">insert</span> signal that caused the coredump <span class="keyword">into</span> the filename 【core信号】</span><br><span class="line"><span class="meta">%t</span> – <span class="keyword">insert</span> UNIX time that the coredump occurred <span class="keyword">into</span> filename 【core文件生成时的unix时间】</span><br><span class="line"><span class="meta">%h</span> – <span class="keyword">insert</span> hostname <span class="keyword">where</span> the coredump happened <span class="keyword">into</span> filename 【主机名】</span><br><span class="line"><span class="meta">%e</span> – <span class="keyword">insert</span> coredumping executable<span class="built_in"> name</span> <span class="keyword">into</span> filename 【应用的名字】</span><br></pre></td></tr></table></figure></p>
+<p>可自己写个除0或者访问NULL指针的程序来验证coredump设置OK。</p>
+<h2 id="如何“阅读”coredump文件"><a href="#如何“阅读”coredump文件" class="headerlink" title="如何“阅读”coredump文件"></a>如何“阅读”coredump文件</h2><p>这章是这个指南的核心所在。编译时的Gcc选项会影响coredump文件，目前知道的有“-g”选项（用于调试，能够在gdb中看到所有的symbol，即函数、变量等）和“-fomit-frame-pointer”（用于优化栈顶指针，将不会保留ebp的信息）。</p>
+<p>【Tips】gdb命令也可用tab键补全。</p>
+<p>以如下程序为例：<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">cd_test.c</span>：</span><br><span class="line"></span><br><span class="line"><span class="symbol">static</span> int g_t1<span class="comment">;</span></span><br><span class="line"><span class="symbol">static</span> int g_t2 = <span class="number">2</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line"><span class="symbol">int</span> div(int div_i, int div_j)</span><br><span class="line">&#123;</span><br><span class="line">    int <span class="built_in">a4</span>, <span class="keyword">b4;</span></span><br><span class="line"><span class="keyword"> </span>   char *<span class="built_in">c4</span><span class="comment">;</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">a4</span> = div_i + <span class="number">3</span><span class="comment">;</span></span><br><span class="line">    <span class="keyword">b4 </span>= div_j + <span class="number">3</span><span class="comment">;</span></span><br><span class="line">    <span class="built_in">c4</span> = <span class="string">"divf"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    return (div_i / div_j)<span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="symbol">int</span> <span class="keyword">sub(int </span><span class="keyword">sub_i, </span>int <span class="keyword">sub_j)</span></span><br><span class="line"><span class="keyword">&#123;</span></span><br><span class="line"><span class="keyword"> </span>   int <span class="built_in">a3</span>, <span class="keyword">b3;</span></span><br><span class="line"><span class="keyword"> </span>   char *<span class="built_in">c3</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">a3</span> = <span class="keyword">sub_i </span>+ <span class="number">2</span><span class="comment">;</span></span><br><span class="line">    <span class="keyword">b3 </span>= <span class="keyword">sub_j </span>+ <span class="number">2</span><span class="comment">;</span></span><br><span class="line">    <span class="built_in">c3</span> = <span class="string">"subf"</span><span class="comment">;</span></span><br><span class="line">    div(<span class="built_in">a3</span>, <span class="number">0</span>)<span class="comment">;    // 这里通过除0让程序运行时挂掉</span></span><br><span class="line"></span><br><span class="line">    return (<span class="keyword">sub_i </span>- <span class="keyword">sub_j);</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">int </span><span class="keyword">add(int </span><span class="keyword">add_i, </span>int <span class="keyword">add_j)</span></span><br><span class="line"><span class="keyword">&#123;</span></span><br><span class="line"><span class="keyword"> </span>   int <span class="built_in">a2</span>, <span class="keyword">b2;</span></span><br><span class="line"><span class="keyword"> </span>   char *<span class="built_in">c2</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">a2</span> = <span class="keyword">add_i </span>+ <span class="number">1</span><span class="comment">;</span></span><br><span class="line">    <span class="keyword">b2 </span>= <span class="keyword">add_j </span>+ <span class="number">1</span><span class="comment">;</span></span><br><span class="line">    <span class="built_in">c2</span> = <span class="string">"addf"</span><span class="comment">;</span></span><br><span class="line">    <span class="keyword">sub(a2, </span><span class="keyword">b2);</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword"> </span>   return (<span class="keyword">add_i </span>+ <span class="keyword">add_j);</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">int </span>main(int argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    int <span class="built_in">a1</span>, <span class="keyword">b1;</span></span><br><span class="line"><span class="keyword"> </span>   char *<span class="built_in">c1</span><span class="comment">;</span></span><br><span class="line">    static int u1<span class="comment">;</span></span><br><span class="line">    static int x1 = <span class="number">1</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">a1</span> = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">    <span class="keyword">b1 </span>= <span class="number">0</span><span class="comment">;</span></span><br><span class="line">    <span class="built_in">c1</span> = <span class="string">"main function"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">add(a1, </span><span class="keyword">b1);</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword"> </span>   return <span class="number">0</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译，执行。下文会涉及到三种gcc编译选项：默认的“gcc –g”，不带“-g”选项，“gcc -g -fomit-frame-pointer”。<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rj<span class="variable">@rj</span><span class="symbol">:~/test/coredump</span><span class="variable">$ </span>gcc -g -o cd_test cd_test.c</span><br><span class="line">rj<span class="variable">@rj</span><span class="symbol">:~/test/coredump</span><span class="variable">$ </span>./cd_test</span><br><span class="line">浮点数例外 (核心已转储)    提示产生coredump文件</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>运行gdb阅读core文件，命令为“gdb 程序 对应coredump文件”，这时就进入gdb的提示符“(gdb)”。</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">rj@rj:~/test/coredump$ gdb cd_test core-cd_test-<span class="number">1359266323</span></span><br><span class="line">GNU gdb (Ubuntu/Linaro <span class="number">7.4</span>-<span class="number">2012.04</span>-<span class="number">0</span>ubuntu2) <span class="number">7.4</span>-<span class="number">2012.04</span></span><br><span class="line">Copyright (C) <span class="number">2012</span> Free Software Foundation, Inc.</span><br><span class="line">License GPLv3+: GNU GPL version <span class="number">3</span> <span class="keyword">or</span> later &lt;http://gnu.org/licenses/gpl.html&gt;</span><br><span class="line">This <span class="keyword">is</span> free software: you are free <span class="keyword">to</span> change <span class="keyword">and</span> redistribute it.</span><br><span class="line">There <span class="keyword">is</span> NO WARRANTY, <span class="keyword">to</span> the extent permitted by law.  <span class="keyword">Type</span> <span class="string">"show copying"</span></span><br><span class="line"><span class="keyword">and</span> <span class="string">"show warranty"</span> <span class="keyword">for</span> details.</span><br><span class="line">This GDB was configured as <span class="string">"i686-linux-gnu"</span>.</span><br><span class="line"><span class="keyword">For</span> bug reporting instructions, please see:</span><br><span class="line">&lt;http://bugs.launchpad.net/gdb-linaro/&gt;...</span><br><span class="line">Reading symbols from /home/rj/test/coredump/cd_test...done.</span><br><span class="line">[<span class="keyword">New</span> LWP <span class="number">28375</span>]</span><br><span class="line"></span><br><span class="line"><span class="literal">warning</span>: Can<span class="symbol">'t</span> read pathname <span class="keyword">for</span> load <span class="keyword">map</span>: 输入/输出错误.</span><br><span class="line">Core was generated by `./cd_test'.</span><br><span class="line">Program terminated <span class="keyword">with</span> <span class="keyword">signal</span> <span class="number">8</span>, Arithmetic exception.</span><br><span class="line">#<span class="number">0</span>  <span class="number">0</span>x080483eb <span class="keyword">in</span> div (div_i=<span class="number">4</span>, div_j=<span class="number">0</span>) at cd_test.c:<span class="number">13</span></span><br><span class="line"><span class="number">13</span>          <span class="keyword">return</span> (div_i / div_j);</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行“backtrace”或其缩写“bt”进入栈回溯。如下所示，函数调用的顺序是从#n中数值高的往低的。比如这些是main()add()sub()div()，#0表示跑飞的地方。英文用frame表示一个调用层次，下文所说的各种信息对应某个指定frame。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  <span class="number">0</span>x080483eb <span class="keyword">in</span> <span class="selector-tag">div</span> (div_i=<span class="number">4</span>, div_j=<span class="number">0</span>) at cd_test<span class="selector-class">.c</span>:<span class="number">13</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0</span>x08048422 <span class="keyword">in</span> sub (sub_i=<span class="number">2</span>, sub_j=<span class="number">1</span>) at cd_test<span class="selector-class">.c</span>:<span class="number">24</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0</span>x08048461 <span class="keyword">in</span> add (add_i=<span class="number">1</span>, add_j=<span class="number">0</span>) at cd_test<span class="selector-class">.c</span>:<span class="number">37</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0</span>x08048498 <span class="keyword">in</span> main (argc=<span class="number">1</span>, argv=<span class="number">0</span>xbfba3264) at cd_test<span class="selector-class">.c</span>:<span class="number">53</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>若编译时没有-g选项，则结果是：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Core was generated by `./cd_test'.</span><br><span class="line">Program terminated with signal <span class="number">8</span>, Arithmetic exception.</span><br><span class="line">#<span class="number">0</span>  <span class="number">0x080483eb</span> in div ()</span><br><span class="line">(gdb) bt</span><br><span class="line">#<span class="number">0</span>  <span class="number">0x080483eb</span> in div ()    对比带-g选项的少了些什么？</span><br><span class="line">#<span class="number">1</span>  <span class="number">0x08048422</span> in sub ()</span><br><span class="line">#<span class="number">2</span>  <span class="number">0x08048461</span> in add ()</span><br><span class="line">#<span class="number">3</span>  <span class="number">0x08048498</span> in main ()</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>执行“frame n”进入对应调用层次。以frame 3为例。<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) frame <span class="number">3</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x08048498</span> <span class="keyword">in</span> main (argc=<span class="number">1</span>, argv=<span class="number">0xbfba3264</span>) <span class="meta">at</span> cd_test.c:<span class="number">53</span></span><br><span class="line"><span class="number">53</span>          <span class="keyword">add</span>(a1, b1)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>没带-g选项的：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) frame <span class="number">3</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0x08048498</span> in main ()    少了很多信息</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>执行“info frame”查看本层调用的栈信息<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info frame</span><br><span class="line">Stack level <span class="number">3</span>, frame <span class="meta">at</span> <span class="number">0xbfba31d0</span>:</span><br><span class="line"> <span class="built_in">eip</span> = <span class="number">0x8048498</span> <span class="keyword">in</span> main (cd_test.c:<span class="number">53</span>)<span class="comment">; saved eip 0xb75d24d3</span></span><br><span class="line"> caller of frame <span class="meta">at</span> <span class="number">0xbfba31b0</span></span><br><span class="line"> source language c.</span><br><span class="line"> Arglist <span class="meta">at</span> <span class="number">0xbfba31c8</span>, args: argc=<span class="number">1</span>, argv=<span class="number">0xbfba3264</span></span><br><span class="line"> Locals <span class="meta">at</span> <span class="number">0xbfba31c8</span>, Previous frame<span class="string">'s sp is 0xbfba31d0</span></span><br><span class="line"><span class="string"> Saved registers:</span></span><br><span class="line"><span class="string">  ebp at 0xbfba31c8, eip at 0xbfba31cc</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>带-fomit-frame-pointer选项：<br><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info frame</span><br><span class="line">Stack level <span class="number">3</span>, frame <span class="keyword">at</span> <span class="number">0</span>xbffa57c0:</span><br><span class="line"> eip = <span class="number">0</span>x80484af <span class="keyword">in</span> main (cd_test.c:<span class="number">53</span>); saved eip <span class="number">0</span>xb753d4d3</span><br><span class="line"> caller <span class="keyword">of</span> frame <span class="keyword">at</span> <span class="number">0</span>xbffa57a4</span><br><span class="line"> source language c.</span><br><span class="line"> Arglist <span class="keyword">at</span> unknown address.</span><br><span class="line"> Locals <span class="keyword">at</span> unknown address, Previous frame<span class="symbol">'s</span> sp <span class="keyword">is</span> <span class="number">0</span>xbffa57c0</span><br><span class="line"> Saved registers:</span><br><span class="line">  eip <span class="keyword">at</span> <span class="number">0</span>xbffa57bc    没有ebp</span><br></pre></td></tr></table></figure></p>
+<p>不带-g选项：<br><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info frame</span><br><span class="line">Stack level <span class="number">3</span>, frame <span class="keyword">at</span> <span class="number">0</span>xbfca4a90:</span><br><span class="line"> eip = <span class="number">0</span>x8048498 <span class="keyword">in</span> main; saved eip <span class="number">0</span>xb75e74d3</span><br><span class="line"> caller <span class="keyword">of</span> frame <span class="keyword">at</span> <span class="number">0</span>xbfca4a70</span><br><span class="line"> Arglist <span class="keyword">at</span> <span class="number">0</span>xbfca4a88, args:</span><br><span class="line"> Locals <span class="keyword">at</span> <span class="number">0</span>xbfca4a88, Previous frame<span class="symbol">'s</span> sp <span class="keyword">is</span> <span class="number">0</span>xbfca4a90</span><br><span class="line"> Saved registers:</span><br><span class="line">  ebp <span class="keyword">at</span> <span class="number">0</span>xbfca4a88, eip <span class="keyword">at</span> <span class="number">0</span>xbfca4a8c</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>使用“info args”查看参数信息<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info args</span><br><span class="line">argc = 1</span><br><span class="line">argv = 0xbfba3264</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>带-fomit-frame-pointer同上。<br>不带-g选项：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="builtin-name">info</span> args</span><br><span class="line"><span class="literal">No</span> symbol table <span class="builtin-name">info</span> available.</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>使用“info locals”查看所有局部变量信息<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info locals</span><br><span class="line">a1 = 1</span><br><span class="line">b1 = 0</span><br><span class="line">c1 = 0x804857f <span class="string">"main function"</span></span><br><span class="line">u1 = 0</span><br><span class="line">x1 = 1</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>带-fomit-frame-pointer同上。<br>不带-g选项依旧是“No symbol table info available”。</p>
+<ul>
+<li><p>使用“print 变量名”查看变量信息，比如查看全局变量。实验结果显示，不管带不带-g或-fomit-pointer-frame选项，全局变量都能查看得到。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="builtin-name">print</span> g_t1</span><br><span class="line"><span class="variable">$1</span> = 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用“info registers”查看寄存器信息，三个选项结果一样。<code>info all-registers</code>会打印更多寄存器信息。</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info registers</span><br><span class="line">eax            <span class="number">0x4</span>      <span class="number">4</span></span><br><span class="line">ecx            <span class="number">0xbfba3264</span>       <span class="number">-1078316444</span></span><br><span class="line">edx            <span class="number">0x0</span>      <span class="number">0</span></span><br><span class="line">ebx            <span class="number">0xb775eff4</span>       <span class="number">-1217007628</span></span><br><span class="line">esp            <span class="number">0xbfba31b0</span>       <span class="number">0xbfba31b0</span></span><br><span class="line">ebp            <span class="number">0xbfba31c8</span>       <span class="number">0xbfba31c8</span></span><br><span class="line">esi            <span class="number">0x0</span>      <span class="number">0</span></span><br><span class="line">edi            <span class="number">0x0</span>      <span class="number">0</span></span><br><span class="line">eip            <span class="number">0x8048498</span>        <span class="number">0x8048498</span> &lt;main+<span class="number">45</span>&gt;</span><br><span class="line">eflags         <span class="number">0x10246</span>  [ PF ZF IF RF ]</span><br><span class="line">cs             <span class="number">0x73</span>     <span class="number">115</span></span><br><span class="line">ss             <span class="number">0x7b</span>     <span class="number">123</span></span><br><span class="line">ds             <span class="number">0x7b</span>     <span class="number">123</span></span><br><span class="line">es             <span class="number">0x7b</span>     <span class="number">123</span></span><br><span class="line">fs             <span class="number">0x0</span>      <span class="number">0</span></span><br><span class="line">gs             <span class="number">0x33</span>     <span class="number">51</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用“info threads”查看线程信息，多线程的暂未实验。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="builtin-name">info</span> threads</span><br><span class="line">  Id   Target Id         Frame</span><br><span class="line">* 1    LWP 28375         0x08048498 <span class="keyword">in</span> main (<span class="attribute">argc</span>=1, <span class="attribute">argv</span>=0xbfba3264) at cd_test.c:53</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>无-g选项的信息会少一些。<br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">gdb</span>) info threads</span><br><span class="line">  Id   Target Id         Frame</span><br><span class="line">* <span class="number">1</span>    LWP <span class="number">28229</span>         <span class="number">0</span>x08048498 in main ()</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>使用“info macro”查看宏，暂未实验。</li>
+<li>使用“disassemble”反汇编。还可以通过“disassemble 函数名”对指定函数进行反汇编。<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">(gdb) disassemble</span><br><span class="line">Dump <span class="keyword">of</span> assembler code <span class="keyword">for</span> <span class="keyword">function</span> main:</span><br><span class="line">   <span class="number">0x0804846b</span> &lt;+<span class="number">0</span>&gt;:     push   <span class="meta">%ebp</span></span><br><span class="line">   <span class="number">0x0804846c</span> &lt;+<span class="number">1</span>&gt;:     mov    <span class="meta">%esp</span>,<span class="meta">%ebp</span></span><br><span class="line">   <span class="number">0x0804846e</span> &lt;+<span class="number">3</span>&gt;:     sub    <span class="variable">$0x18</span>,<span class="meta">%esp</span></span><br><span class="line">   <span class="number">0x08048471</span> &lt;+<span class="number">6</span>&gt;:     movl   <span class="variable">$0x1</span>,-<span class="number">0xc</span>(<span class="meta">%ebp</span>)</span><br><span class="line">   <span class="number">0x08048478</span> &lt;+<span class="number">13</span>&gt;:    movl   <span class="variable">$0x0</span>,-<span class="number">0x8</span>(<span class="meta">%ebp</span>)</span><br><span class="line">   <span class="number">0x0804847f</span> &lt;+<span class="number">20</span>&gt;:    movl   <span class="variable">$0x804857f</span>,-<span class="number">0x4</span>(<span class="meta">%ebp</span>)</span><br><span class="line">   <span class="number">0x08048486</span> &lt;+<span class="number">27</span>&gt;:    mov    -<span class="number">0x8</span>(<span class="meta">%ebp</span>),<span class="meta">%eax</span></span><br><span class="line">   <span class="number">0x08048489</span> &lt;+<span class="number">30</span>&gt;:    mov    <span class="meta">%eax</span>,<span class="number">0x4</span>(<span class="meta">%esp</span>)</span><br><span class="line">   <span class="number">0x0804848d</span> &lt;+<span class="number">34</span>&gt;:    mov    -<span class="number">0xc</span>(<span class="meta">%ebp</span>),<span class="meta">%eax</span></span><br><span class="line">   <span class="number">0x08048490</span> &lt;+<span class="number">37</span>&gt;:    mov    <span class="meta">%eax</span>,(<span class="meta">%esp</span>)</span><br><span class="line">   <span class="number">0x08048493</span> &lt;+<span class="number">40</span>&gt;:    call   <span class="number">0x8048430</span> <span class="xml"><span class="tag">&lt;<span class="name">add</span>&gt;</span></span></span><br><span class="line"><span class="xml">=&gt; 0x08048498 <span class="tag">&lt;<span class="name">+45</span>&gt;</span>:    mov    $0x0,%eax    标识在哪挂掉</span></span><br><span class="line"><span class="xml">   0x0804849d <span class="tag">&lt;<span class="name">+50</span>&gt;</span>:    leave</span></span><br><span class="line"><span class="xml">   0x0804849e <span class="tag">&lt;<span class="name">+51</span>&gt;</span>:    ret</span></span><br><span class="line"><span class="xml">End of assembler dump.</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>不带-g选项的同上。<br>带-fomit-frame-pointer：<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(gdb) disassemble</span><br><span class="line">Dump of assembler code for function main:    没有<span class="built_in">ebp</span>了</span><br><span class="line">   <span class="number">0x08048480</span> &lt;+<span class="number">0</span>&gt;:     <span class="keyword">sub</span>    <span class="number">$0</span>x18,%esp</span><br><span class="line">   <span class="number">0x08048483</span> &lt;+<span class="number">3</span>&gt;:     movl   <span class="number">$0</span>x1,<span class="number">0xc</span>(%esp)</span><br><span class="line">   <span class="number">0x0804848b</span> &lt;+<span class="number">11</span>&gt;:    movl   <span class="number">$0</span>x0,<span class="number">0x10</span>(%esp)</span><br><span class="line">   <span class="number">0x08048493</span> &lt;+<span class="number">19</span>&gt;:    movl   <span class="number">$0</span>x804859f,<span class="number">0x14</span>(%esp)</span><br><span class="line">   <span class="number">0x0804849b</span> &lt;+<span class="number">27</span>&gt;:    <span class="keyword">mov</span>    <span class="number">0x10</span>(%esp),%eax</span><br><span class="line">   <span class="number">0x0804849f</span> &lt;+<span class="number">31</span>&gt;:    <span class="keyword">mov</span>    %eax,<span class="number">0x4</span>(%esp)</span><br><span class="line">   <span class="number">0x080484a3</span> &lt;+<span class="number">35</span>&gt;:    <span class="keyword">mov</span>    <span class="number">0xc</span>(%esp),%eax</span><br><span class="line">   <span class="number">0x080484a7</span> &lt;+<span class="number">39</span>&gt;:    <span class="keyword">mov</span>    %eax,(%esp)</span><br><span class="line">   <span class="number">0x080484aa</span> &lt;+<span class="number">42</span>&gt;:    <span class="keyword">call</span>   <span class="number">0x804843d</span> &lt;<span class="keyword">add</span>&gt;</span><br><span class="line">=&gt; <span class="number">0x080484af</span> &lt;+<span class="number">47</span>&gt;:    <span class="keyword">mov</span>    <span class="number">$0</span>x0,%eax</span><br><span class="line">   <span class="number">0x080484b4</span> &lt;+<span class="number">52</span>&gt;:    <span class="keyword">add</span>    <span class="number">$0</span>x18,%esp</span><br><span class="line">   <span class="number">0x080484b7</span> &lt;+<span class="number">55</span>&gt;:    <span class="keyword">ret</span></span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>Gdb中使用Linux命令：<code>shell 你的命令</code>。<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(gdb) shell ls -al /usr</span><br><span class="line">总用量 164</span><br><span class="line">drwxr-xr-x <span class="number"> 10 </span>root root <span class="number"> 4096 </span> 4月<span class="number"> 23 </span><span class="number"> 2012 </span>.</span><br><span class="line">drwxr-xr-x <span class="number"> 23 </span>root root <span class="number"> 4096 </span> 1月<span class="number"> 27 </span>01:25 ..</span><br><span class="line">drwxr-xr-x  <span class="number"> 2 </span>root root<span class="number"> 61440 </span> 1月<span class="number"> 19 </span>02:45 bin</span><br><span class="line">drwxr-xr-x  <span class="number"> 2 </span>root root <span class="number"> 4096 </span> 9月 <span class="number"> 5 </span>19:53 games</span><br><span class="line">drwxr-xr-x <span class="number"> 37 </span>root root<span class="number"> 20480 </span>11月<span class="number"> 28 </span>14:20 include</span><br><span class="line">drwxr-xr-x<span class="number"> 194 </span>root root<span class="number"> 36864 </span> 1月 <span class="number"> 8 </span>19:31 lib</span><br><span class="line">drwxr-xr-x <span class="number"> 11 </span>root root <span class="number"> 4096 </span> 6月 <span class="number"> 1 </span><span class="number"> 2012 </span>local</span><br><span class="line">drwxr-xr-x  <span class="number"> 2 </span>root root<span class="number"> 12288 </span> 1月<span class="number"> 22 </span>12:29 sbin</span><br><span class="line">drwxr-xr-x<span class="number"> 316 </span>root root<span class="number"> 12288 </span> 1月<span class="number"> 22 </span>12:29 share</span><br><span class="line">drwxr-xr-x <span class="number"> 10 </span>root root <span class="number"> 4096 </span>12月<span class="number"> 11 </span>20:32 src</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>GDB的功能远不止于此，本文档只是个简易的coredump文件阅读指南。</p>
+<p>另外，关于-fomit-frame-pointer选项，在<a href="http://sourceware.org/gdb/current/onlinedocs/gdb/Frames.html#Frames" target="_blank" rel="noopener">gdb官方说明文档</a>： </p>
+<blockquote>
+<p>Some compilers provide a way to compile functions so that they operate without stack frames. (For example, the gcc option `-fomit-frame-pointer’ generates functions without a frame.) <strong>This is occasionally done with heavily used library functions to save the frame setup time.</strong> gdb has limited facilities for dealing with these function invocations. If the innermost function invocation has no stack frame, gdb nevertheless regards it as though it had a separate frame, which is numbered zero as usual, allowing correct tracing of the function call chain. However, gdb has no provision for frameless functions elsewhere in the stack.</p>
+</blockquote>
+<p>上面的黑体字说明-fomit-frame-pointer会造成编译器有时会把函数编译成无stack frame，即有可能在backtrace的出现各种“?? ()”，</p>
+<p>如下所示。<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="keyword">bt</span></span><br><span class="line">#<span class="number">0</span>  <span class="number">0x080483eb</span> <span class="keyword">in</span> <span class="keyword">div</span> (div_i=<span class="number">134513698</span>, div_j=<span class="number">4</span>) <span class="meta">at</span> cd_test.c:<span class="number">13</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0xbfec16a8</span> <span class="keyword">in</span> ?? ()</span><br><span class="line">#<span class="number">2</span>  <span class="number">0x08048422</span> <span class="keyword">in</span> <span class="keyword">sub</span> (sub_i=<span class="number">134513761</span>, sub_j=<span class="number">2</span>) <span class="meta">at</span> cd_test.c:<span class="number">24</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0xbfec16c8</span> <span class="keyword">in</span> ?? ()</span><br><span class="line">#<span class="number">4</span>  <span class="number">0x08048461</span> <span class="keyword">in</span> <span class="keyword">add</span> (add_i=<span class="number">134513816</span>, add_j=<span class="number">1</span>) <span class="meta">at</span> cd_test.c:<span class="number">37</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0xbfec16e8</span> <span class="keyword">in</span> ?? ()</span><br><span class="line">#<span class="number">6</span>  <span class="number">0x08048498</span> <span class="keyword">in</span> main (argc=-<span class="number">1218612013</span>, argv=<span class="number">0x1</span>) <span class="meta">at</span> cd_test.c:<span class="number">51</span></span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/coredump/" rel="tag"># coredump</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201609/programmer/linux/arm_abort.html" rel="next" title="ARM 平台 abort 退出后堆栈打不全">
+                <i class="fa fa-chevron-left"></i> ARM 平台 abort 退出后堆栈打不全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201610/tools/rpm.html" rel="prev" title="rpm使用记录">
+                rpm使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#coredump简介"><span class="nav-number">1.</span> <span class="nav-text">coredump简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#产生原因"><span class="nav-number">2.</span> <span class="nav-text">产生原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#coredump相关系统设置"><span class="nav-number">3.</span> <span class="nav-text">coredump相关系统设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系统是否允许产生coredump文件"><span class="nav-number">3.1.</span> <span class="nav-text">系统是否允许产生coredump文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#coredump文件的保存路径和文件名格式"><span class="nav-number">3.2.</span> <span class="nav-text">coredump文件的保存路径和文件名格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何“阅读”coredump文件"><span class="nav-number">4.</span> <span class="nav-text">如何“阅读”coredump文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201609/programmer/tools/coredump.html";
+    this.page.identifier = "201609/programmer/tools/coredump.html";
+    this.page.title = 'Coredump文件简易指南';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

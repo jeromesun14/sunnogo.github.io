@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="本文描述常见 git 命令备忘。">
+<meta name="keywords" content="git,command,version control">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些常见的 git 命令备忘">
+<meta property="og:url" content="http://sunyongfeng.com/201901/tools/git_cmd.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="本文描述常见 git 命令备忘。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.094Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一些常见的 git 命令备忘">
+<meta name="twitter:description" content="本文描述常见 git 命令备忘。">
+  <link rel="canonical" href="http://sunyongfeng.com/201901/tools/git_cmd">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一些常见的 git 命令备忘 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201901/tools/git_cmd.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">一些常见的 git 命令备忘
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-01-31 09:43:33" itemprop="dateCreated datePublished" datetime="2019-01-31T09:43:33+08:00">2019-01-31</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tools/" itemprop="url" rel="index"><span itemprop="name">tools</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201901/tools/git_cmd.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201901/tools/git_cmd.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">本文描述常见 git 命令备忘。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文首次编辑：2016-04-27。</p>
+<ul>
+<li>查看 log，按 message 过滤、按 author 过滤、按日期过滤等。<a href="https://www.atlassian.com/git/tutorials/git-log。" target="_blank" rel="noopener">https://www.atlassian.com/git/tutorials/git-log。</a></li>
+<li>灵活打 patch，<a href="https://www.jianshu.com/p/814fb6606734" target="_blank" rel="noopener">https://www.jianshu.com/p/814fb6606734</a></li>
+<li>第一次切换分支，git checkout -b xxx origin/xxx</li>
+<li>后续切分支，git checkout xxx</li>
+<li>删除本地分支，git branch -d xxx</li>
+<li>删除远程分支，git push origin –delete xxx</li>
+<li>查看当前分支，git branch -a | grep “*”</li>
+<li>git checkout到特定版本，git checkout upstream的前8位</li>
+<li>git clone / push 的时候不用密码：<code>git config --global credential.helper &#39;cache --timeout 7200&#39;</code>，timeout 的单位为秒。</li>
+<li>创建分支，<code>git checkout -b newbranch</code></li>
+<li>重命名分支，<code>git branch -m oldBranch newBranch</code></li>
+<li>提供本地分支到远程 repo（远程 repo 无此分支），<code>git push origin newBranch</code> or <code>git push -u origin newBranch</code></li>
+<li>强制推送本地修订，覆盖远程 repo。会覆盖此间别人的提交。<code>git push --force-with-lease</code></li>
+<li><p>打 patch 时，如何把 patch 中的 commit message 和 user 保持不变？<code>git am xxx.patch</code>，与 <code>git format-patch</code> 相对应</p>
+</li>
+<li><p>stage</p>
+</li>
+</ul>
+<p>Q：多一个 stage 有什么优点？<br>A：暂存空间。git add 后的文件放到 stage 区，再修改同样的文件，其修订不会体现在此次 commit，除非再 git add 一次。</p>
+<ul>
+<li>git format-patch，已提交版本生成 patch<ul>
+<li><code>git format-patch -&lt;n&gt; &lt;SHA1&gt;</code>，输出从 SHA1 开始的 n 个提交 patch，会输出 10 个 patch</li>
+<li><code>git format-patch -10 HEAD --stdout &gt; 0001-last-10-commits.patch</code>，输出最新前 10 次修订为一个 patch</li>
+</ul>
+</li>
+<li><code>git log -p -1 &lt;commit&gt;</code>，查看某次提交的具体修订</li>
+<li><code>git diff sha1 sha2 &gt; mypatch.diff</code>，输出 sha1 到 sha2 的所有修订，如果 sha1 比 sha2 早，则是修订 patch，如果晚，则是回退 patch。</li>
+<li>git am -3 –ignore-space-change，只能使用 format-patch 的 patch</li>
+<li>git config core.editor vim</li>
+<li>git checkout file，可以让 file 从 staged 状态返回 untracked 状态<ul>
+<li>git checkout – file</li>
+</ul>
+</li>
+<li>git reset HEAD file，让文件从 staged 返回 modified 状态</li>
+<li>git clean -f -d，删除未被跟踪的任何文件/目录</li>
+<li>.gitignore，忽略不需要跟踪的文件</li>
+<li>git revert commitid，撤消某个修订并自动 commit</li>
+<li>git reset –soft，回退修订</li>
+<li>基于某个 commitid 创建新分支 name<ul>
+<li>git reset –hard commitid</li>
+<li>git branch name</li>
+</ul>
+</li>
+<li>git merge，不推荐使用。可通过 git format 打 patch，优势是可以看到同步的每个修订。</li>
+<li>git cherry-pick commitid，单独同步某次提交</li>
+<li>git show commit</li>
+<li>git commit –amend，修改最后一次提交的 log</li>
+<li>git rebase，不推荐新手使用。</li>
+<li><p>git reset –hard commitid, git push, 回退到某个特定版本</p>
+</li>
+<li><p>git remote -v，查看当前仓库的链接</p>
+</li>
+<li>git status –untracked-files=no，git status 只查看跟踪的文件，同 git status -uno</li>
+<li>回退某个文件的到特定版本，<code>git checkout c5f567 -- file1/to/restore file2/to/restore</code>，详见 <a href="git checkout c5f567 -- file1/to/restore file2/to/restore">stackoverflow</a></li>
+</ul>
+<h2 id="删除未被跟踪的任何文件和目录"><a href="#删除未被跟踪的任何文件和目录" class="headerlink" title="删除未被跟踪的任何文件和目录"></a>删除未被跟踪的任何文件和目录</h2><p><strong>注意</strong>：本操作会删除所有未加入 git 版本管理的文件。</p>
+<p>在对应组件源码目录下，<code>git clean -f -d -X</code>，清除该目录中所有没有被跟踪的文件。</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">NAME</span><br><span class="line">       git-clean - Remove untracked <span class="built_in">files</span> <span class="built_in">from</span> <span class="keyword">the</span> working tree</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">       git clean [-d] [-f] [-i] [-n] [-q] [-e &lt;pattern&gt;] [-x | -X] [<span class="comment">--] &lt;path&gt;...</span></span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">       Cleans <span class="keyword">the</span> working tree <span class="keyword">by</span> recursively removing <span class="built_in">files</span> that are <span class="keyword">not</span> under <span class="built_in">version</span> control, starting <span class="built_in">from</span> <span class="keyword">the</span> current <span class="built_in">directory</span>.</span><br><span class="line"></span><br><span class="line">       Normally, only <span class="built_in">files</span> unknown <span class="built_in">to</span> Git are removed, but <span class="keyword">if</span> <span class="keyword">the</span> -x option is specified, ignored <span class="built_in">files</span> are also removed. This can, <span class="keyword">for</span> example, be useful <span class="built_in">to</span> remove all build products.</span><br><span class="line"></span><br><span class="line">       If <span class="keyword">any</span> optional &lt;path&gt;... arguments are given, only those paths are affected.</span><br><span class="line"></span><br><span class="line">OPTIONS</span><br><span class="line">       -d</span><br><span class="line">           Remove untracked <span class="built_in">directories</span> <span class="keyword">in</span> addition <span class="built_in">to</span> untracked <span class="built_in">files</span>. If <span class="keyword">an</span> untracked <span class="built_in">directory</span> is managed <span class="keyword">by</span> <span class="keyword">a</span> different Git repository, <span class="keyword">it</span> is <span class="keyword">not</span> removed <span class="keyword">by</span> default. Use -f option twice <span class="keyword">if</span></span><br><span class="line">           you really want <span class="built_in">to</span> remove such <span class="keyword">a</span> <span class="built_in">directory</span>.</span><br><span class="line"></span><br><span class="line">       -f, <span class="comment">--force</span></span><br><span class="line">           If <span class="keyword">the</span> Git configuration <span class="built_in">variable</span> clean.requireForce is <span class="keyword">not</span> <span class="built_in">set</span> <span class="built_in">to</span> <span class="literal">false</span>, git clean will refuse <span class="built_in">to</span> run unless given -f, -n <span class="keyword">or</span> -i.</span><br><span class="line"></span><br><span class="line">       -i, <span class="comment">--interactive</span></span><br><span class="line">           Show what would be done <span class="keyword">and</span> clean <span class="built_in">files</span> interactively. See “Interactive mode” <span class="keyword">for</span> details.</span><br><span class="line"></span><br><span class="line">       -n, <span class="comment">--dry-run</span></span><br><span class="line">           Don’t actually remove anything, just show what would be done.</span><br><span class="line"></span><br><span class="line">       -q, <span class="comment">--quiet</span></span><br><span class="line">           Be quiet, only report errors, but <span class="keyword">not</span> <span class="keyword">the</span> <span class="built_in">files</span> that are successfully removed.</span><br><span class="line"></span><br><span class="line">       -e &lt;pattern&gt;, <span class="comment">--exclude=&lt;pattern&gt;</span></span><br><span class="line">           In addition <span class="built_in">to</span> those found <span class="keyword">in</span> .gitignore (per <span class="built_in">directory</span>) <span class="keyword">and</span> $GIT_DIR/info/exclude, also consider these patterns <span class="built_in">to</span> be <span class="keyword">in</span> <span class="keyword">the</span> <span class="built_in">set</span> <span class="keyword">of</span> <span class="keyword">the</span> ignore rules <span class="keyword">in</span> effect.</span><br><span class="line"></span><br><span class="line">       -x</span><br><span class="line">           Don’t use <span class="keyword">the</span> standard ignore rules <span class="built_in">read</span> <span class="built_in">from</span> .gitignore (per <span class="built_in">directory</span>) <span class="keyword">and</span> $GIT_DIR/info/exclude, but <span class="built_in">do</span> still use <span class="keyword">the</span> ignore rules given <span class="keyword">with</span> -e options. This allows removing all</span><br><span class="line">           untracked <span class="built_in">files</span>, including build products. This can be used (possibly <span class="keyword">in</span> conjunction <span class="keyword">with</span> git reset) <span class="built_in">to</span> <span class="built_in">create</span> <span class="keyword">a</span> pristine working <span class="built_in">directory</span> <span class="built_in">to</span> test <span class="keyword">a</span> clean build.</span><br><span class="line"></span><br><span class="line">       -X</span><br><span class="line">           Remove only <span class="built_in">files</span> ignored <span class="keyword">by</span> Git. This may be useful <span class="built_in">to</span> rebuild everything <span class="built_in">from</span> scratch, but keep manually created <span class="built_in">files</span>.</span><br></pre></td></tr></table></figure>
+<p>样例：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">jerome@compile:~/sb/src/libttoo$ git status</span><br><span class="line">On branch master</span><br><span class="line">Untracked files:</span><br><span class="line">  (use <span class="string">"git add &lt;file&gt;..."</span> to include <span class="keyword">in</span> what will be committed)</span><br><span class="line"></span><br><span class="line">        .gitignore</span><br><span class="line">        debian/files</span><br><span class="line">        debian/libttoo-dbg<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">        debian/libttoo-dbg.substvars</span><br><span class="line">        debian/libttoo-dbg/</span><br><span class="line">        debian/libttoo-dev<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">        debian/libttoo-dev.substvars</span><br><span class="line">        debian/libttoo-dev/</span><br><span class="line">        debian/libttoo<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">        debian/libttoo<span class="selector-class">.postinst</span><span class="selector-class">.debhelper</span></span><br><span class="line">        debian/libttoo<span class="selector-class">.postrm</span><span class="selector-class">.debhelper</span></span><br><span class="line">        debian/libttoo.substvars</span><br><span class="line">        debian/libttoo/</span><br><span class="line">        debian/tmp/</span><br><span class="line">        include/ttoo_version.patch</span><br><span class="line">        output/x86-tt/bin/</span><br><span class="line"></span><br><span class="line">nothing added to commit but untracked files present (use <span class="string">"git add"</span> to track)</span><br><span class="line">jerome@compile:~/sb/src/libttoo$ git clean -df</span><br><span class="line">Removing .gitignore</span><br><span class="line">Removing debian/files</span><br><span class="line">Removing debian/libttoo-dbg<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">Removing debian/libttoo-dbg.substvars</span><br><span class="line">Removing debian/libttoo-dbg/</span><br><span class="line">Removing debian/libttoo-dev<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">Removing debian/libttoo-dev.substvars</span><br><span class="line">Removing debian/libttoo-dev/</span><br><span class="line">Removing debian/libttoo<span class="selector-class">.debhelper</span><span class="selector-class">.log</span></span><br><span class="line">Removing debian/libttoo<span class="selector-class">.postinst</span><span class="selector-class">.debhelper</span></span><br><span class="line">Removing debian/libttoo<span class="selector-class">.postrm</span><span class="selector-class">.debhelper</span></span><br><span class="line">Removing debian/libttoo.substvars</span><br><span class="line">Removing debian/libttoo/</span><br><span class="line">Removing debian/tmp/</span><br><span class="line">Removing include/ttoo_version.patch</span><br><span class="line">Removing output/x86-tt/bin/</span><br><span class="line">Removing output/x86-tt/objects/</span><br><span class="line">jerome@compile:~/sb/src/libttoo$ git status</span><br><span class="line">On branch master</span><br><span class="line">nothing to commit, working directory clean</span><br><span class="line">jerome@compile:~/sb/src/libttoo$</span><br></pre></td></tr></table></figure>
+<h2 id="git-fork-一个仓库到本地后，同步远程仓库的修订"><a href="#git-fork-一个仓库到本地后，同步远程仓库的修订" class="headerlink" title="git fork 一个仓库到本地后，同步远程仓库的修订"></a>git fork 一个仓库到本地后，同步远程仓库的修订</h2><p>详见：</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/28676261" target="_blank" rel="noopener">gitlab或github下fork后如何同步源的新更新内容？</a></li>
+<li><a href="https://gaohaoyang.github.io/2015/04/12/Syncing-a-fork/" target="_blank" rel="noopener">同步一个 fork</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="noopener">Git远程操作详解</a></li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">$ git clone <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/ </span></span><br><span class="line">Cloning into <span class="string">'libteam'</span>...</span><br><span class="line"><span class="string">remote:</span> Counting <span class="string">objects:</span> <span class="number">4985</span>, done.</span><br><span class="line"><span class="string">remote:</span> Compressing <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">1822</span>/<span class="number">1822</span>), done.</span><br><span class="line"><span class="string">remote:</span> Total <span class="number">4985</span> (delta <span class="number">3089</span>), reused <span class="number">4985</span> (delta <span class="number">3089</span>)</span><br><span class="line">Receiving <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">4985</span><span class="regexp">/4985), 15.87 MiB | 0 bytes/</span>s, done.</span><br><span class="line">Resolving <span class="string">deltas:</span> <span class="number">100</span>% (<span class="number">3089</span>/<span class="number">3089</span>), done.</span><br><span class="line">Checking connectivity... done.</span><br><span class="line">$ cd libteam/</span><br><span class="line">$ git remote -v</span><br><span class="line">origin  <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/ (fetch)</span></span><br><span class="line">origin  <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/ (push)</span></span><br><span class="line">$ git remote add upstream <span class="string">https:</span><span class="comment">//github.com/jpirko/libteam.git</span></span><br><span class="line">$ git remote -v</span><br><span class="line">origin  <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/ (fetch)</span></span><br><span class="line">origin  <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/ (push)</span></span><br><span class="line">upstream        <span class="string">https:</span><span class="comment">//github.com/jpirko/libteam.git (fetch)</span></span><br><span class="line">upstream        <span class="string">https:</span><span class="comment">//github.com/jpirko/libteam.git (push)</span></span><br><span class="line">$ git fetch upstream </span><br><span class="line"><span class="string">remote:</span> Counting <span class="string">objects:</span> <span class="number">4</span>, done.</span><br><span class="line"><span class="string">remote:</span> Total <span class="number">4</span> (delta <span class="number">3</span>), reused <span class="number">3</span> (delta <span class="number">3</span>), pack-reused <span class="number">1</span></span><br><span class="line">Unpacking <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">4</span>/<span class="number">4</span>), done.</span><br><span class="line">From <span class="string">https:</span><span class="comment">//github.com/jpirko/libteam</span></span><br><span class="line"> * [<span class="keyword">new</span> branch]      gh-pages   -&gt; upstream/gh-pages</span><br><span class="line"> * [<span class="keyword">new</span> branch]      master     -&gt; upstream/master</span><br><span class="line">$ git merge upstream/master </span><br><span class="line">Updating <span class="number">3</span>ede1b2.<span class="number">.789591</span>c</span><br><span class="line">Fast-forward</span><br><span class="line"> man/teamd.conf<span class="number">.5</span> | <span class="number">7</span> ++++++-</span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">6</span> insertions(+), <span class="number">1</span> deletion(-)</span><br><span class="line">$ git push origin master </span><br><span class="line">Username <span class="keyword">for</span> <span class="string">'http://192.168.199.32'</span>: your_name</span><br><span class="line">Password <span class="keyword">for</span> <span class="string">'http://your_name@192.168.199.32'</span>: </span><br><span class="line">Counting <span class="string">objects:</span> <span class="number">4</span>, done.</span><br><span class="line">Delta compression using up to <span class="number">24</span> threads.</span><br><span class="line">Compressing <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">4</span>/<span class="number">4</span>), done.</span><br><span class="line">Writing <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">4</span><span class="regexp">/4), 511 bytes | 0 bytes/</span>s, done.</span><br><span class="line">Total <span class="number">4</span> (delta <span class="number">3</span>), reused <span class="number">0</span> (delta <span class="number">0</span>)</span><br><span class="line">To <span class="string">http:</span><span class="comment">//192.168.199.32/sonic/libteam/</span></span><br><span class="line">   <span class="number">3</span>ede1b2.<span class="number">.789591</span>c  master -&gt; master</span><br></pre></td></tr></table></figure>
+<p>如果远程“父”仓库的有很多 tags 和 branches，如何同步到本地远程 repo？</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">$ git remote <span class="keyword">add</span> upstream https://github.com/opencomputeproject/SAI</span><br><span class="line">$ git remote -v </span><br><span class="line">origin  http://<span class="number">192.168</span><span class="meta">.199</span><span class="meta">.32</span>/sonic/SAI (fetch)</span><br><span class="line">origin  http://<span class="number">192.168</span><span class="meta">.199</span><span class="meta">.32</span>/sonic/SAI (<span class="keyword">push</span>)</span><br><span class="line">upstream        https://github.com/opencomputeproject/SAI (fetch)</span><br><span class="line">upstream        https://github.com/opencomputeproject/SAI (<span class="keyword">push</span>)</span><br><span class="line">$ git fetch upstream</span><br><span class="line"><span class="symbol">remote:</span> Counting objects: <span class="number">190</span>, done.</span><br><span class="line"><span class="symbol">remote:</span> Compressing objects: <span class="number">100</span>% (<span class="number">6</span>/<span class="number">6</span>), done.</span><br><span class="line"><span class="symbol">remote:</span> Total <span class="number">190</span> (delta <span class="number">119</span>), reused <span class="number">122</span> (delta <span class="number">119</span>), pack-reused <span class="number">65</span></span><br><span class="line">Receiving objects: <span class="number">100</span>% (<span class="number">190</span>/<span class="number">190</span>), <span class="number">291.31</span> KiB | <span class="number">250.00</span> KiB/s, done.</span><br><span class="line">Resolving deltas: <span class="number">100</span>% (<span class="number">139</span>/<span class="number">139</span>), completed with <span class="number">57</span> local objects.</span><br><span class="line">From https://github.com/opencomputeproject/SAI</span><br><span class="line"> * [new branch]      master     -&gt; upstream/master</span><br><span class="line"> * [new branch]      revert-<span class="number">648</span>-vlanigmpcontrol -&gt; upstream/revert-<span class="number">648</span>-vlanigmpcontrol</span><br><span class="line"> * [new branch]      v0<span class="meta">.9</span><span class="meta">.1</span>     -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.1</span></span><br><span class="line"> * [new branch]      v0<span class="meta">.9</span><span class="meta">.2</span>     -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.2</span></span><br><span class="line"> * [new branch]      v0<span class="meta">.9</span><span class="meta">.4</span>     -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.4</span></span><br><span class="line"> * [new branch]      v0<span class="meta">.9</span><span class="meta">.5</span>     -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.5</span></span><br><span class="line"> * [new branch]      v0<span class="meta">.9</span><span class="meta">.6</span>     -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.6</span></span><br><span class="line"> * [new branch]      v1<span class="meta">.0</span>       -&gt; upstream/v1<span class="meta">.0</span></span><br><span class="line"> * [new branch]      v1<span class="meta">.1</span>       -&gt; upstream/v1<span class="meta">.1</span></span><br><span class="line"> * [new branch]      v1<span class="meta">.2</span>       -&gt; upstream/v1<span class="meta">.2</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.1</span>     -&gt; v1<span class="meta">.2</span><span class="meta">.1</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.2</span>     -&gt; v1<span class="meta">.2</span><span class="meta">.2</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.3</span>     -&gt; v1<span class="meta">.2</span><span class="meta">.3</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.4</span>     -&gt; v1<span class="meta">.2</span><span class="meta">.4</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.3</span><span class="meta">.0</span>     -&gt; v1<span class="meta">.3</span><span class="meta">.0</span></span><br><span class="line">$ git <span class="keyword">push</span> --mirror </span><br><span class="line">Username for <span class="string">'http://192.168.199.32'</span>: your_name</span><br><span class="line">Password for <span class="string">'http://your_name@192.168.199.32'</span>: </span><br><span class="line">Counting objects: <span class="number">200</span>, done.</span><br><span class="line">Delta compression using <span class="meta">up</span> to <span class="number">24</span> threads.</span><br><span class="line">Compressing objects: <span class="number">100</span>% (<span class="number">93</span>/<span class="number">93</span>), done.</span><br><span class="line">Writing objects: <span class="number">100</span>% (<span class="number">200</span>/<span class="number">200</span>), <span class="number">351.49</span> KiB | <span class="number">0</span> bytes/s, done.</span><br><span class="line">Total <span class="number">200</span> (delta <span class="number">161</span>), reused <span class="number">145</span> (delta <span class="number">107</span>)</span><br><span class="line"><span class="symbol">remote:</span> Resolving deltas: <span class="number">100</span>% (<span class="number">161</span>/<span class="number">161</span>), completed with <span class="number">60</span> local objects.</span><br><span class="line">To http://<span class="number">192.168</span><span class="meta">.199</span><span class="meta">.32</span>/sonic/SAI</span><br><span class="line"> - [deleted]         revert-<span class="number">648</span>-vlanigmpcontrol</span><br><span class="line"> - [deleted]         riotmac</span><br><span class="line"> - [deleted]         v0<span class="meta">.9</span><span class="meta">.1</span></span><br><span class="line"> - [deleted]         v0<span class="meta">.9</span><span class="meta">.2</span></span><br><span class="line"> - [deleted]         v0<span class="meta">.9</span><span class="meta">.4</span></span><br><span class="line"> - [deleted]         v0<span class="meta">.9</span><span class="meta">.5</span></span><br><span class="line"> - [deleted]         v0<span class="meta">.9</span><span class="meta">.6</span></span><br><span class="line"> - [deleted]         v1<span class="meta">.0</span></span><br><span class="line"> - [deleted]         v1<span class="meta">.1</span></span><br><span class="line"> - [deleted]         v1<span class="meta">.2</span></span><br><span class="line"> * [new branch]      origin/HEAD -&gt; origin/HEAD</span><br><span class="line"> * [new branch]      origin/master -&gt; origin/master</span><br><span class="line"> * [new branch]      origin/revert-<span class="number">648</span>-vlanigmpcontrol -&gt; origin/revert-<span class="number">648</span>-vlanigmpcontrol</span><br><span class="line"> * [new branch]      origin/riotmac -&gt; origin/riotmac</span><br><span class="line"> * [new branch]      origin/v0<span class="meta">.9</span><span class="meta">.1</span> -&gt; origin/v0<span class="meta">.9</span><span class="meta">.1</span></span><br><span class="line"> * [new branch]      origin/v0<span class="meta">.9</span><span class="meta">.2</span> -&gt; origin/v0<span class="meta">.9</span><span class="meta">.2</span></span><br><span class="line"> * [new branch]      origin/v0<span class="meta">.9</span><span class="meta">.4</span> -&gt; origin/v0<span class="meta">.9</span><span class="meta">.4</span></span><br><span class="line"> * [new branch]      origin/v0<span class="meta">.9</span><span class="meta">.5</span> -&gt; origin/v0<span class="meta">.9</span><span class="meta">.5</span></span><br><span class="line"> * [new branch]      origin/v0<span class="meta">.9</span><span class="meta">.6</span> -&gt; origin/v0<span class="meta">.9</span><span class="meta">.6</span></span><br><span class="line"> * [new branch]      origin/v1<span class="meta">.0</span> -&gt; origin/v1<span class="meta">.0</span></span><br><span class="line"> * [new branch]      origin/v1<span class="meta">.1</span> -&gt; origin/v1<span class="meta">.1</span></span><br><span class="line"> * [new branch]      origin/v1<span class="meta">.2</span> -&gt; origin/v1<span class="meta">.2</span></span><br><span class="line"> * [new branch]      upstream/master -&gt; upstream/master</span><br><span class="line"> * [new branch]      upstream/revert-<span class="number">648</span>-vlanigmpcontrol -&gt; upstream/revert-<span class="number">648</span>-vlanigmpcontrol</span><br><span class="line"> * [new branch]      upstream/v0<span class="meta">.9</span><span class="meta">.1</span> -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.1</span></span><br><span class="line"> * [new branch]      upstream/v0<span class="meta">.9</span><span class="meta">.2</span> -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.2</span></span><br><span class="line"> * [new branch]      upstream/v0<span class="meta">.9</span><span class="meta">.4</span> -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.4</span></span><br><span class="line"> * [new branch]      upstream/v0<span class="meta">.9</span><span class="meta">.5</span> -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.5</span></span><br><span class="line"> * [new branch]      upstream/v0<span class="meta">.9</span><span class="meta">.6</span> -&gt; upstream/v0<span class="meta">.9</span><span class="meta">.6</span></span><br><span class="line"> * [new branch]      upstream/v1<span class="meta">.0</span> -&gt; upstream/v1<span class="meta">.0</span></span><br><span class="line"> * [new branch]      upstream/v1<span class="meta">.1</span> -&gt; upstream/v1<span class="meta">.1</span></span><br><span class="line"> * [new branch]      upstream/v1<span class="meta">.2</span> -&gt; upstream/v1<span class="meta">.2</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.1</span> -&gt; v1<span class="meta">.2</span><span class="meta">.1</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.2</span> -&gt; v1<span class="meta">.2</span><span class="meta">.2</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.3</span> -&gt; v1<span class="meta">.2</span><span class="meta">.3</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.2</span><span class="meta">.4</span> -&gt; v1<span class="meta">.2</span><span class="meta">.4</span></span><br><span class="line"> * [new tag]         v1<span class="meta">.3</span><span class="meta">.0</span> -&gt; v1<span class="meta">.3</span><span class="meta">.0</span></span><br></pre></td></tr></table></figure>
+<h2 id="合并多次本地提交"><a href="#合并多次本地提交" class="headerlink" title="合并多次本地提交"></a>合并多次本地提交</h2><ul>
+<li>不喜欢默认编译器 nano，先配置一下默认编辑器为 vim：<code>git config --global core.editor vim</code></li>
+<li>git rebase -i HEAD~2，合并前两次提交</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">$ git log</span><br><span class="line"><span class="keyword">commit</span> <span class="number">3</span>d4729bc94a3a780afb2892c967ea23383933419</span><br><span class="line">Author: your_name &lt;your_name@your_company.com&gt;</span><br><span class="line"><span class="built_in">Date</span>:   Mon Apr <span class="number">2</span> <span class="number">20</span>:<span class="number">30</span>:<span class="number">16</span> <span class="number">2018</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    [COMPILE] fix xxx issues</span><br><span class="line"></span><br><span class="line"><span class="keyword">commit</span> <span class="number">19</span>c2ee6f54ab1a860a54c38708024e69572a9358</span><br><span class="line">Author: your_name &lt;your_name@your_company.com&gt;</span><br><span class="line"><span class="built_in">Date</span>:   Mon Apr <span class="number">2</span> <span class="number">19</span>:<span class="number">49</span>:<span class="number">11</span> <span class="number">2018</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    [<span class="keyword">Version</span> Control] remove modules <span class="keyword">are</span> <span class="keyword">not</span> needed</span><br><span class="line">$ git rebase -i <span class="keyword">HEAD</span>~<span class="number">2</span></span><br><span class="line">  GNU nano <span class="number">2.5</span><span class="number">.3</span>                                     <span class="keyword">File</span>: /home/<span class="keyword">user</span>/workshop/.git/rebase-<span class="keyword">merge</span>/git-rebase-todo                                                                                 </span><br><span class="line"></span><br><span class="line">pick <span class="number">19</span>c2ee6 [<span class="keyword">Version</span> Control] remove modules <span class="keyword">are</span> <span class="keyword">not</span> needed</span><br><span class="line">pick <span class="number">3</span>d4729b [COMPILE] fix xxx issues</span><br><span class="line"></span><br><span class="line"><span class="comment"># Rebase 8572f84..3d4729b onto 8572f84 (2 command(s))</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Commands:</span></span><br><span class="line"><span class="comment"># p, pick = use commit</span></span><br><span class="line"><span class="comment"># r, reword = use commit, but edit the commit message</span></span><br><span class="line"><span class="comment"># e, edit = use commit, but stop for amending</span></span><br><span class="line"><span class="comment"># s, squash = use commit, but meld into previous commit</span></span><br><span class="line"><span class="comment"># f, fixup = like "squash", but discard this commit's log message</span></span><br><span class="line"><span class="comment"># x, exec = run command (the rest of the line) using shell</span></span><br><span class="line"><span class="comment"># d, drop = remove commit</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># These lines can be re-ordered; they are executed from top to bottom.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># If you remove a line here THAT COMMIT WILL BE LOST.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># However, if you remove everything, the rebase will be aborted.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Note that empty commits are commented out</span></span><br></pre></td></tr></table></figure>
+<p>改要保留的提交 log 为 pick，把要合并的提交改为 squash。如上文改为 </p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pick 19c2ee6 <span class="comment">[Version Control]</span> remove modules <span class="keyword">are</span> not needed</span><br><span class="line">squash 3d4729b <span class="comment">[COMPILE]</span> fix xxx issues</span><br></pre></td></tr></table></figure>
+<p>保存退出后看 git log：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git log</span><br><span class="line"><span class="keyword">commit</span> <span class="number">47</span>c2b52a018680d314673fa11afd14d46a8841cf</span><br><span class="line">Author: your_name &lt;your_name@your_company.com&gt;</span><br><span class="line"><span class="built_in">Date</span>:   Mon Apr <span class="number">2</span> <span class="number">19</span>:<span class="number">49</span>:<span class="number">11</span> <span class="number">2018</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    [<span class="keyword">Version</span> Control] remove modules <span class="keyword">are</span> <span class="keyword">not</span> needed</span><br><span class="line">    </span><br><span class="line">    [COMPILE] fix xxx issues</span><br></pre></td></tr></table></figure>
+<h2 id="处理-merge-冲突"><a href="#处理-merge-冲突" class="headerlink" title="处理 merge 冲突"></a>处理 merge 冲突</h2><ul>
+<li>git pull 发现有冲突</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git pull</span><br><span class="line">Auto-merging .gitmodules</span><br><span class="line">CONFLICT (content): <span class="keyword">Merge</span> conflict <span class="keyword">in</span> .gitmodules</span><br><span class="line"><span class="keyword">Automatic</span> <span class="keyword">merge</span> <span class="keyword">failed</span>; fix conflicts and then <span class="keyword">commit</span> the result.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>打开冲突的文件 .gitmodules</li>
+</ul>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ vi .gitmodules </span><br><span class="line"><span class="meta">[submodule "src/repo"]</span></span><br><span class="line"><span class="code">    path = src/repo</span></span><br><span class="line">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span><br><span class="line"><span class="code">    url = http://192.168.250.250/repog/repo</span></span><br><span class="line">=======</span><br><span class="line"><span class="code">    url = http://192.168.250.250/repog/repo.git</span></span><br><span class="line">&gt;&gt;&gt;&gt;&gt;&gt;&gt; 19c2ee6f54ab1a860a54c38708024e69572a9358</span><br></pre></td></tr></table></figure>
+<ul>
+<li>fix 对应的冲突<br>例如上文修订为：</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">submodule <span class="meta-string">"src/repo"</span></span>]</span><br><span class="line">    path = src/repo</span><br><span class="line">    url = http:<span class="comment">//192.168.250.250/repog/repo</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>提交 fix 的结果</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">add</span> .gitmodules               </span><br><span class="line">$ git commit -m <span class="string">"fix merge conflict"</span></span><br><span class="line">[<span class="meta">your_branch ee31e1a</span>] fix merge conflict</span><br></pre></td></tr></table></figure>
+<ul>
+<li>提交代码</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin your_branch</span><br><span class="line">Counting <span class="string">objects:</span> <span class="number">34</span>, done.</span><br><span class="line">Delta compression using up to <span class="number">24</span> threads.</span><br><span class="line">Compressing <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">33</span>/<span class="number">33</span>), done.</span><br><span class="line">Writing <span class="string">objects:</span> <span class="number">100</span>% (<span class="number">34</span><span class="regexp">/34), 3.49 KiB | 0 bytes/</span>s, done.</span><br><span class="line">Total <span class="number">34</span> (delta <span class="number">25</span>), reused <span class="number">0</span> (delta <span class="number">0</span>)</span><br><span class="line">To <span class="string">http:</span><span class="comment">//192.168.250.250/repog/repox</span></span><br><span class="line">   <span class="number">19</span>c2ee6..ee31e1a  your_branch -&gt; your_branch</span><br></pre></td></tr></table></figure>
+<h2 id="如何不留-log-的-revert？（强制提交本地-repo-内容）"><a href="#如何不留-log-的-revert？（强制提交本地-repo-内容）" class="headerlink" title="如何不留 log 的 revert？（强制提交本地 repo 内容）"></a>如何不留 log 的 revert？（强制提交本地 repo 内容）</h2><p>强制 revert 远程服务器的内容为本地 repo 内容。一般为 rebase 之后所需。</p>
+<p>命令：<code>git push --force-with-lease</code></p>
+<p>但是如果不是洁癖，最好还是用 <code>git revert</code>，有记录地回退。</p>
+<h2 id="查看某个-commit-id-属于哪个-tags-或-branch"><a href="#查看某个-commit-id-属于哪个-tags-或-branch" class="headerlink" title="查看某个 commit id 属于哪个 tags 或 branch"></a>查看某个 commit id 属于哪个 tags 或 branch</h2><ul>
+<li><code>git branch -r --contains commitid</code></li>
+<li><code>git tag --contains commitid</code></li>
+</ul>
+<h2 id="tag-相关操作"><a href="#tag-相关操作" class="headerlink" title="tag 相关操作"></a>tag 相关操作</h2><ul>
+<li><code>git tag -l</code> 列出全部 tag</li>
+<li><code>git checkout &lt;tag_name&gt;</code>，detach 到某个 tag</li>
+<li><code>git checkout tags/&lt;tag_name&gt; -b &lt;branch_name&gt;</code>，根据某个 tag 创建分支</li>
+<li>查看某个 commmitid 是否属于某个 tag <code>git tag --contains commitid</code></li>
+</ul>
+<h2 id="如何-merge-其他-repo-中的某次提交？"><a href="#如何-merge-其他-repo-中的某次提交？" class="headerlink" title="如何 merge 其他 repo 中的某次提交？"></a>如何 merge 其他 repo 中的某次提交？</h2><ul>
+<li>添加其他 repo，<code>git remote add upstream your_repo_url</code></li>
+<li>下载其他 repo 的代码：<code>git fetch upstream</code></li>
+<li>查看其他 repo 的 log：<code>git log upstream/master</code></li>
+<li>合并某次提交：<code>git cherry-pick your_repo_commit_id</code></li>
+</ul>
+<h2 id="git-am-失败如何合代码"><a href="#git-am-失败如何合代码" class="headerlink" title="git am 失败如何合代码"></a>git am 失败如何合代码</h2><p>类似这个链接：<a href="https://blog.csdn.net/sunnylgz/article/details/7660638。" target="_blank" rel="noopener">https://blog.csdn.net/sunnylgz/article/details/7660638。</a></p>
+<p>出现问题时：</p>
+<ul>
+<li>git apply –reject xxx.patch</li>
+<li>到对应目录，应可以看到有对应的 .rej 文件，打开一看就可以看出是哪段代码合不进去。</li>
+<li>手动处理冲突</li>
+<li>git add 对应文件</li>
+<li>git am –continue</li>
+</ul>
+<h2 id="查看本地分支与远程分支的差异"><a href="#查看本地分支与远程分支的差异" class="headerlink" title="查看本地分支与远程分支的差异"></a>查看本地分支与远程分支的差异</h2><p>git status 的时候经常可以看到 <code>Your branch is ahead of &#39;origin/xxx&#39; by 3 commits.</code>，有时候可能不知道这个 ahead / behind 的 commits 分别是什么。可通过 <code>git log origin/xxx..xxx</code> 查看，xxx 指分支名，以 master 分支为例，<code>git log origin/master..master</code>。</p>
+<h2 id="git-log-导入-excel"><a href="#git-log-导入-excel" class="headerlink" title="git log 导入 excel"></a>git log 导入 excel</h2><ul>
+<li><a href="https://stackoverflow.com/questions/39253307/export-git-log-into-an-excel-file" target="_blank" rel="noopener">stackoverflow</a>，<code>git log --pretty=format:%h,%an,%ae,%s &gt; /path/to/file.csv</code>，然后导入 csv，以 “,” 为分隔符隔开。前面 git log 输出格式为（hash [abbreviated], author name, author email, subject）。</li>
+<li><a href="https://stackoverflow.com/questions/22588648/git-svn-log-stop-on-copy-equivalent" target="_blank" rel="noopener">类似 svn log –stop-on-copy 功能</a>，只取分支创建后的记录<ul>
+<li>本地 git checkout 目标分支和目标分支的父分支。</li>
+<li><code>git log base_branch..target_branch --pretty=format:%h,%an,%ae,%s &gt; your.csv</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="git-add-提示-“error-insufficient-permission-for-adding-an-object-to-repository-database-git-objects”"><a href="#git-add-提示-“error-insufficient-permission-for-adding-an-object-to-repository-database-git-objects”" class="headerlink" title="git add 提示 “error: insufficient permission for adding an object to repository database .git/objects”"></a>git add 提示 “error: insufficient permission for adding an object to repository database .git/objects”</h2><ul>
+<li>原因：.git/objects 中的权限有问题</li>
+<li>解决：见 <a href="https://stackoverflow.com/questions/6448242/git-push-error-insufficient-permission-for-adding-an-object-to-repository-datab" target="_blank" rel="noopener">https://stackoverflow.com/questions/6448242/git-push-error-insufficient-permission-for-adding-an-object-to-repository-datab</a>, <code>sudo chown yourname:yourgroup -R .git/objects/</code></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">$ git add openssh_7.9p1.orig.tar.gz.asc</span><br><span class="line">error: insufficient permission for adding an object to repository database .git/objects</span><br><span class="line">error: openssh_7.9p1.orig.tar.gz.asc: failed to <span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">database</span></span><br><span class="line"><span class="keyword">error</span>: unable <span class="keyword">to</span> <span class="keyword">index</span> <span class="keyword">file</span> openssh_7<span class="number">.9</span>p1.orig.tar.gz.asc</span><br><span class="line">fatal: adding files <span class="keyword">failed</span></span><br><span class="line">$ ls -al .git/objects/</span><br><span class="line">total <span class="number">236</span></span><br><span class="line">drwxrwxr-x <span class="number">59</span> ubuntu ubuntu <span class="number">4096</span> Mar  <span class="number">6</span> <span class="number">19</span>:<span class="number">49</span> .</span><br><span class="line">drwxrwxr-x  <span class="number">8</span> ubuntu ubuntu <span class="number">4096</span> Mar  <span class="number">6</span> <span class="number">20</span>:<span class="number">14</span> ..</span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> Mar  <span class="number">6</span> <span class="number">19</span>:<span class="number">49</span> <span class="number">01</span></span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> <span class="built_in">Dec</span> <span class="number">25</span> <span class="number">21</span>:<span class="number">46</span> <span class="number">03</span></span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> <span class="built_in">Dec</span> <span class="number">25</span> <span class="number">21</span>:<span class="number">46</span> <span class="number">06</span></span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> <span class="built_in">Dec</span> <span class="number">28</span> <span class="number">16</span>:<span class="number">12</span> <span class="number">0</span>c</span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> Jan <span class="number">17</span> <span class="number">09</span>:<span class="number">29</span> <span class="number">1</span>c</span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> <span class="built_in">Dec</span>  <span class="number">4</span> <span class="number">09</span>:<span class="number">44</span> <span class="number">20</span></span><br><span class="line">drwxrwxr-x  <span class="number">2</span> ubuntu ubuntu <span class="number">4096</span> Feb <span class="number">19</span> <span class="number">09</span>:<span class="number">39</span> <span class="number">29</span></span><br><span class="line">drwxr-xr-x  <span class="number">2</span> root   root   <span class="number">4096</span> Jan <span class="number">18</span> <span class="number">13</span>:<span class="number">10</span> <span class="number">31</span></span><br><span class="line">...</span><br><span class="line">$ sudo chown ubuntu:ubuntu -R .git/objects/</span><br><span class="line">[sudo] <span class="keyword">password</span> <span class="keyword">for</span> ubuntu: </span><br><span class="line">$ git <span class="keyword">status</span></span><br><span class="line"><span class="keyword">On</span> branch <span class="keyword">master</span></span><br><span class="line">Your branch <span class="keyword">is</span> ahead <span class="keyword">of</span> <span class="string">'origin/master'</span> <span class="keyword">by</span> <span class="number">1</span> commit.</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git push"</span> <span class="keyword">to</span> publish your <span class="keyword">local</span> commits)</span><br><span class="line"></span><br><span class="line">Untracked files:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git add &lt;file&gt;..."</span> <span class="keyword">to</span> <span class="keyword">include</span> <span class="keyword">in</span> what will be committed)</span><br><span class="line"></span><br><span class="line">        openssh_7<span class="number">.9</span>p1.orig.tar.gz.asc</span><br><span class="line"></span><br><span class="line"><span class="keyword">nothing</span> added <span class="keyword">to</span> <span class="keyword">commit</span> but untracked files <span class="keyword">present</span> (<span class="keyword">use</span> <span class="string">"git add"</span> <span class="keyword">to</span> track)</span><br><span class="line">$ git <span class="keyword">add</span> openssh_7<span class="number">.9</span>p1.orig.tar.gz.asc </span><br><span class="line">$</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/版本控制/" rel="tag"># 版本控制</a>
+          
+            <a href="/tags/git/" rel="tag"># git</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201901/networks/rpc.rpc_poll.rpc_streaming.html" rel="next" title="图解 rpc rpc_poll 和 rpc_streaming 的差异">
+                <i class="fa fa-chevron-left"></i> 图解 rpc rpc_poll 和 rpc_streaming 的差异
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201903/linux/elementaryos.html" rel="prev" title="elementary OS 使用记录">
+                elementary OS 使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#删除未被跟踪的任何文件和目录"><span class="nav-number">1.</span> <span class="nav-text">删除未被跟踪的任何文件和目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-fork-一个仓库到本地后，同步远程仓库的修订"><span class="nav-number">2.</span> <span class="nav-text">git fork 一个仓库到本地后，同步远程仓库的修订</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并多次本地提交"><span class="nav-number">3.</span> <span class="nav-text">合并多次本地提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理-merge-冲突"><span class="nav-number">4.</span> <span class="nav-text">处理 merge 冲突</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何不留-log-的-revert？（强制提交本地-repo-内容）"><span class="nav-number">5.</span> <span class="nav-text">如何不留 log 的 revert？（强制提交本地 repo 内容）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看某个-commit-id-属于哪个-tags-或-branch"><span class="nav-number">6.</span> <span class="nav-text">查看某个 commit id 属于哪个 tags 或 branch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tag-相关操作"><span class="nav-number">7.</span> <span class="nav-text">tag 相关操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何-merge-其他-repo-中的某次提交？"><span class="nav-number">8.</span> <span class="nav-text">如何 merge 其他 repo 中的某次提交？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-am-失败如何合代码"><span class="nav-number">9.</span> <span class="nav-text">git am 失败如何合代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看本地分支与远程分支的差异"><span class="nav-number">10.</span> <span class="nav-text">查看本地分支与远程分支的差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-log-导入-excel"><span class="nav-number">11.</span> <span class="nav-text">git log 导入 excel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-add-提示-“error-insufficient-permission-for-adding-an-object-to-repository-database-git-objects”"><span class="nav-number">12.</span> <span class="nav-text">git add 提示 “error: insufficient permission for adding an object to repository database .git/objects”</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201901/tools/git_cmd.html";
+    this.page.identifier = "201901/tools/git_cmd.html";
+    this.page.title = '一些常见的 git 命令备忘';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="研究包管理工具的依赖关系管理。">
+<meta name="keywords" content="ubuntu,linux,deb,package,control,dependency,dependencies,rpm,build dependency,pip,npm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="包管理工具依赖关系管理">
+<meta property="og:url" content="http://sunyongfeng.com/201706/linux/deb_dependency.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="研究包管理工具的依赖关系管理。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.060Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="包管理工具依赖关系管理">
+<meta name="twitter:description" content="研究包管理工具的依赖关系管理。">
+  <link rel="canonical" href="http://sunyongfeng.com/201706/linux/deb_dependency">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>包管理工具依赖关系管理 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201706/linux/deb_dependency.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">包管理工具依赖关系管理
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-06-28 10:42:00" itemprop="dateCreated datePublished" datetime="2017-06-28T10:42:00+08:00">2017-06-28</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201706/linux/deb_dependency.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201706/linux/deb_dependency.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">研究包管理工具的依赖关系管理。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>因产品的无法按 app 升级，发现产品中的组件已按包管理工具打包，但是却没有用上包管理工具的核心——依赖关系管理。本文研究包管理工具的依赖关系管理。</p>
+<p>通常依赖关系管理分为安装时/运行时依赖和构建时依赖。这里主要讲安装时/运行时依赖。我所理解的安装时依赖即运行时依赖。<br>常见的包管理工具有 deb / rpm / pip / npm / rake 等，这里以 deb 为例。</p>
+<p>详见 <a href="https://ubuntuforums.org/showthread.php?t=910717" target="_blank" rel="noopener">How to make a “Basic” .deb</a>。为验证安装时依赖关系管理，创建 mydep_2.24-1。helloworld_1.0-1 依赖 mydep_2.24-1。</p>
+<h2 id="目录架构"><a href="#目录架构" class="headerlink" title="目录架构"></a>目录架构</h2><ul>
+<li>helloworld 软件包目录架构</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>tree helloworld_1.<span class="number">0</span>-<span class="number">1</span></span><br><span class="line">helloworld_1.<span class="number">0</span>-<span class="number">1</span></span><br><span class="line">├── DEBIAN</span><br><span class="line">│   └── control</span><br><span class="line">└── usr</span><br><span class="line">    └── local</span><br><span class="line">        └── bin</span><br><span class="line">            └── helloworld</span><br></pre></td></tr></table></figure>
+<ul>
+<li>mydep 软件包目录架构</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">4</span> directories, <span class="number">2</span> files</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>tree mydep_2.<span class="number">24</span>-<span class="number">1</span></span><br><span class="line">mydep_2.<span class="number">24</span>-<span class="number">1</span></span><br><span class="line">├── DEBIAN</span><br><span class="line">│   └── control</span><br><span class="line">└── usr</span><br><span class="line">    └── local</span><br><span class="line">        └── bin</span><br><span class="line">            └── mydep</span><br><span class="line"></span><br><span class="line"><span class="number">4</span> directories, <span class="number">2</span> files</span><br></pre></td></tr></table></figure>
+<h2 id="控制文件"><a href="#控制文件" class="headerlink" title="控制文件"></a>控制文件</h2><p>该实验主要用到两个字段：</p>
+<ol>
+<li>Version，本 package 版本号</li>
+<li>Depends，本 package 依赖哪些软件包，及依赖的版本号是多少</li>
+</ol>
+<ul>
+<li>helloworld 控制文件</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@ubuntu</span>:<span class="regexp">~/workshop/</span>test$ cat helloworld_1<span class="number">.0</span><span class="number">-1</span><span class="regexp">/DEBIAN/</span>control </span><br><span class="line"><span class="string">Package:</span> helloworld</span><br><span class="line"><span class="string">Version:</span> <span class="number">1.0</span><span class="number">-1</span></span><br><span class="line"><span class="string">Section:</span> base</span><br><span class="line"><span class="string">Priority:</span> optional</span><br><span class="line"><span class="string">Architecture:</span> amd64</span><br><span class="line"><span class="string">Depends:</span> mydep (&gt;= <span class="number">2.24</span>)</span><br><span class="line"><span class="string">Maintainer:</span> Your Name &lt;you<span class="meta">@email</span>.com&gt;</span><br><span class="line"><span class="string">Description:</span> Hello World</span><br><span class="line"> When you need some sunshine, just run <span class="keyword">this</span></span><br><span class="line">  small program!</span><br></pre></td></tr></table></figure>
+<ul>
+<li>mydep 控制文件</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@ubuntu</span>:<span class="regexp">~/workshop/</span>test$ cat mydep_2<span class="number">.24</span><span class="number">-1</span><span class="regexp">/DEBIAN/</span>control </span><br><span class="line"><span class="string">Package:</span> mydep</span><br><span class="line"><span class="string">Version:</span> <span class="number">2.24</span><span class="number">-1</span></span><br><span class="line"><span class="string">Section:</span> base</span><br><span class="line"><span class="string">Priority:</span> optional</span><br><span class="line"><span class="string">Architecture:</span> amd64</span><br><span class="line"><span class="string">Maintainer:</span> Your Name &lt;you<span class="meta">@email</span>.com&gt;</span><br><span class="line"><span class="string">Description:</span> Hello World my dep</span><br><span class="line"> When you need some sunshine my dep, just run <span class="keyword">this</span></span><br><span class="line">  small program!</span><br></pre></td></tr></table></figure>
+<h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2><p>通过命令 <code>dpkg-deb --build dir</code> 打包。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>dpkg-deb --build helloworld_1.<span class="number">0</span>-<span class="number">1</span>/</span><br><span class="line">dpkg-<span class="symbol">deb:</span> building package <span class="string">'helloworld'</span> <span class="keyword">in</span> <span class="string">'helloworld_1.0-1.deb'</span>.</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>dpkg-deb --build mydep_2.<span class="number">24</span>-<span class="number">1</span>/</span><br><span class="line">dpkg-<span class="symbol">deb:</span> building package <span class="string">'mydep'</span> <span class="keyword">in</span> <span class="string">'mydep_2.24-1.deb'</span></span><br></pre></td></tr></table></figure>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="依赖关系不成立，安装失败"><a href="#依赖关系不成立，安装失败" class="headerlink" title="依赖关系不成立，安装失败"></a>依赖关系不成立，安装失败</h3><p>如果先安装 helloworld，提示依赖的 mydep 未安装，失败。</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~/workshop/test$ sudo dpkg -i helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb </span><br><span class="line">(Reading database ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing <span class="keyword">to</span> unpack helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking helloworld (<span class="number">1.0</span>-<span class="number">1</span>) over (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">dpkg: dependency problems prevent <span class="keyword">configuration</span> <span class="keyword">of</span> helloworld:</span><br><span class="line"> helloworld depends <span class="keyword">on</span> mydep (&gt;= <span class="number">2.24</span>); however:</span><br><span class="line">  <span class="keyword">Package</span> mydep <span class="keyword">is</span> <span class="keyword">not</span> installed.</span><br><span class="line"></span><br><span class="line">dpkg: <span class="literal">error</span> processing <span class="keyword">package</span> helloworld (<span class="comment">--install):</span></span><br><span class="line"> dependency problems - leaving unconfigured</span><br><span class="line">Errors were encountered <span class="keyword">while</span> processing:</span><br><span class="line"> helloworld</span><br></pre></td></tr></table></figure>
+<h3 id="依赖关系成立，安装成功"><a href="#依赖关系成立，安装成功" class="headerlink" title="依赖关系成立，安装成功"></a>依赖关系成立，安装成功</h3><p>先安装 mydep。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>sudo dpkg -i mydep_2.<span class="number">24</span>-<span class="number">1</span>.deb </span><br><span class="line">Selecting previously unselected package mydep.</span><br><span class="line">(Reading database ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing to unpack mydep_2.<span class="number">24</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking mydep (<span class="number">2.24</span>-<span class="number">1</span>) ...</span><br><span class="line">Setting up mydep (<span class="number">2.24</span>-<span class="number">1</span>) ...</span><br></pre></td></tr></table></figure>
+<p>再安装 helloworld</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>sudo dpkg -i helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb </span><br><span class="line">(Reading database ... <span class="number">325289</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing to unpack helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking helloworld (<span class="number">1.0</span>-<span class="number">1</span>) over (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">Setting up helloworld (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br></pre></td></tr></table></figure>
+<h2 id="卸载软件"><a href="#卸载软件" class="headerlink" title="卸载软件"></a>卸载软件</h2><p>如果先删除 mydep，会一般把依赖 mydep 的软件包都删除。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~/workshop/test$ sudo apt-<span class="built_in">get</span> <span class="built_in">remove</span> mydep</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">The following packages will <span class="keyword">be</span> REMOVED:</span><br><span class="line">  helloworld mydep</span><br><span class="line"><span class="number">0</span> upgraded, <span class="number">0</span> newly installed, <span class="number">2</span> <span class="keyword">to</span> <span class="built_in">remove</span> <span class="built_in">and</span> <span class="number">278</span> not upgraded.</span><br><span class="line">After this operation, <span class="number">0</span> B of additional disk space will <span class="keyword">be</span> used.</span><br><span class="line">Do you want <span class="keyword">to</span> <span class="keyword">continue</span>? [Y/n] <span class="keyword">y</span></span><br><span class="line">(Reading database ... <span class="number">325288</span> <span class="keyword">files</span> <span class="built_in">and</span> directories currently installed.)</span><br><span class="line">Removing helloworld (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">Removing mydep (<span class="number">2.24</span>-<span class="number">1</span>) ...</span><br><span class="line">dpk<span class="variable">g:</span> warnin<span class="variable">g:</span> <span class="keyword">while</span> removing mydep, directory <span class="string">'/usr/local/bin'</span> not <span class="built_in">empty</span> <span class="keyword">so</span> not removed</span><br></pre></td></tr></table></figure>
+<h2 id="依赖关系数据库"><a href="#依赖关系数据库" class="headerlink" title="依赖关系数据库"></a>依赖关系数据库</h2><p>deb 软件依赖关系数据库存放于 <code>/var/lib/dpkg/status</code>，纯文本文件。比如 mydep 和 helloworld 的信息如下。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@ubuntu</span>:<span class="regexp">~/workshop/</span>test$ sudo vi <span class="regexp">/var/</span>lib<span class="regexp">/dpkg/</span>status</span><br><span class="line"></span><br><span class="line"><span class="number">37582</span> <span class="string">Package:</span> mydep                                                                                      </span><br><span class="line"><span class="number">37583</span> <span class="string">Status:</span> install ok installed                                                                        </span><br><span class="line"><span class="number">37584</span> <span class="string">Priority:</span> optional                                                                                  </span><br><span class="line"><span class="number">37585</span> <span class="string">Section:</span> base                                                                                       </span><br><span class="line"><span class="number">37586</span> <span class="string">Maintainer:</span> Your Name &lt;you<span class="meta">@email</span>.com&gt;                                                               </span><br><span class="line"><span class="number">37587</span> <span class="string">Architecture:</span> amd64                                                                                 </span><br><span class="line"><span class="number">37588</span> <span class="string">Version:</span> <span class="number">2.24</span><span class="number">-1</span>                                                                                     </span><br><span class="line"><span class="number">37589</span> <span class="string">Description:</span> Hello World my dep                                                                     </span><br><span class="line"><span class="number">37590</span>  When you need some sunshine my dep, just run <span class="keyword">this</span>                                                  </span><br><span class="line"><span class="number">37591</span>   small program!  </span><br><span class="line"></span><br><span class="line"><span class="number">42473</span> <span class="string">Package:</span> helloworld                                                                                 </span><br><span class="line"><span class="number">42474</span> <span class="string">Status:</span> install ok installed                                                                        </span><br><span class="line"><span class="number">42475</span> <span class="string">Priority:</span> optional                                                                                  </span><br><span class="line"><span class="number">42476</span> <span class="string">Section:</span> base                                                                                       </span><br><span class="line"><span class="number">42477</span> <span class="string">Maintainer:</span> Your Name &lt;you<span class="meta">@email</span>.com&gt;                                                               </span><br><span class="line"><span class="number">42478</span> <span class="string">Architecture:</span> amd64                                                                                 </span><br><span class="line"><span class="number">42479</span> <span class="string">Version:</span> <span class="number">1.0</span><span class="number">-1</span>                                                                                      </span><br><span class="line"><span class="number">42480</span> <span class="string">Depends:</span> mydep (&gt;= <span class="number">2.24</span>)                                                                            </span><br><span class="line"><span class="number">42481</span> <span class="string">Description:</span> Hello World                                                                            </span><br><span class="line"><span class="number">42482</span>  When you need some sunshine, just run <span class="keyword">this</span>                                                         </span><br><span class="line"><span class="number">42483</span>   small program!</span><br></pre></td></tr></table></figure>
+<h3 id="hack-依赖关系数据库"><a href="#hack-依赖关系数据库" class="headerlink" title="hack 依赖关系数据库"></a>hack 依赖关系数据库</h3><p>由于没有看源码确认，通过删除依赖关系数据库中 helloworld 依赖 mydep 的 Depends 行 <code>42480 Depends: mydep (&gt;= 2.24)</code>。<br>通过删除 mydep 包，看 helloworld 会不会被连带删除确认依赖关系数据库是否生效。经验证，此时卸载 mydep 包，不会卸载 helloworld 包，与预期的相符。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~/workshop/test$ sudo vi /var/lib/dpkg/status</span><br><span class="line"></span><br><span class="line">42462 Package: helloworld                                                                                 </span><br><span class="line">42463 Status: <span class="keyword">install</span> ok installed                                                                        </span><br><span class="line"><span class="number">42464</span> <span class="keyword">Priority</span>: optional                                                                                  </span><br><span class="line"><span class="number">42465</span> <span class="keyword">Section</span>: base                                                                                       </span><br><span class="line"><span class="number">42466</span> Maintainer: Your <span class="keyword">Name</span> &lt;you@email.com&gt;                                                               </span><br><span class="line"><span class="number">42467</span> Architecture: amd64                                                                                 </span><br><span class="line"><span class="number">42468</span> <span class="keyword">Version</span>: <span class="number">1.0</span><span class="number">-1</span>                                                                                      </span><br><span class="line"><span class="number">42469</span> Description: Hello World                                                                            </span><br><span class="line"><span class="number">42470</span>  <span class="keyword">When</span> you need <span class="keyword">some</span> sunshine, just run this                                                         </span><br><span class="line"><span class="number">42471</span>   small program! </span><br><span class="line"></span><br><span class="line">sunyongfeng@ubuntu:~/workshop/<span class="keyword">test</span>$ sudo apt-<span class="keyword">get</span> remove mydep</span><br><span class="line">Reading <span class="keyword">package</span> lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">The <span class="keyword">following</span> packages will be REMOVED:</span><br><span class="line">  mydep</span><br><span class="line"><span class="number">0</span> upgraded, <span class="number">0</span> newly installed, <span class="number">1</span> <span class="keyword">to</span> remove <span class="keyword">and</span> <span class="number">278</span> <span class="keyword">not</span> upgraded.</span><br><span class="line"><span class="keyword">After</span> this operation, <span class="number">0</span> B <span class="keyword">of</span> additional disk <span class="keyword">space</span> will be used.</span><br><span class="line"><span class="keyword">Do</span> you want <span class="keyword">to</span> continue? [Y/n] y</span><br><span class="line">(Reading <span class="keyword">database</span> ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Removing mydep (<span class="number">2.24</span><span class="number">-1</span>) ...</span><br></pre></td></tr></table></figure>
+<h2 id="升级-mydep-版本，会不会提醒依赖它的-helloworld"><a href="#升级-mydep-版本，会不会提醒依赖它的-helloworld" class="headerlink" title="升级 mydep 版本，会不会提醒依赖它的 helloworld"></a>升级 mydep 版本，会不会提醒依赖它的 helloworld</h2><p>答案是不会。</p>
+<p>将 helloworld 的控制文件 Depends 行改为 <code>42480 Depends: mydep (= 2.24)</code>，升级 mydep 为版本 2.25-1，此时不会提醒 helloworld。但是重新安装 helloworld 会进一步提醒。</p>
+<p>因此对被依赖的软件包，如果升级为不向前兼容的版本，只能以“死给你看”的形式“通知”依赖它的软件包。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>vi helloworld_1.<span class="number">0</span>-<span class="number">1</span>/DEBIAN/control</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>rm helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb </span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>dpkg-deb --build helloworld_1.<span class="number">0</span>-<span class="number">1</span>/</span><br><span class="line">dpkg-<span class="symbol">deb:</span> building package <span class="string">'helloworld'</span> <span class="keyword">in</span> <span class="string">'helloworld_1.0-1.deb'</span>.</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>sudo apt-get remove helloworld </span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">The following packages will be <span class="symbol">REMOVED:</span></span><br><span class="line">  helloworld</span><br><span class="line"><span class="number">0</span> upgraded, <span class="number">0</span> newly installed, <span class="number">1</span> to remove <span class="keyword">and</span> <span class="number">278</span> <span class="keyword">not</span> upgraded.</span><br><span class="line"><span class="number">1</span> <span class="keyword">not</span> fully installed <span class="keyword">or</span> removed.</span><br><span class="line">After this operation, <span class="number">0</span> B of additional disk space will be used.</span><br><span class="line">Do you want to continue? [Y/n] y</span><br><span class="line">(Reading database ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Removing helloworld (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>sudo dpkg -i helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb </span><br><span class="line">Selecting previously unselected package helloworld.</span><br><span class="line">(Reading database ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing to unpack helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking helloworld (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">Setting up helloworld (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span>sudo dpkg -i mydep_2.<span class="number">24</span>-<span class="number">1</span>.deb </span><br><span class="line"><span class="symbol">dpkg:</span> <span class="symbol">warning:</span> downgrading mydep from <span class="number">2.25</span>-<span class="number">1</span> to <span class="number">2.24</span>-<span class="number">1</span></span><br><span class="line">(Reading database ... <span class="number">325288</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing to unpack mydep_2.<span class="number">24</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking mydep (<span class="number">2.24</span>-<span class="number">1</span>) over (<span class="number">2.25</span>-<span class="number">1</span>) ...</span><br><span class="line">Setting up mydep (<span class="number">2.24</span>-<span class="number">1</span>) ...</span><br><span class="line"></span><br><span class="line">sunyongfeng<span class="variable">@ubuntu</span><span class="symbol">:~/workshop/test</span><span class="variable">$ </span> sudo dpkg -i helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb </span><br><span class="line">(Reading database ... <span class="number">325289</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing to unpack helloworld_1.<span class="number">0</span>-<span class="number">1</span>.deb ...</span><br><span class="line">Unpacking helloworld (<span class="number">1.0</span>-<span class="number">1</span>) over (<span class="number">1.0</span>-<span class="number">1</span>) ...</span><br><span class="line"><span class="symbol">dpkg:</span> dependency problems prevent configuration of <span class="symbol">helloworld:</span></span><br><span class="line"> helloworld depends on mydep (= <span class="number">2.24</span>-<span class="number">1</span>); <span class="symbol">however:</span></span><br><span class="line">  Version of mydep on system is <span class="number">2.25</span>-<span class="number">1</span>.</span><br><span class="line"></span><br><span class="line"><span class="symbol">dpkg:</span> error processing package helloworld (--install)<span class="symbol">:</span></span><br><span class="line"> dependency problems - leaving unconfigured</span><br><span class="line">Errors were encountered <span class="keyword">while</span> <span class="symbol">processing:</span></span><br><span class="line"> helloworld</span><br></pre></td></tr></table></figure>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><a href="http://tldp.org/HOWTO/html_single/Debian-Binary-Package-Building-HOWTO/" target="_blank" rel="noopener">http://tldp.org/HOWTO/html_single/Debian-Binary-Package-Building-HOWTO/</a></li>
+<li><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkg_basics.en.html" target="_blank" rel="noopener">https://www.debian.org/doc/manuals/debian-faq/ch-pkg_basics.en.html</a></li>
+</ol>
+<blockquote>
+<p>Written with <a href="https://stackedit.io/" target="_blank" rel="noopener">StackEdit</a>.</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/deb/" rel="tag"># deb</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201706/programmer/linux/kernel_module_dep.html" rel="next" title="linux kernel module 依赖相关">
+                <i class="fa fa-chevron-left"></i> linux kernel module 依赖相关
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201708/networks/p4/p4lang_intro.html" rel="prev" title="p4 语言简介">
+                p4 语言简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目录架构"><span class="nav-number">1.</span> <span class="nav-text">目录架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制文件"><span class="nav-number">2.</span> <span class="nav-text">控制文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包"><span class="nav-number">3.</span> <span class="nav-text">打包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">4.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖关系不成立，安装失败"><span class="nav-number">4.1.</span> <span class="nav-text">依赖关系不成立，安装失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖关系成立，安装成功"><span class="nav-number">4.2.</span> <span class="nav-text">依赖关系成立，安装成功</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载软件"><span class="nav-number">5.</span> <span class="nav-text">卸载软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖关系数据库"><span class="nav-number">6.</span> <span class="nav-text">依赖关系数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hack-依赖关系数据库"><span class="nav-number">6.1.</span> <span class="nav-text">hack 依赖关系数据库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#升级-mydep-版本，会不会提醒依赖它的-helloworld"><span class="nav-number">7.</span> <span class="nav-text">升级 mydep 版本，会不会提醒依赖它的 helloworld</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201706/linux/deb_dependency.html";
+    this.page.identifier = "201706/linux/deb_dependency.html";
+    this.page.title = '包管理工具依赖关系管理';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

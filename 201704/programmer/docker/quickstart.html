@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="如何从 host 拷贝文件到 docker 容器中。">
+<meta name="keywords" content="ubuntu,docker,copy,cp,container">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker 快速入门">
+<meta property="og:url" content="http://sunyongfeng.com/201704/programmer/docker/quickstart.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="如何从 host 拷贝文件到 docker 容器中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.078Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker 快速入门">
+<meta name="twitter:description" content="如何从 host 拷贝文件到 docker 容器中。">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/programmer/docker/quickstart">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>docker 快速入门 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/programmer/docker/quickstart.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">docker 快速入门
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-19 13:54:20" itemprop="dateCreated datePublished" datetime="2017-04-19T13:54:20+08:00">2017-04-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/programmer/docker/quickstart.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/programmer/docker/quickstart.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">如何从 host 拷贝文件到 docker 容器中。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="安装-docker"><a href="#安装-docker" class="headerlink" title="安装 docker"></a>安装 docker</h2><p>一键安装 <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="noopener">docker</a>：<code>wget -qO- https://get.docker.com/ | sh</code>。</p>
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><ol>
+<li>运行容器，docker run 有多种选项。<code>docker run -d --net=host --privileged -t -v workshop:/workshop --name jerome debian:jessie bash</code><ul>
+<li><code>-v</code> 选项，将 host 目录挂载到 docker 容器系统中</li>
+<li><code>--name your_name</code>，为运行的容器命名，相信直接操作名字总比操作一串数字方便、可用</li>
+</ul>
+</li>
+<li>查看运行中的容器，<code>docker ps</code></li>
+<li>容器退出后，还会缓存在系统中，<ul>
+<li>查看缓存，<code>docker ps -a</code></li>
+<li>运行缓存，<code>docker start jerome</code>，</li>
+<li>删除缓存，<code>docker rm jerome</code></li>
+</ul>
+</li>
+<li>进入容器 shell 命令行，<code>docker exec -it jerome bash</code>，不会像 <code>docker attach</code> 进去退出后，直接将在跑的 docker 实例退出来。</li>
+<li>怕误操作导致缓存丢失？那就提交一下，<code>docker commit jerome debian:jessie_jerome</code></li>
+<li>查看本地镜像，<code>docker images</code></li>
+<li>重命名镜像，<code>docker tag image-id REPOSITORY[:TAG]</code></li>
+<li>复制文件到容器中，<code>docker cp abc jerome:/</code> or <code>docker cp jerome:/abc host_dir/abc</code></li>
+<li>清除 images, <code>docker rmi</code>，<ul>
+<li><code>-f</code> 强制清除，如果碰到这种 log，<code>Error response from daemon: conflict: unable to delete b3370fb9c34a (must be forced) - image is being used by stopped container a1e524588570</code>，带 -f 选项清除</li>
+<li><code>docker rmi -f $(docker images -f &quot;dangling=true&quot; -q)</code>，删除 <none>:<none>，没有 tag 的 image</none></none></li>
+<li><code>docker rmi -f $(docker images &quot;your_image_name*&quot; -q)</code>，删除以 “your_image_name” 开头的所有 image</li>
+</ul>
+</li>
+</ol>
+<p>进入正在运行的容器命令行样例：</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                 COMMAND             CREATED              STATUS              PORTS               NAMES</span><br><span class="line">dab2267a06dd        p4dockerswitch_bmv2   <span class="string">"/bin/bash"</span>         About a minute ago   Up About a minute                       elastic_morse</span><br><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~$ docker <span class="keyword">exec</span> -i -t dab2267a06dd /bin/bash</span><br><span class="line">root@dab2267a06dd:/# </span><br><span class="line">root@dab2267a06dd:/# ls</span><br><span class="line">bin   dev  home  lib64  mnt            nanomsg<span class="number">-1.0</span><span class="number">.0</span>.tar.gz  opt        <span class="keyword">proc</span><span class="title">  run</span> <span class="title">  srv</span> <span class="title"> third-party</span> <span class="title">  thrift-0.9.2.tar.gz</span> <span class="title"> usr</span></span><br><span class="line"><span class="title">boot</span> <span class="title"> etc</span> <span class="title"> lib</span> <span class="title">  media</span> <span class="title"> nanomsg-1.0.0</span> <span class="title"> nnpy</span> <span class="title">                 p4factory</span> <span class="title"> root</span> <span class="title"> sbin</span> <span class="title"> sys</span> <span class="title"> thrift-0.9.2</span> <span class="title"> tmp</span> <span class="title">                 var</span></span><br><span class="line"><span class="title">root@dab2267a06dd:/#</span></span><br></pre></td></tr></table></figure>
+<h2 id="docker-使用中国源"><a href="#docker-使用中国源" class="headerlink" title="docker 使用中国源"></a>docker 使用中国源</h2><p>见 <a href="https://www.docker-cn.com/registry-mirror" target="_blank" rel="noopener">https://www.docker-cn.com/registry-mirror</a></p>
+<ul>
+<li>方法1：</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull registry<span class="selector-class">.docker-cn</span><span class="selector-class">.com</span>/library/ubuntu:<span class="number">16.04</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>方法2：拉取的时候加参数 <code>--registry-mirror=https://registry.docker-cn.com</code></p>
+</li>
+<li><p>方法3：默认配置，需要重启 docker 服务才能生效</p>
+</li>
+</ul>
+<p>为了永久性保留更改，您可以修改 /etc/docker/daemon.json 文件并添加上 registry-mirrors 键值。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"registry-mirrors"</span>: [<span class="string">"https://registry.docker-cn.com"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改保存后重启 Docker 以使配置生效。</p>
+<h2 id="本地-repo"><a href="#本地-repo" class="headerlink" title="本地 repo"></a>本地 repo</h2><p>详见 <a href="https://docs.docker.com/registry/，参考" target="_blank" rel="noopener">https://docs.docker.com/registry/，参考</a> <a href="https://www.jianshu.com/p/fc544e27b507。" target="_blank" rel="noopener">https://www.jianshu.com/p/fc544e27b507。</a></p>
+<h2 id="docker-命令没有权限"><a href="#docker-命令没有权限" class="headerlink" title="docker 命令没有权限"></a>docker 命令没有权限</h2><p>必须 sudo docker xxx？</p>
+<p>见 <a href="http://wiki.jikexueyuan.com/project/docker/articles/basics.html" target="_blank" rel="noopener">使用docker第一步</a>:</p>
+<p>本指南假设你已经完成了Docker的安装工作。检查你安装的Docker,运行以下命令：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Check that you have a working install</span></span><br><span class="line"><span class="variable">$ </span>docker info</span><br></pre></td></tr></table></figure>
+<p>如果你得到 <code>docker: command not found</code>，你可能没有完整的安装上Docker。<br>如果你得到 <code>/var/lib/docker/repositories: permission denied</code>，那你可能没有权限访问你主机上的Docker。</p>
+<p>为获得访问Docker权限可以直接在命令前加sudo，或者采取以下步骤授予权限：：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果还没有docker group就添加一个：</span></span><br><span class="line">$ sudo groupadd docker</span><br><span class="line"><span class="comment"># 将用户加入该group内。然后退出并重新登录即可生效。</span></span><br><span class="line">$ sudo gpasswd -a <span class="variable">$&#123;USER&#125;</span> docker</span><br><span class="line"><span class="comment"># 重启docker</span></span><br><span class="line">$ sudo<span class="built_in"> service </span>docker restart</span><br></pre></td></tr></table></figure>
+<h2 id="docker-空间不足"><a href="#docker-空间不足" class="headerlink" title="docker 空间不足"></a>docker 空间不足</h2><p>配置 docker 的 basesize。</p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop docker</span><br><span class="line">/etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"storage-driver"</span>: <span class="string">"devicemapper"</span></span><br><span class="line">&#125;</span><br><span class="line">sudo dockerd --storage-opt dm.basesize=50G</span><br><span class="line">sudo systemctl start docker</span><br></pre></td></tr></table></figure>
+<h2 id="修改-docker-storage-driver-为-aufs"><a href="#修改-docker-storage-driver-为-aufs" class="headerlink" title="修改 docker storage driver 为 aufs"></a>修改 docker storage driver 为 aufs</h2><p>ubuntu 16.04 默认为 overlay2，但是目前在用的 sonic 不支持，因此只能回退为 aufs。可通过 <code>docker info</code> 命令查看，其中有一句为：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Storage <span class="string">Driver:</span> overlay2</span><br></pre></td></tr></table></figure>
+<p>ubuntu 16.04 如何支持 aufs？详见 <a href="https://docs.docker.com/engine/userguide/storagedriver/aufs-driver/" target="_blank" rel="noopener">Use the AUFS storage driver</a>。</p>
+<ol start="0">
+<li>查看本机 docker storage driver 是否为 aufs，<code>docker info</code>，</li>
+<li>备份 docker 数据，<code>sudo cp /var/lib/docker /var/lib/docker.bak</code></li>
+<li>停止 docker 服务，<code>sudo service docker stop</code></li>
+<li>确认系统是否支持 aufs，<code>grep aufs /proc/filesystem</code></li>
+<li>如果系统不支持 aufs，安装依赖包，<code>sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual</code></li>
+<li>加载 aufs 内核模块，<code>sudo modprobe aufs</code></li>
+<li>配置 docker 启动参数，依赖 <code>/etc/docker/daemon.json</code> 为以下内容。</li>
+<li>启动 docker 服务，<code>sudo service docker start</code></li>
+<li>确认 docker storage driver 已改为 aufs，<code>docker info</code></li>
+</ol>
+<p>/etc/docker/daemon.json 内容：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;                                                                                                   </span><br><span class="line">    <span class="attr">"storage-driver"</span>: <span class="string">"aufs"</span>                                                                        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="docker-提示-daemon-未运行"><a href="#docker-提示-daemon-未运行" class="headerlink" title="docker 提示 daemon 未运行"></a>docker 提示 daemon 未运行</h2><p>提示如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br><span class="line">Cannot connect <span class="built_in">to</span> <span class="keyword">the</span> Docker daemon <span class="keyword">at</span> unix:<span class="comment">///var/run/docker.sock. Is the docker daemon running?</span></span><br></pre></td></tr></table></figure>
+<p>找 docker log 看原因，原因为 <code>/etc/docker/daemon.json</code> 的配置文件有问题</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ vi /var/<span class="built_in">log</span>/docker.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line">unable <span class="built_in">to</span> configure <span class="keyword">the</span> Docker daemon <span class="keyword">with</span> <span class="built_in">file</span> /etc/docker/daemon.json: invalid <span class="keyword">character</span> <span class="string">'r'</span> looking <span class="keyword">for</span> beginning <span class="keyword">of</span> object key <span class="keyword">string</span></span><br></pre></td></tr></table></figure>
+<p>查看配置文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">cat</span> /etc/docker/daemon.json     </span><br><span class="line">&#123;registry-mirror<span class="variable">s:</span> [http<span class="variable">s:</span>//registry.docker-<span class="keyword">cn</span>.<span class="keyword">com</span>]&#125;</span><br></pre></td></tr></table></figure>
+<p>正确的配置文件对比发现，配置的 field 和 value 都要有双引号</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"storage-driver"</span>: <span class="string">"aufs"</span>,</span><br><span class="line">    <span class="attr">"experimental"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"registry-mirrors"</span>: [<span class="string">"https://registry.docker-cn.com"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为什么我的配置文件没有双引号？查看 Dockerfile: </p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"DOCKER_OPTS=\"--experimental\""</span> &gt;&gt; /etc/default/docker</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir /etc/docker &amp;&amp; <span class="built_in">echo</span> <span class="string">"&#123;"</span>registry-mirrors<span class="string">": ["</span>https://registry.docker-cn.com<span class="string">"]&#125;"</span> &gt;&gt; /etc/docker/daemon.json</span></span><br></pre></td></tr></table></figure>
+<p>正确的写法如下，echo 的用法整错了。</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RUN echo <span class="string">"DOCKER_OPTS=<span class="subst">\"</span>--experimental<span class="subst">\"</span>"</span> &gt;&gt; /etc/<span class="section">default</span>/docker</span><br><span class="line">RUN mkdir /etc/docker &amp;&amp; echo <span class="string">"&#123;<span class="subst">\"</span>registry-mirrors<span class="subst">\"</span>: [<span class="subst">\"</span>https://registry.docker-cn.com<span class="subst">\"</span>]&#125;"</span> &gt;&gt; /etc/docker/daemon.json</span><br></pre></td></tr></table></figure>
+<p>echo 样例：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">~$ <span class="keyword">echo</span> <span class="string">"&#123;"</span>registry-mirrors<span class="string">": ["</span>http<span class="variable">s:</span>//registry.docker-<span class="keyword">cn</span>.<span class="keyword">com</span><span class="string">"]&#125;"</span>    </span><br><span class="line">&#123;registry-mirror<span class="variable">s:</span> [http<span class="variable">s:</span>//registry.docker-<span class="keyword">cn</span>.<span class="keyword">com</span>]&#125;</span><br><span class="line">~$ <span class="keyword">echo</span> <span class="string">"&#123;\"registry-mirrors\": [\"https://registry.docker-cn.com\"]&#125;"</span></span><br><span class="line">&#123;<span class="string">"registry-mirrors"</span>: [<span class="string">"https://registry.docker-cn.com"</span>]&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Dockerfile-中找不到对应路径的文件"><a href="#Dockerfile-中找不到对应路径的文件" class="headerlink" title="Dockerfile 中找不到对应路径的文件"></a>Dockerfile 中找不到对应路径的文件</h2><p>见 <a href="https://stackoverflow.com/questions/48126926/unable-to-locate-file-in-docker-container" target="_blank" rel="noopener">https://stackoverflow.com/questions/48126926/unable-to-locate-file-in-docker-container</a>:</p>
+<ul>
+<li>先通过 <code>COPY</code> 把文件拷贝到 docker 容器中的路径</li>
+<li>使用时使用 docker 容器中的路径</li>
+</ul>
+<p>即 docker build 时，<code>RUN</code> 时使用的路径，是 docker 容器中的路径。</p>
+<h2 id="持续集成编译时出现-‘the-input-device-is-not-a-TTY’"><a href="#持续集成编译时出现-‘the-input-device-is-not-a-TTY’" class="headerlink" title="持续集成编译时出现 ‘the input device is not a TTY’"></a>持续集成编译时出现 ‘the input device is not a TTY’</h2><p>原因: 持续集成环境没有以 tty 形式进行编译，需要把 docker run 的 -t 选项删除。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/linux/docker_failed_after_update_kernel.html" rel="next" title="Linux升级内核后 docker 不可用">
+                <i class="fa fa-chevron-left"></i> Linux升级内核后 docker 不可用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/linux/vnc4server.html" rel="prev" title="windows 通过 vnc4server 远程 ubuntu">
+                windows 通过 vnc4server 远程 ubuntu <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-docker"><span class="nav-number">1.</span> <span class="nav-text">安装 docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本操作"><span class="nav-number">2.</span> <span class="nav-text">基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-使用中国源"><span class="nav-number">3.</span> <span class="nav-text">docker 使用中国源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地-repo"><span class="nav-number">4.</span> <span class="nav-text">本地 repo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-命令没有权限"><span class="nav-number">5.</span> <span class="nav-text">docker 命令没有权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-空间不足"><span class="nav-number">6.</span> <span class="nav-text">docker 空间不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改-docker-storage-driver-为-aufs"><span class="nav-number">7.</span> <span class="nav-text">修改 docker storage driver 为 aufs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-提示-daemon-未运行"><span class="nav-number">8.</span> <span class="nav-text">docker 提示 daemon 未运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile-中找不到对应路径的文件"><span class="nav-number">9.</span> <span class="nav-text">Dockerfile 中找不到对应路径的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持续集成编译时出现-‘the-input-device-is-not-a-TTY’"><span class="nav-number">10.</span> <span class="nav-text">持续集成编译时出现 ‘the input device is not a TTY’</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/programmer/docker/quickstart.html";
+    this.page.identifier = "201704/programmer/docker/quickstart.html";
+    this.page.title = 'docker 快速入门';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

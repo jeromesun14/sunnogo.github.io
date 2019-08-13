@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="记录适配 HP openswitch 到 arm CPU 的过程。">
+<meta name="keywords" content="yocto,bitbake,openswitch,openembedded,oe,ops,download too slowly,下载太慢,sstate,gcc,tune,compile,long,编译太久,适配,移植,porting,adapter,arm,mips,ppc,powerpc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="移植 openswitch 到 arm">
+<meta property="og:url" content="http://sunyongfeng.com/201704/programmer/yocto/porting_openswitch_to_arm.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="记录适配 HP openswitch 到 arm CPU 的过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.088Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="移植 openswitch 到 arm">
+<meta name="twitter:description" content="记录适配 HP openswitch 到 arm CPU 的过程。">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/programmer/yocto/porting_openswitch_to_arm">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>移植 openswitch 到 arm | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/programmer/yocto/porting_openswitch_to_arm.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">移植 openswitch 到 arm
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-21 11:02:20" itemprop="dateCreated datePublished" datetime="2017-04-21T11:02:20+08:00">2017-04-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/yocto/" itemprop="url" rel="index"><span itemprop="name">yocto</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/programmer/yocto/porting_openswitch_to_arm.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/programmer/yocto/porting_openswitch_to_arm.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">记录适配 HP openswitch 到 arm CPU 的过程。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>HP ops 目前已过时，现在主导 openswitch 项目的是 DELL 和 SnapRoute，主推 DELL NAS + SnapRoute Flexswitch （称为 opx）。</p>
+<p>本文 openswitch 指 HP ops。记录以前移植 openswtich 到 arm CPU 的过程。</p>
+<h2 id="1-BSP-适配"><a href="#1-BSP-适配" class="headerlink" title="1. BSP 适配"></a>1. BSP 适配</h2><h3 id="1-1-新增一个新产品"><a href="#1-1-新增一个新产品" class="headerlink" title="1.1. 新增一个新产品"></a>1.1. 新增一个新产品</h3><p>在目录 <code>yocto/openswitch/</code> 下新建 <code>meta-platform-openswitch-[product]</code>，其中 product 对应新增的产品名字，可以从已有的产品目录拷贝。以 xxx 为例子：</p>
+<ul>
+<li><p>使用 cp 命令，拷贝其他产品目录为 <code>meta-platform-openswitch-xxx</code>：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp <span class="keyword">meta</span>-platform-openswitch-as6712  <span class="keyword">meta</span>-platform-openswitch-xxx –r</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除 <code>recipes-kernel</code> 以外的配方目录（以 <code>recipes-*</code> 开头的）</p>
+</li>
+<li>将目录下所有文件的中 as6712 修改为 xxx，主要有以下几个文件：<ul>
+<li><code>conf/machine/as6712.conf</code> 重命名为 <code>conf/machine/xxx.conf</code></li>
+<li><code>conf/layer/conf</code></li>
+<li><code>README</code></li>
+<li><code>rules.make</code></li>
+<li><code>recipes-kernel</code> 子目录下的 <code>*.bbappend</code> 中的 <code>PR_append</code></li>
+</ul>
+</li>
+<li>根据 cpu 架构适配 <code>conf/machine/xxx.conf</code> 文件，xxx 的 cpu 是 arm cortexa9 系列，其中 <code>DEFAULTTUNE</code> 定义表示不支持硬件 FPU。</li>
+</ul>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DEFAULTTUNE ?= <span class="string">"core2-64"</span></span><br><span class="line">require conf/machine/<span class="keyword">include</span>/tune-core2.inc</span><br><span class="line">改成：</span><br><span class="line">DEFAULTTUNE ?= <span class="string">"cortexa9-neon"</span></span><br><span class="line">require conf/machine/<span class="keyword">include</span>/tune-cortexa9.inc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据产品支持的内核版本，修订 <code>PREFERRED_VERSION_linux-ops</code> 参数</li>
+<li>暂时屏蔽 <code>MACHINE_FEATURES</code> 和 <code>MACHINE_ESSENTIAL_EXTRA_RDEPENDS</code>，根据需要添加          </li>
+</ul>
+<h3 id="1-2-添加一个新内核版本支持"><a href="#1-2-添加一个新内核版本支持" class="headerlink" title="1.2.  添加一个新内核版本支持"></a>1.2.  添加一个新内核版本支持</h3><ul>
+<li>在目录 <code>yocto/openswitch/meta-distro-openswitch/recipes-kernel/linux/</code> 新增 <code>linux-ops_[version].bb</code> 文件，可以从其他版本复制</li>
+<li>修订 *.bb 文件<ul>
+<li>对应内核版本号，<code>KERNEL_RELEASE = &quot;3.10.18&quot;</code></li>
+<li>对应内核源码下载地址，当前为本地地址 <code>SRC_URI = http://192.168.x.x/linux-3.10.18.tar.gz;name=kernel</code></li>
+<li>对应源码的 md5sum 值（可以使用 linux md5sum 工具计算），<code>SRC_URI[kernel.md5sum] = &quot;e19cbb242d776223c337e10a31ca9865&quot;</code></li>
+<li>对应源码的 sha256sum 值（可以使用 linux sha256sum 工具计算），<code>SRC_URI[kernel.sha256sum]     = &quot;a11abd0ac80c6195aaab16c8be3e97c07c705d0ee135f3c5c092a99c4973b1be&quot;</code></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>备注：两个 checksum 和下载地址要保证正确，不然编译的时候会出错</p>
+</blockquote>
+<ul>
+<li>由于 openswitch 的 linux-ops 不支持设备树，需要新增文件 <code>linux-dtb.inc</code>，并且修订文件 <code>linux.inc</code>：</li>
+</ul>
+<figure class="highlight smalltalk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">LOCALVERSION</span> ?= <span class="comment">""</span></span><br><span class="line">require linux-dtb.inc     #新增</span><br><span class="line"><span class="symbol">#kernel_conf_variable</span> <span class="type">CMDLINE</span> <span class="comment">"\"</span><span class="string">$&#123;</span><span class="type">CMDLINE</span>&#125; <span class="string">$&#123;</span><span class="type">CMDLINE_DEBUG</span>&#125;\<span class="comment">""</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>适配 xxx，新增文件：</li>
+</ul>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yocto<span class="meta-keyword">/openswitch/</span>meta-platform-openswitch-xxx<span class="meta-keyword">/recipes-kernel/</span>dtc/dtc_git.bbappend</span><br><span class="line">yocto<span class="meta-keyword">/openswitch/</span>meta-platform-openswitch-xxx<span class="meta-keyword">/recipes-kernel/</span>linux/linux-ops_3<span class="number">.10</span><span class="number">.18</span>.bbappend</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 <code>meta-platform-openswitch-xxx/recipes-kernel/linux/linux-ops/</code> 增加内核配置文件以及产品需要的 patch文件</li>
+</ul>
+<h3 id="1-3-适配完成之后，使用-make-kernel-编译内核模块"><a href="#1-3-适配完成之后，使用-make-kernel-编译内核模块" class="headerlink" title="1.3. 适配完成之后，使用 make kernel 编译内核模块"></a>1.3. 适配完成之后，使用 <code>make kernel</code> 编译内核模块</h3><p>no log。</p>
+<h3 id="1-4-调试问题汇总"><a href="#1-4-调试问题汇总" class="headerlink" title="1.4. 调试问题汇总"></a>1.4. 调试问题汇总</h3><ul>
+<li>Open-switch 内核默认编译出来的 image 是 zimage，我的设备 uboot 比较老，不支持这种格式；可以通过在 <code>xxx.config</code> 中新增 <code>KERNEL_IMAGETYPE = &quot;uImage&quot;</code> 来指定成 uimage 格式。</li>
+<li>在设备树编译的时候，需要指定目录的在内核的绝对地址，不能单单执行个xx.dts: <code>KERNEL_DEVICETREE = &quot;${S}/arch/arm/boot/dts/zzz_yyy.dts&quot;</code></li>
+<li>内核编译出来的 image 如果使用 uImage 或者 zImage 的时候，内核需要打开以下配置，并且 cpu 产品目录需要有这个文件 <code>arch/arm/mach-yyy/include/mach/uncompress.h</code>，否则会出现调整内核之后死机：</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">CONFIG_BLK_DEV_INITRD</span>=y</span><br><span class="line"><span class="attr">CONFIG_INITRAMFS_SOURCE</span>=<span class="string">""</span></span><br><span class="line"><span class="attr">CONFIG_RD_GZIP</span>=y</span><br><span class="line"><span class="attr">CONFIG_DECOMPRESS_GZIP</span>=y</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果使用的 uImage 或者 zImage 格式加载，内核的入口函数是 <code>arch/arm/boot/bootp/init.S</code> 中，这个文件主要是跳转到 <code>misc.c</code> 自解压内核 image，然后跳转到真正的内核执行。</li>
+<li>如果出现自解压完成，调整到真正内核执行的时候无 log 输出，可以将内核的 <code>early debug</code> 打开，具体配置宏如下：</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">CONFIG_DEBUG_LL</span>=y</span><br><span class="line"><span class="attr">CONFIG_DEBUG_LL_UART_NONE</span>=y</span><br><span class="line"><span class="comment"># CONFIG_DEBUG_ICEDCC is not set</span></span><br><span class="line"><span class="comment"># CONFIG_DEBUG_SEMIHOSTING is not set</span></span><br><span class="line"><span class="attr">CONFIG_DEBUG_LL_INCLUDE</span>=<span class="string">"mach/debug-macro.S"</span></span><br><span class="line"><span class="attr">CONFIG_UNCOMPRESS_INCLUDE</span>=<span class="string">"mach/uncompress.h"</span></span><br><span class="line"><span class="attr">CONFIG_EARLY_PRINTK</span>=y</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果出现以下的错误 log，是由于 uboot 未传入正确的设备树或者参数导致：</li>
+</ul>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:Uncompressing Linux... done, booting the kernel.</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:Error: unrecognized/unsupported machine ID (r1 = 0x00000bb8).</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:Available machine support:</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.036:</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.051:ID (hex)        NAME</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.051:ffffffff        XXX YYY ZZZ</span><br><span class="line">10<span class="string">-21</span><span class="string">-09</span>:30:03.051:</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>bootm</code> 命令可以带两地址，第一个表示 image 的地址，第二个表示设备树地址，<code>bootm 62000000 - 62400000</code>。</li>
+</ul>
+<h3 id="1-5-kernel-defconfig"><a href="#1-5-kernel-defconfig" class="headerlink" title="1.5. kernel defconfig"></a>1.5. kernel defconfig</h3><h3 id="1-6-支持-systemd-的-kernel-defconfig"><a href="#1-6-支持-systemd-的-kernel-defconfig" class="headerlink" title="1.6. 支持 systemd 的 kernel defconfig"></a>1.6. 支持 systemd 的 kernel defconfig</h3><p>这里的 defconfig 不全是支持 systemd 所需配置。<br>支持 systemd 所需配置见 <a href="https://github.com/systemd/systemd/blob/master/README" target="_blank" rel="noopener">systemd README</a>，注意不同的 systemd 版本可能对内核的配置要求不一样。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/yocto/openswitch/meta-platform-openswitch-xxx/recipes-kernel/linux/linux-ops/defconfig b/yocto/openswitch/meta-platform-openswitch-xxx/recipes-kernel/linux/linux-ops/defconfig</span><br><span class="line"><span class="keyword">index</span> a61c606.<span class="number">.06</span>a5f0e <span class="number">100755</span></span><br><span class="line">--- a/yocto/openswitch/<span class="built_in">meta</span>-platform-openswitch-xxx/recipes-kernel/linux/linux-ops/defconfig</span><br><span class="line">+++ b/yocto/openswitch/<span class="built_in">meta</span>-platform-openswitch-xxx/recipes-kernel/linux/linux-ops/defconfig</span><br><span class="line">@@ <span class="number">-41</span>,<span class="number">7</span> +<span class="number">41</span>,<span class="number">7</span> @@ CONFIG_SYSVIPC=y</span><br><span class="line"> CONFIG_SYSVIPC_SYSCTL=y</span><br><span class="line"> CONFIG_POSIX_MQUEUE=y</span><br><span class="line"> CONFIG_POSIX_MQUEUE_SYSCTL=y</span><br><span class="line">-# CONFIG_FHANDLE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_FHANDLE=y</span><br><span class="line"> # CONFIG_AUDIT <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_HAVE_GENERIC_HARDIRQS=y</span><br><span class="line"> </span><br><span class="line">@@ <span class="number">-91</span>,<span class="number">7</span> +<span class="number">91</span>,<span class="number">15</span> @@ CONFIG_RCU_FANOUT_LEAF=<span class="number">16</span></span><br><span class="line"> CONFIG_IKCONFIG=y</span><br><span class="line"> CONFIG_IKCONFIG_PROC=y</span><br><span class="line"> CONFIG_LOG_BUF_SHIFT=<span class="number">21</span></span><br><span class="line">-# CONFIG_CGROUPS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_CGROUPS=y</span><br><span class="line">+# CONFIG_CGROUP_DEBUG <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_CGROUP_FREEZER <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_CGROUP_DEVICE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_CPUSETS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_CGROUP_CPUACCT <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_RESOURCE_COUNTERS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_CGROUP_SCHED <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_BLK_CGROUP <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_CHECKPOINT_RESTORE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_NAMESPACES <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_UIDGID_CONVERTED=y</span><br><span class="line">@@ <span class="number">-99</span>,<span class="number">13</span> +<span class="number">107</span>,<span class="number">7</span> @@ CONFIG_UIDGID_CONVERTED=y</span><br><span class="line"> # CONFIG_SCHED_AUTOGROUP <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_SYSFS_DEPRECATED <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_RELAY <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-CONFIG_BLK_DEV_INITRD=y</span><br><span class="line">-CONFIG_INITRAMFS_SOURCE=<span class="string">""</span></span><br><span class="line">-CONFIG_RD_GZIP=y</span><br><span class="line">-# CONFIG_RD_BZIP2 <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_RD_LZMA <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_RD_XZ <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_RD_LZO <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_BLK_DEV_INITRD <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_CC_OPTIMIZE_FOR_SIZE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_SYSCTL=y</span><br><span class="line"> CONFIG_ANON_INODES=y</span><br><span class="line">@@ <span class="number">-380</span>,<span class="number">12</span> +<span class="number">382</span>,<span class="number">14</span> @@ CONFIG_ARM_AMBA=y</span><br><span class="line"> CONFIG_PCI=y</span><br><span class="line"> CONFIG_PCI_DOMAINS=y</span><br><span class="line"> CONFIG_PCI_SYSCALL=y</span><br><span class="line">+# CONFIG_ARCH_SUPPORTS_MSI <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_DEBUG <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_REALLOC_ENABLE_AUTO <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_STUB <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_IOV <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_PRI <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCI_PASID <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_PCIEPORTBUS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PCCARD <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> </span><br><span class="line"> #</span><br><span class="line">@@ <span class="number">-452</span>,<span class="number">10</span> +<span class="number">456</span>,<span class="number">7</span> @@ CONFIG_ATAGS=y</span><br><span class="line"> # CONFIG_DEPRECATED_PARAM_STRUCT <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_ZBOOT_ROM_TEXT=<span class="number">0x0</span></span><br><span class="line"> CONFIG_ZBOOT_ROM_BSS=<span class="number">0x0</span></span><br><span class="line">-CONFIG_ARM_APPENDED_DTB=y</span><br><span class="line">-CONFIG_ARM_ATAG_DTB_COMPAT=y</span><br><span class="line">-CONFIG_ARM_ATAG_DTB_COMPAT_CMDLINE_FROM_BOOTLOADER=y</span><br><span class="line">-# CONFIG_ARM_ATAG_DTB_COMPAT_CMDLINE_EXTEND <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_ARM_APPENDED_DTB <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_CMDLINE=<span class="string">"console=ttyS0,115200n8 maxcpus=1 mem=240M"</span></span><br><span class="line"> CONFIG_CMDLINE_FROM_BOOTLOADER=y</span><br><span class="line"> # CONFIG_CMDLINE_EXTEND <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">@@ <span class="number">-463</span>,<span class="number">7</span> +<span class="number">464</span>,<span class="number">7</span> @@ CONFIG_CMDLINE_FROM_BOOTLOADER=y</span><br><span class="line"> # CONFIG_XIP_KERNEL <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_KEXEC <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_CRASH_DUMP <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-CONFIG_AUTO_ZRELADDR=y</span><br><span class="line">+# CONFIG_AUTO_ZRELADDR <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> </span><br><span class="line"> #</span><br><span class="line"> # CPU <span class="built_in">Power</span> Management</span><br><span class="line">@@ <span class="number">-478</span>,<span class="number">7</span> +<span class="number">479</span>,<span class="number">7</span> @@ CONFIG_AUTO_ZRELADDR=y</span><br><span class="line"> #</span><br><span class="line"> # At <span class="built_in">least</span> one emulation must be selected</span><br><span class="line"> #</span><br><span class="line">-# CONFIG_VFP <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+#CONFIG_VFP=y</span><br><span class="line"> </span><br><span class="line"> #</span><br><span class="line"> # Userspace <span class="keyword">binary</span> formats</span><br><span class="line">@@ <span class="number">-544</span>,<span class="number">6</span> +<span class="number">545</span>,<span class="number">7</span> @@ CONFIG_HAVE_NET_DSA=y</span><br><span class="line"> CONFIG_RPS=y</span><br><span class="line"> CONFIG_RFS_ACCEL=y</span><br><span class="line"> CONFIG_XPS=y</span><br><span class="line">+# CONFIG_NETPRIO_CGROUP <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_BQL=y</span><br><span class="line"> # CONFIG_BPF_JIT <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> </span><br><span class="line">@@ <span class="number">-571</span>,<span class="number">7</span> +<span class="number">573</span>,<span class="number">8</span> @@ CONFIG_HAVE_BPF_JIT=y</span><br><span class="line"> # Generic Driver Options</span><br><span class="line"> #</span><br><span class="line"> CONFIG_UEVENT_HELPER_PATH=<span class="string">"/sbin/mdev"</span></span><br><span class="line">-# CONFIG_DEVTMPFS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_DEVTMPFS=y</span><br><span class="line">+CONFIG_DEVTMPFS_MOUNT=y</span><br><span class="line"> CONFIG_STANDALONE=y</span><br><span class="line"> CONFIG_PREVENT_FIRMWARE_BUILD=y</span><br><span class="line"> CONFIG_FW_LOADER=y</span><br><span class="line">@@ <span class="number">-1760</span>,<span class="number">8</span> +<span class="number">1763</span>,<span class="number">15</span> @@ CONFIG_ARM_GIC=y</span><br><span class="line"> #</span><br><span class="line"> CONFIG_DCACHE_WORD_ACCESS=y</span><br><span class="line"> # CONFIG_EXT2_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_EXT3_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_EXT3_FS=y</span><br><span class="line">+CONFIG_EXT3_DEFAULTS_TO_ORDERED=y</span><br><span class="line">+CONFIG_EXT3_FS_XATTR=y</span><br><span class="line">+# CONFIG_EXT3_FS_POSIX_ACL <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_EXT3_FS_SECURITY <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_EXT4_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_JBD=y</span><br><span class="line">+# CONFIG_JBD_DEBUG <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_FS_MBCACHE=y</span><br><span class="line"> # CONFIG_REISERFS_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_JFS_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_XFS_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">@@ <span class="number">-1769</span>,<span class="number">6</span> +<span class="number">1779</span>,<span class="number">7</span> @@ CONFIG_DCACHE_WORD_ACCESS=y</span><br><span class="line"> # CONFIG_BTRFS_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_NILFS2_FS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_FS_POSIX_ACL <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+CONFIG_EXPORTFS=y</span><br><span class="line"> CONFIG_FILE_LOCKING=y</span><br><span class="line"> CONFIG_FSNOTIFY=y</span><br><span class="line"> CONFIG_DNOTIFY=y</span><br><span class="line">@@ <span class="number">-1932</span>,<span class="number">7</span> +<span class="number">1943</span>,<span class="number">6</span> @@ CONFIG_HAVE_DEBUG_KMEMLEAK=y</span><br><span class="line"> # CONFIG_DEBUG_LOCKING_API_SELFTESTS <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_DEBUG_STACK_USAGE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_DEBUG_KOBJECT <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_DEBUG_HIGHMEM <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_DEBUG_BUGVERBOSE <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_DEBUG_INFO <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_DEBUG_VM <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">@@ <span class="number">-1983</span>,<span class="number">13</span> +<span class="number">1993</span>,<span class="number">9</span> @@ CONFIG_HAVE_ARCH_KGDB=y</span><br><span class="line"> # CONFIG_STRICT_DEVMEM <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_ARM_UNWIND <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_DEBUG_USER=y</span><br><span class="line">-CONFIG_DEBUG_LL=y</span><br><span class="line">-CONFIG_DEBUG_LL_UART_NONE=y</span><br><span class="line">-# CONFIG_DEBUG_ICEDCC <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-# CONFIG_DEBUG_SEMIHOSTING <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">+# CONFIG_DEBUG_LL <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> CONFIG_DEBUG_LL_INCLUDE=<span class="string">"mach/debug-macro.S"</span></span><br><span class="line"> CONFIG_UNCOMPRESS_INCLUDE=<span class="string">"mach/uncompress.h"</span></span><br><span class="line">-CONFIG_EARLY_PRINTK=y</span><br><span class="line"> # CONFIG_OC_ETM <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_PID_IN_CONTEXTIDR <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> </span><br><span class="line">@@ <span class="number">-2142</span>,<span class="number">7</span> +<span class="number">2148</span>,<span class="number">6</span> @@ CONFIG_LZO_COMPRESS=y</span><br><span class="line"> CONFIG_LZO_DECOMPRESS=y</span><br><span class="line"> # CONFIG_XZ_DEC <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line"> # CONFIG_XZ_DEC_BCJ <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">set</span></span><br><span class="line">-CONFIG_DECOMPRESS_GZIP=y</span><br><span class="line"> CONFIG_HAS_IOMEM=y</span><br><span class="line"> CONFIG_HAS_IOPORT=y</span><br><span class="line"> CONFIG_HAS_DMA=y</span><br></pre></td></tr></table></figure>
+<h2 id="2-gcc-tune"><a href="#2-gcc-tune" class="headerlink" title="2. gcc tune"></a>2. gcc tune</h2><h3 id="2-1-rootfs-不可用"><a href="#2-1-rootfs-不可用" class="headerlink" title="2.1.rootfs 不可用"></a>2.1.rootfs 不可用</h3><p>xxx cpu 为 arm cortex-a9 芯片。<code>DEFAULTTUNE</code> 置为 <code>cortexa9</code> 或 <code>cortexa9-neon</code> 时，编译出来的 rootfs 不可用：<br>启机运行时，会出现 <code>undefined instruction</code>，内核 kill init 退出：</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">init (<span class="number">1</span>): undefined instruction: pc=b6ebcbdc</span><br><span class="line">Code: e1866315 ee021b90 e2402020 e1866235 (f37204a1)</span><br><span class="line">Kernel panic - not syncing: Attempted <span class="keyword">to</span> kill init! exitcode=<span class="number">0x00000004</span></span><br><span class="line"> </span><br><span class="line">CPU1: stopping</span><br><span class="line">CPU: <span class="number">1</span> PID: <span class="number">0</span> Comm: swapper/<span class="number">1</span> Tainted: G        W    <span class="number">3.10</span><span class="number">.18</span> #<span class="number">1</span></span><br><span class="line">Backtrace:</span><br><span class="line"><span class="meta">[&lt;c00117b8&gt;]</span> (dump_backtrace+<span class="number">0x0</span>/<span class="number">0x10c</span>) from <span class="meta">[&lt;c00119cc&gt;]</span> (show_stack+<span class="number">0x18</span>/<span class="number">0x1c</span>)</span><br><span class="line">r6:<span class="number">00000000</span> r5:<span class="number">00000001</span> r4:c041d9f8 r3:<span class="number">00000000</span></span><br><span class="line"><span class="meta">[&lt;c00119b4&gt;]</span> (show_stack+<span class="number">0x0</span>/<span class="number">0x1c</span>) from <span class="meta">[&lt;c02e2034&gt;]</span> (dump_stack+<span class="number">0x24</span>/<span class="number">0x28</span>)</span><br><span class="line"><span class="meta">[&lt;c02e2010&gt;]</span> (dump_stack+<span class="number">0x0</span>/<span class="number">0x28</span>) from <span class="meta">[&lt;c0013ca4&gt;]</span> (handle_IPI+<span class="number">0x118</span>/<span class="number">0x134</span>)</span><br><span class="line"><span class="meta">[&lt;c0013b8c&gt;]</span> (handle_IPI+<span class="number">0x0</span>/<span class="number">0x134</span>) from <span class="meta">[&lt;c0008620&gt;]</span> (gic_handle_irq+<span class="number">0x60</span>/<span class="number">0x64</span>)</span><br><span class="line">r6:ef06ff68 r5:c04022f4 r4:fee2010c r3:c000f14c</span><br><span class="line"><span class="meta">[&lt;c00085c0&gt;]</span> (gic_handle_irq+<span class="number">0x0</span>/<span class="number">0x64</span>) from <span class="meta">[&lt;c000e0c0&gt;]</span> (__irq_svc+<span class="number">0x40</span>/<span class="number">0x50</span>)</span><br><span class="line">Exception stack(<span class="number">0xef06ff68</span> <span class="keyword">to</span> <span class="number">0xef06ffb0</span>)</span><br><span class="line">ff60:                   c18116b0 <span class="number">00000000</span> <span class="number">00002</span>fdc <span class="number">00000000</span> ef06e000 ef06e000</span><br><span class="line">ff80: c0401f28 c0401f70 c02e7b2c ef06e000 ef06e000 ef06ffbc ef06ffc0 ef06ffb0</span><br><span class="line">ffa0: c000f14c c000f150 <span class="number">60000113</span> ffffffff</span><br><span class="line">r7:ef06ff9c r6:ffffffff r5:<span class="number">60000113</span> r4:c000f150</span><br><span class="line"><span class="meta">[&lt;c000f11c&gt;]</span> (arch_cpu_idle+<span class="number">0x0</span>/<span class="number">0x38</span>) from <span class="meta">[&lt;c0055c60&gt;]</span> (cpu_startup_entry+<span class="number">0xec</span>/<span class="number">0x13c</span>)</span><br><span class="line"><span class="meta">[&lt;c0055b74&gt;]</span> (cpu_startup_entry+<span class="number">0x0</span>/<span class="number">0x13c</span>) from <span class="meta">[&lt;c02debd8&gt;]</span> (secondary_start_kernel+<span class="number">0x128</span>/<span class="number">0x130</span>)</span><br><span class="line">r7:c041da1c</span><br><span class="line"><span class="meta">[&lt;c02deab0&gt;]</span> (secondary_start_kernel+<span class="number">0x0</span>/<span class="number">0x130</span>) from <span class="meta">[&lt;612de104&gt;]</span> (<span class="number">0x612de104</span>)</span><br><span class="line">r4:<span class="number">9003</span>c06a r3:c02de0ec</span><br></pre></td></tr></table></figure>
+<p>这个问题排查了约两个星期，排查的方向：</p>
+<ul>
+<li>内核是否支持 systemd？<br>根据 systemd 官方说明文档配置内核，启机还是挂在同样的地方；</li>
+<li>rootfs 的格式是不是有问题（ubifs 还是 ext3）？<br>把 rootfs 改为 ubifs，启机还是挂在同样的地方；</li>
+<li>反汇编<br>通过 <code>objdump</code> vmlinux 或看system map table，都没有对应 PC 值。这个 undefined instruction 的意思应该就是说明没有这个指令，所以不用看了，找也找不着。</li>
+</ul>
+<p>偶然的机会，与同事的讨论中，他曾经在某个产品上使用 debian 8 （默认采用 systemd） 的 rootfs 跑过。因此通过 ops-build 编译的 kernel + debian 8 rootfs （U盘启动）确认内核没有问题。<br>既然内核没有问题，那就得看 debian jessie arm 版本编译的结果与 ops-build 编译结果的差异，通过 <code>readelf -A systemd</code> 查看 systemd 编译结果的架构相关信息，发现了差异：</p>
+<p>不可用的 rootfs：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/rgosm-build/prj_xxx/images/rootfs/lib/systemd</span><span class="variable">$ </span>arm-cortex_a9-linux-gnueabi-readelf -A systemd</span><br><span class="line">Attribute <span class="symbol">Section:</span> aeabi</span><br><span class="line">File Attributes</span><br><span class="line">  <span class="symbol">Tag_CPU_name:</span> <span class="string">"7-A"</span></span><br><span class="line">  <span class="symbol">Tag_CPU_arch:</span> v7</span><br><span class="line">  <span class="symbol">Tag_CPU_arch_profile:</span> Application</span><br><span class="line">  <span class="symbol">Tag_ARM_ISA_use:</span> Yes</span><br><span class="line">  <span class="symbol">Tag_THUMB_ISA_use:</span> Thumb-<span class="number">2</span></span><br><span class="line">  <span class="symbol">Tag_VFP_arch:</span> VFPv3</span><br><span class="line">  <span class="symbol">Tag_Advanced_SIMD_arch:</span> NEONv1</span><br><span class="line">  <span class="symbol">Tag_ABI_PCS_wchar_t:</span> <span class="number">4</span></span><br><span class="line">  <span class="symbol">Tag_ABI_FP_rounding:</span> Needed</span><br><span class="line">  <span class="symbol">Tag_ABI_FP_denormal:</span> Needed</span><br><span class="line">  <span class="symbol">Tag_ABI_FP_exceptions:</span> Needed</span><br><span class="line">  <span class="symbol">Tag_ABI_FP_number_model:</span> IEEE <span class="number">754</span></span><br><span class="line">  <span class="symbol">Tag_ABI_align8_needed:</span> Yes</span><br><span class="line">  <span class="symbol">Tag_ABI_enum_size:</span> int</span><br><span class="line">  <span class="symbol">Tag_ABI_HardFP_use:</span> SP <span class="keyword">and</span> DP</span><br><span class="line">  <span class="symbol">Tag_CPU_unaligned_access:</span> v6</span><br></pre></td></tr></table></figure>
+<p>可用的 rootfs：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">sunyongfeng@openswitch-OptiPlex-380:~/workshop/rgosm-build/prj_xxx/images/rootfs$</span> <span class="string">arm-cortex_a9-linux-gnueabi-readelf</span> <span class="bullet">-A</span> <span class="string">lib/systemd/systemd</span></span><br><span class="line"><span class="string">Attribute</span> <span class="attr">Section:</span> <span class="string">aeabi</span></span><br><span class="line"><span class="string">File</span> <span class="string">Attributes</span></span><br><span class="line"><span class="attr">  Tag_CPU_name:</span> <span class="string">"4T"</span></span><br><span class="line"><span class="attr">  Tag_CPU_arch:</span> <span class="string">v4T</span></span><br><span class="line"><span class="attr">  Tag_ARM_ISA_use:</span> <span class="literal">Yes</span></span><br><span class="line"><span class="attr">  Tag_THUMB_ISA_use:</span> <span class="string">Thumb-1</span></span><br><span class="line"><span class="attr">  Tag_ABI_PCS_wchar_t:</span> <span class="number">4</span></span><br><span class="line"><span class="attr">  Tag_ABI_FP_rounding:</span> <span class="string">Needed</span></span><br><span class="line"><span class="attr">  Tag_ABI_FP_denormal:</span> <span class="string">Needed</span></span><br><span class="line"><span class="attr">  Tag_ABI_FP_exceptions:</span> <span class="string">Needed</span></span><br><span class="line"><span class="attr">  Tag_ABI_FP_number_model:</span> <span class="string">IEEE</span> <span class="number">754</span></span><br><span class="line"><span class="attr">  Tag_ABI_align8_needed:</span> <span class="literal">Yes</span></span><br><span class="line"><span class="attr">  Tag_ABI_align8_preserved:</span> <span class="literal">Yes</span><span class="string">,</span> <span class="string">except</span> <span class="string">leaf</span> <span class="string">SP</span></span><br><span class="line"><span class="attr">  Tag_ABI_enum_size:</span> <span class="string">int</span></span><br></pre></td></tr></table></figure>
+<p>主要差异在 NEON、VFP 和 HardFP 上。因尝试改 <code>tune-cortexa9.inc</code> 等相关文件调整默认 FPU 等编译选项，但是一直修改失败，因此换了个思路，看 debian porting to arm 用了什么编译选项。详见 <a href="https://wiki.debian.org/ArmEabiPort" target="_blank" rel="noopener">debian 移植到 arm 32 的编译选项</a> ，根据文中的建议 tune gcc。</p>
+<h3 id="2-2-tune-gcc"><a href="#2-2-tune-gcc" class="headerlink" title="2.2. tune gcc"></a>2.2. tune gcc</h3><ul>
+<li>配置 <code>yocto/openswitch/meta-platform-openswitch-xxx/conf/machine/xxx.conf</code>，改 <code>DEFAULTTUNE</code> 为 <code>armv4t</code></li>
+</ul>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DEFAULTTUNE ?= <span class="string">"armv4t"</span></span><br><span class="line">require conf/machine/<span class="keyword">include</span>/tune-cortexa9.inc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置 <code>yocto/poky/meta/conf/machine/include/arm/arch-arm.inc</code>，改 <code>TARGET_FPU</code> 为 <code>soft</code>，添加选项 <code>-mabi=aapcs-linux</code></li>
+<li>配置 <code>yocto/poky/meta/conf/machine/include/arm/feature-arm-neon.inc</code> 和 <code>yocto/poky/meta/conf/machine/include/arm/feature-arm-vfp.inc</code>，把 FPU 相关配置改为 soft。</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/ops-build</span>.rj<span class="variable">$ </span>git diff yocto/poky/meta/conf/machine*</span><br><span class="line">diff --git a/yocto/poky/meta/conf/machine/<span class="keyword">include</span>/arm/arch-arm.inc b/yocto/poky/meta/conf/machine/<span class="keyword">include</span>/arm/arch-arm.inc</span><br><span class="line">index <span class="number">90</span>b80c4..b1a04b8 <span class="number">100644</span></span><br><span class="line">--- a/yocto/poky/meta/conf/machine/<span class="keyword">include</span>/arm/arch-arm.inc</span><br><span class="line">+++ b/yocto/poky/meta/conf/machine/<span class="keyword">include</span>/arm/arch-arm.inc</span><br><span class="line">@@ -<span class="number">13</span>,<span class="number">5</span> +<span class="number">13</span>,<span class="number">6</span> @@ TUNE_PKGARCH = <span class="string">"$&#123;ARMPKGARCH&#125;$&#123;ARMPKGSFX_THUMB&#125;$&#123;ARMPKGSFX_DSP&#125;$&#123;ARMPKGSFX_EABI&#125;</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">ABIEXTENSION = "</span>eabi<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">-TARGET_FPU = "</span><span class="variable">$&#123;</span><span class="variable">@d</span>.getVar(<span class="string">'ARMPKGSFX_FPU'</span>, True).strip(<span class="string">'-'</span>) <span class="keyword">or</span> <span class="string">'soft'</span>&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+TARGET_FPU = "</span>soft<span class="string">"</span></span><br><span class="line"><span class="string">+TUNE_CCARGS .= "</span> -mabi=aapcs-linux<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">diff --git a/yocto/poky/meta/conf/machine/include/arm/feature-arm-neon.inc b/yocto/poky/meta/conf/machine/include/arm/feature-arm-neon.inc</span></span><br><span class="line"><span class="string">index e8b2b85..25d612e 100644</span></span><br><span class="line"><span class="string">--- a/yocto/poky/meta/conf/machine/include/arm/feature-arm-neon.inc</span></span><br><span class="line"><span class="string">+++ b/yocto/poky/meta/conf/machine/include/arm/feature-arm-neon.inc</span></span><br><span class="line"><span class="string">@@ -1,3 +1,3 @@</span></span><br><span class="line"><span class="string">TUNEVALID[neon] = "</span>Enable Neon SIMD accelerator unit.<span class="string">"</span></span><br><span class="line"><span class="string">-TUNE_CCARGS .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"neon"</span>, bb.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfpv4"</span>, <span class="string">" -mfpu=neon-vfpv4"</span>, <span class="string">" -mfpu=neon"</span>, d), <span class="string">""</span> , d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">-ARMPKGSFX_FPU .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"neon"</span>, <span class="string">"-neon"</span>, <span class="string">""</span>, d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+TUNE_CCARGS .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"neon"</span>, bb.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfpv4"</span>, <span class="string">" -msoft-float"</span>, <span class="string">" -msoft-float"</span>, d), <span class="string">""</span> , d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+ARMPKGSFX_FPU .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"neon"</span>, <span class="string">""</span>, <span class="string">""</span>, d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">diff --git a/yocto/poky/meta/conf/machine/include/arm/feature-arm-vfp.inc b/yocto/poky/meta/conf/machine/include/arm/feature-arm-vfp.inc</span></span><br><span class="line"><span class="string">index 13927ff..73efcb8 100644</span></span><br><span class="line"><span class="string">--- a/yocto/poky/meta/conf/machine/include/arm/feature-arm-vfp.inc</span></span><br><span class="line"><span class="string">+++ b/yocto/poky/meta/conf/machine/include/arm/feature-arm-vfp.inc</span></span><br><span class="line"><span class="string">@@ -2,8 +2,8 @@ TUNEVALID[vfp] = "</span>Enable Vector Floating Point (vfp) unit.<span class="string">"</span></span><br><span class="line"><span class="string">ARMPKGSFX_FPU .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfp"</span>, <span class="string">"-vfp"</span>, <span class="string">""</span> ,d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">TUNEVALID[vfpv4] = "</span>Enable Vector Floating Point Version <span class="number">4</span> (vfpv4) unit.<span class="string">"</span></span><br><span class="line"><span class="string">-ARMPKGSFX_FPU .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfpv4"</span>, <span class="string">"-vfpv4"</span>, <span class="string">""</span> ,d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+ARMPKGSFX_FPU .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfpv4"</span>, <span class="string">"-vfp"</span>, <span class="string">""</span> ,d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">TUNEVALID[callconvention-hard] = "</span>Enable EABI hard float call convention, requires VFP.<span class="string">"</span></span><br><span class="line"><span class="string">-TUNE_CCARGS .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfp"</span>, bb.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"callconvention-hard"</span>, <span class="string">" -mfloat-abi=hard"</span>, <span class="string">" -mfloat-abi=softfp"</span>, d), <span class="string">""</span> ,d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">-ARMPKGSFX_EABI .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, [ <span class="string">"callconvention-hard"</span>, <span class="string">"vfp"</span> ], <span class="string">"hf"</span>, <span class="string">""</span>, d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+TUNE_CCARGS .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"vfp"</span>, bb.utils.contains(<span class="string">"TUNE_FEATURES"</span>, <span class="string">"callconvention-hard"</span>, <span class="string">" -mfloat-abi=soft"</span>, <span class="string">" -mfloat-abi=soft"</span>, d), <span class="string">""</span> ,d)&#125;<span class="string">"</span></span><br><span class="line"><span class="string">+ARMPKGSFX_EABI .= "</span><span class="variable">$&#123;</span><span class="variable">@bb</span>.utils.contains(<span class="string">"TUNE_FEATURES"</span>, [ <span class="string">"callconvention-hard"</span>, <span class="string">"vfp"</span> ], <span class="string">""</span>, <span class="string">""</span>, d)&#125;<span class="string">"</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-3-关于-xxx-CPU-是否支持-NEON-和-VFP"><a href="#2-3-关于-xxx-CPU-是否支持-NEON-和-VFP" class="headerlink" title="2.3. 关于 xxx CPU 是否支持 NEON 和 VFP"></a>2.3. 关于 xxx CPU 是否支持 NEON 和 VFP</h3><p>xxx CPU 的芯片手册上有明确写支持 NEON 和 VFP，但是不清楚如何使能 NEON，是否要在上电和通过特定配置使能？<br>通过 <code>cat /proc/cpuinfo</code> 可以看出芯片不支持 NEON 和 VFP，但是 /proc/cpuinfo 能完全体现 CPU features 吗？<br>PS：内核有明确打开了配置 <code>CONFIG_NEON=y</code> 与 <code>CONFIG_VFP=y</code>。</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">root@ops-xxx:~# cat /<span class="keyword">proc</span>/cpuinfo</span><br><span class="line">processor       : 0</span><br><span class="line">model<span class="title"> name</span>      :<span class="title"> ARMv7</span> Processor<span class="title"> rev</span> 0 (v7l)</span><br><span class="line">BogoMIPS        : 1987.37</span><br><span class="line">Features        :<span class="title"> swp</span> half<span class="title"> thumb</span> fastmult<span class="title"> edsp</span> tls</span><br><span class="line">CPU<span class="title"> implementer</span> : 0x41</span><br><span class="line">CPU<span class="title"> architecture:</span> 7</span><br><span class="line">CPU<span class="title"> variant</span>     : 0x3</span><br><span class="line">CPU<span class="title"> part</span>        : 0xc09</span><br><span class="line">CPU<span class="title"> revision</span>    : 0</span><br><span class="line"> </span><br><span class="line">processor       : 1</span><br><span class="line">model<span class="title"> name</span>      :<span class="title"> ARMv7</span> Processor<span class="title"> rev</span> 0 (v7l)</span><br><span class="line">BogoMIPS        : 1993.93</span><br><span class="line">Features        :<span class="title"> swp</span> half<span class="title"> thumb</span> fastmult<span class="title"> edsp</span> tls</span><br><span class="line">CPU<span class="title"> implementer</span> : 0x41</span><br><span class="line">CPU<span class="title"> architecture:</span> 7</span><br><span class="line">CPU<span class="title"> variant</span>     : 0x3</span><br><span class="line">CPU<span class="title"> part</span>        : 0xc09</span><br><span class="line">CPU<span class="title"> revision</span>    : 0</span><br><span class="line"> </span><br><span class="line">Hardware        :<span class="title"> yyy</span> CPU</span><br><span class="line">Revision        : 0000</span><br><span class="line">Serial          : 0000000000000000</span><br></pre></td></tr></table></figure>
+<p>通过查阅资料发现 NEON 应该是在系统运行时使能的：</p>
+<blockquote>
+<p>内核在遇到第一个NEON指令时会产生一个Undefined Instruction的异常，这会让内核自动重启NEON协处理器，内核还可以在上下文切换时关闭NEON来省电。<br>BY <a href="http://houh-1984.blog.163.com/blog/static/31127834201382694010808/" target="_blank" rel="noopener">《ARM平台NEON指令的编译和优化》</a></p>
+</blockquote>
+<p>以及：</p>
+<blockquote>
+<p>arm 论坛 “<a href="https://community.arm.com/thread/8409" target="_blank" rel="noopener">How to enable Neon in cortex A8?</a>“<br>Yes you can’t enable it directly from user mode you have to have the privilege though the startup code for the process or an interrupt when such an instruction is first used should do that normally. For the actual instructions needed have you seen: <a href="http://infocenter.arm.com/help/topic/com.arm.doc.dui0472k/chr1359124222192.html" target="_blank" rel="noopener">ARM Compiler armcc User Guide : 5.5 Enabling NEON and FPU for bare-metal</a></p>
+</blockquote>
+<p>直接在 uboot 中修订？<a href="http://lists.denx.de/pipermail/u-boot/2015-January/201269.html" target="_blank" rel="noopener">http://lists.denx.de/pipermail/u-boot/2015-January/201269.html</a> </p>
+<p><strong>TODO</strong> 后续再做验证。<br>FPU 基本只应用于图像处理、音视频处理，与我们无关，因此可以放心不用。</p>
+<h2 id="3-编译问题及修订记录"><a href="#3-编译问题及修订记录" class="headerlink" title="3. 编译问题及修订记录"></a>3. 编译问题及修订记录</h2><h3 id="3-1-python-xattr-在-x86-平台上直接使用交叉编译结果"><a href="#3-1-python-xattr-在-x86-平台上直接使用交叉编译结果" class="headerlink" title="3.1. python xattr 在 x86 平台上直接使用交叉编译结果"></a>3.1. python xattr 在 x86 平台上直接使用交叉编译结果</h3><p>问题 log：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">NOTE</span>: Preparing RunQueue</span><br><span class="line"><span class="keyword">NOTE</span>: Checking sstate mirror object availability (<span class="keyword">for</span> 545 objects)</span><br><span class="line"><span class="keyword">NOTE</span>: Executing SetScene Tasks</span><br><span class="line"><span class="keyword">NOTE</span>: Executing RunQueue Tasks</span><br><span class="line"><span class="keyword">ERROR</span>: Function failed: do_compile (<span class="keyword">log</span> <span class="keyword">file</span> is located at /home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/temp/<span class="keyword">log</span>.do_compile.14582)</span><br><span class="line"><span class="keyword">ERROR</span>: Logfile of failure stored <span class="keyword">in</span>: /home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/temp/<span class="keyword">log</span>.do_compile.14582</span><br><span class="line"><span class="keyword">Log</span> data follows:</span><br><span class="line">| DEBUG: Executing <span class="keyword">shell</span> function do_compile</span><br><span class="line">| running build</span><br><span class="line">| Traceback (most recent call last):</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"setup.py"</span>, <span class="keyword">line</span> 67, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">|     cmdclass=&#123;'build': cffi_build&#125;,</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/distutils/core.py"</span>, <span class="keyword">line</span> 151, <span class="keyword">in</span> setup</span><br><span class="line">|     dist.run_commands()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/distutils/dist.py"</span>, <span class="keyword">line</span> 953, <span class="keyword">in</span> run_commands</span><br><span class="line">|     self.run_command(cmd)</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/distutils/dist.py"</span>, <span class="keyword">line</span> 971, <span class="keyword">in</span> run_command</span><br><span class="line">|     cmd_obj.ensure_finalized()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/distutils/cmd.py"</span>, <span class="keyword">line</span> 109, <span class="keyword">in</span> ensure_finalized</span><br><span class="line">|     self.finalize_options()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"setup.py"</span>, <span class="keyword">line</span> 15, <span class="keyword">in</span> finalize_options</span><br><span class="line">|     from xattr.lib import ffi</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/xattr-0.8.0/xattr/__init__.py"</span>, <span class="keyword">line</span> 12, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">|     from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/xattr-0.8.0/xattr/lib.py"</span>, <span class="keyword">line</span> 596, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">|     <span class="string">""</span>", ext_package='xattr')</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/site-packages/cffi/api.py"</span>, <span class="keyword">line</span> 424, <span class="keyword">in</span> verify</span><br><span class="line">|     lib = self.verifier.load_library()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/site-packages/cffi/verifier.py"</span>, <span class="keyword">line</span> 111, <span class="keyword">in</span> load_library</span><br><span class="line">|     <span class="keyword">return</span> self._load_library()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/site-packages/cffi/verifier.py"</span>, <span class="keyword">line</span> 222, <span class="keyword">in</span> _load_library</span><br><span class="line">|     <span class="keyword">return</span> self._vengine.load_library()</span><br><span class="line">|   <span class="keyword">File</span> <span class="string">"/home/sunyongfeng/workshop/ops-build.rj/build/tmp/sysroots/x86_64-linux/usr/lib/python2.7/site-packages/cffi/vengine_cpy.py"</span>, <span class="keyword">line</span> 155, <span class="keyword">in</span> load_library</span><br><span class="line">|     raise ffiplatform.VerificationError(<span class="keyword">error</span>)</span><br><span class="line">| cffi.ffiplatform.VerificationError: importing '/home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/xattr-0.8.0/xattr/__pycache__/_cffi__xf88a1d89x3f40c4a9.<span class="keyword">so</span>': /home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/xattr-0.8.0/xattr/__pycache__/_cffi__xf88a1d89x3f40c4a9.<span class="keyword">so</span>: wrong ELF <span class="keyword">class</span>: ELFCLASS32</span><br><span class="line">| <span class="keyword">ERROR</span>: python setup.py build execution failed.</span><br><span class="line">| WARNING: <span class="keyword">exit</span> code 1 from a <span class="keyword">shell</span> command.</span><br><span class="line">| <span class="keyword">ERROR</span>: Function failed: do_compile (<span class="keyword">log</span> <span class="keyword">file</span> is located at /home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/0.8.0-r0/temp/<span class="keyword">log</span>.do_compile.14582)</span><br><span class="line"><span class="keyword">ERROR</span>: Task 3879 (/home/sunyongfeng/workshop/ops-build.rj/yocto/openswitch/meta-foss-openswitch/recipes-devtools/python/python-xattr_0.8.0.bb, do_compile) failed with <span class="keyword">exit</span> code '1'</span><br><span class="line"><span class="keyword">NOTE</span>: Tasks Summary: Attempted 2351 tasks of <span class="keyword">which</span> 2295 didn't need to be rerun and 1 failed.</span><br><span class="line">Waiting <span class="keyword">for</span> 0 running tasks to finish:</span><br><span class="line"></span><br><span class="line">Summary: 1 task failed:</span><br><span class="line">  /home/sunyongfeng/workshop/ops-build.rj/yocto/openswitch/meta-foss-openswitch/recipes-devtools/python/python-xattr_0.8.0.bb, do_compile</span><br><span class="line">Summary: There was 1 WARNING message shown.</span><br><span class="line">Summary: There was 1 <span class="keyword">ERROR</span> message shown, returning a non-zero <span class="keyword">exit</span> code.</span><br><span class="line">tools/Rules.make:216: recipe <span class="keyword">for</span> target '_fs' failed</span><br><span class="line">make: *** [_fs] <span class="keyword">Error</span> 1</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/ops-build.rj$</span><br></pre></td></tr></table></figure>
+<p>原因：见 <a href="https://github.com/pyca/cryptography/issues/1325" target="_blank" rel="noopener">github issue</a></p>
+<blockquote>
+<p>I don’t think it’s a cffi issue. I tried to cross compile for a 32 bit system from a 64 bit system. cffi module cffi_backend.so compiled OK for the target (that is 32 bit). <strong>The problem is that when cryptography tries to pre-cross compile (for 32 bit) cffi modules (_Cryptography_cffi*.so), it uses (host) 64 bit compiler flags and tries to load the 32 bit cross compiled _cffi_backend.so.</strong> This is why you get “wrong ELF class: ELFCLASS32”.</p>
+<p>There needs to be some way to configure the C compiler flags from within the cryptography package while cross compiling the cffi modules. You can see how cffi module itself is allowing that in its setup.py file. Another python package I was able to configure the target c flags is python readline.</p>
+<p>I got around this problem (dirty hack) by skipping the cffi modules pre-cross compilation process (Cryptography_cffi*.so) and copying (during the build time) those modules I compiled on the target system.</p>
+</blockquote>
+<p>这种交叉编译时在 build 系统上直接使用编译给 host 的结果，很是蛋疼。</p>
+<p>解决：</p>
+<blockquote>
+<p>Well I could get it working myself by following midicase comment on vincentbernat/snimpy.</p>
+<ol>
+<li>build and install host cffi</li>
+<li>build and install target packages that depend in cffi</li>
+<li>build and install target cffi<br>I’ve created a detailed install instructions <a href="https://github.com/AndreMiras/km/wiki/CFFI-Cross-Compile" target="_blank" rel="noopener">https://github.com/AndreMiras/km/wiki/CFFI-Cross-Compile</a>.</li>
+</ol>
+</blockquote>
+<p>依葫芦画瓢，也衔把 cffi 编译成 build 主机的结果，后续 ARM 设备上要用的话，再编译一个 ARM 架构的 .so。<br>优雅的做法是打 patch 改 xattr 编译 cffi 的配置文件，先编译成 build 机可用、再编译成 host 机可用的结果。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/ops-build</span>.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/<span class="number">0</span>.<span class="number">8.0</span>-r<span class="number">0</span>/xattr-<span class="number">0</span>.<span class="number">8.0</span>/xattr/__pycache_<span class="number">_</span><span class="variable">$ </span>gcc -o _cffi__xf88a1d89x3f40c4a9.so _cffi__xf88a1d89x3f40c4a9.c -shared -I/usr/<span class="keyword">include</span>/python2.<span class="number">7</span>/ -fPIC</span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/ops-build</span>.rj/build/tmp/work/cortexa9-vfp-neon-openswitch-linux-gnueabi/python-xattr/<span class="number">0</span>.<span class="number">8.0</span>-r<span class="number">0</span>/xattr-<span class="number">0</span>.<span class="number">8.0</span>/xattr/__pycache_<span class="number">_</span><span class="variable">$ </span>ls</span><br><span class="line">_cffi__x7c9e2f59xb862c7dd.c  _cffi__xf88a1d89x3f40c4a9.c  _cffi__xf88a1d89x3f40c4a9.so  _cffi__xf88a1d89x3f40c4a9.so.arm  xattr</span><br></pre></td></tr></table></figure>
+<h3 id="3-2-go-编译失败"><a href="#3-2-go-编译失败" class="headerlink" title="3.2. go 编译失败"></a>3.2. go 编译失败</h3><p>go 编译不过，go 的依赖方是 ops-webui，应该是 web 操作界面相关的东西，目前还用不上直接删了。</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">| <span class="literal">WARNING</span>: <span class="keyword">exit</span> code <span class="number">2</span> from a shell command.</span><br><span class="line">| <span class="literal">ERROR</span>: <span class="keyword">Function</span> failed: do_compile (log <span class="keyword">file</span> <span class="keyword">is</span> located at /home/sunyongfeng/workshop/ops-build.rj/build/tmp/work/x86_64-openswitch-linux-gnueabi/go-cross/<span class="number">1.6</span>.<span class="number">3</span>-r0/temp/log.do_compile.<span class="number">31635</span>)</span><br><span class="line"><span class="literal">ERROR</span>: Task <span class="number">3543</span> (/home/sunyongfeng/workshop/ops-build.rj/yocto/openswitch/meta-foss-openswitch/recipes-devtools/go/go-cross_1.<span class="number">6.3</span>.bb, do_compile) failed <span class="keyword">with</span> <span class="keyword">exit</span> code <span class="string">'1'</span></span><br><span class="line"><span class="literal">NOTE</span>: Tasks Summary: Attempted <span class="number">3606</span> tasks <span class="keyword">of</span> which <span class="number">3599</span> didn<span class="symbol">'t</span> need <span class="keyword">to</span> be rerun <span class="keyword">and</span> <span class="number">1</span> failed.</span><br><span class="line">Waiting <span class="keyword">for</span> <span class="number">0</span> running tasks <span class="keyword">to</span> finish:</span><br><span class="line"> </span><br><span class="line">Summary: <span class="number">1</span> task failed:</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除 ops-webui.bb</li>
+<li>删除 recipes-go</li>
+<li>删除 recipes-nodejs</li>
+</ul>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">deleted:</span>    yocto<span class="meta-keyword">/openswitch/</span>meta-distro-openswitch<span class="meta-keyword">/recipes-ops/</span>mgmt/ops-webui.bb</span><br><span class="line"><span class="symbol">deleted:</span>    yocto<span class="meta-keyword">/openswitch/</span>meta-foss-openswitch<span class="meta-keyword">/recipes-go/</span>prometheus/prometheus-promu_git.bb</span><br><span class="line"><span class="symbol">deleted:</span>    yocto<span class="meta-keyword">/openswitch/</span>meta-foss-openswitch<span class="meta-keyword">/recipes-nodejs/</span>nodejs/nodejs.inc</span><br><span class="line"><span class="symbol">deleted:</span>    yocto<span class="meta-keyword">/openswitch/</span>meta-foss-openswitch<span class="meta-keyword">/recipes-nodejs/</span>nodejs/nodejs4.inc</span><br><span class="line"><span class="symbol">deleted:</span>    yocto<span class="meta-keyword">/openswitch/</span>meta-foss-openswitch<span class="meta-keyword">/recipes-nodejs/</span>nodejs/nodejs_4<span class="number">.1</span><span class="number">.2</span>.bb</span><br></pre></td></tr></table></figure>
+<h3 id="3-3-ops-多地方出现-VLOG-format-和指针强转-Warning-导致编译失败"><a href="#3-3-ops-多地方出现-VLOG-format-和指针强转-Warning-导致编译失败" class="headerlink" title="3.3. ops-* 多地方出现 VLOG format 和指针强转 Warning 导致编译失败"></a>3.3. ops-* 多地方出现 VLOG format 和指针强转 Warning 导致编译失败</h3><p>这纯粹是 ops 代码的问题，估计没有 porting 到 32 位机上。<br>出现 warning 的位置实在太多，暂不考虑直接改 .c/.h 源代码。考虑从编译选项入手。</p>
+<p>由于带 <code>-Werror</code>，所以 Warning 会被当成 Error 处理。在 <code>local.conf</code> 中配置 <code>-Wno-error</code> 可体现在编译选项中，但是这个编译选项在 <code>-Werror</code> 之前，经确认，要放在之后才能生效。<br>因此需要考虑打 patch 删除源码配置文件中编译选项带的 <code>-Werror</code>。</p>
+<p>ops-* 组件使用两种编译工具，CMake 与 autoconf。这里为快速适配，还没有使用打 patch 的方法打补丁。</p>
+<h4 id="3-3-1-CMake-类处理"><a href="#3-3-1-CMake-类处理" class="headerlink" title="3.3.1. CMake 类处理"></a>3.3.1. CMake 类处理</h4><p>查找所有 <code>CMakeLists.txt</code> 文件，删除文件中的所有 <code>-Werror</code>。<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">find</span> . -name <span class="string">"CMakeLists.txt"</span> | xargs sed -<span class="built_in">i</span> <span class="string">"s/ -Werror//g"</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="3-3-2-autoconf-类处理"><a href="#3-3-2-autoconf-类处理" class="headerlink" title="3.3.2. autoconf 类处理"></a>3.3.2. autoconf 类处理</h4><p>只有 <code>ops-lldpd</code> 组件用的 autoconf 且出现 warning。</p>
+<ul>
+<li>删除 <code>build/tmp/stamps</code> 目录内 <code>ops-lldpd.do_configure.xxx</code>，这样做才能重新 <code>configure</code>；</li>
+<li>修改 <code>build/tmp/work/armv4-openswitch-linux-gnueabi/ops-lldpd/gitAUTOINC+fd74e10ef2-r0/git/ 源码</code>configure.ac<code>文件，将其中的</code>-Werror` 选项删除。</li>
+</ul>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/configure.ac b/configure.ac</span><br><span class="line">index c476286..ea5d5fb <span class="number">100644</span></span><br><span class="line">--- a/configure.ac</span><br><span class="line">+++ b/configure.ac</span><br><span class="line">@@ -<span class="number">29</span>,<span class="number">7</span> +<span class="number">29</span>,<span class="number">7</span> @@ AC_CONFIG_MACRO_DIR(<span class="string">[m4]</span>)</span><br><span class="line"> AC_SUBST(<span class="string">[CONFIGURE_ARGS]</span>, <span class="string">[$ac_configure_args]</span>)</span><br><span class="line"> </span><br><span class="line"> # Configure automake</span><br><span class="line">-AM_INIT_AUTOMAKE(<span class="string">[foreign -Wall -Werror]</span>)</span><br><span class="line">+AM_INIT_AUTOMAKE(<span class="string">[foreign -Wall]</span>)</span><br><span class="line"> AM_MAINTAINER_MODE</span><br><span class="line"> m4_ifdef(<span class="string">[AM_SILENT_RULES]</span>, <span class="string">[AM_SILENT_RULES(yes)]</span>)</span><br><span class="line"> </span><br><span class="line">@@ -<span class="number">70</span>,<span class="number">7</span> +<span class="number">70</span>,<span class="number">6</span> @@ AX_CFLAGS_GCC_OPTION(<span class="string">[-fdiagnostics-show-option]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-fdiagnostics-color=auto]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-pipe]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-Wall]</span>)</span><br><span class="line">-AX_CFLAGS_GCC_OPTION(<span class="string">[-Werror]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-W]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-Wextra]</span>)</span><br><span class="line"> AX_CFLAGS_GCC_OPTION(<span class="string">[-Wformat]</span>)</span><br></pre></td></tr></table></figure>
+<p>这个定义没有的使用地方没有写好，导致好多 ops-lldpd 强转的地方编译不过：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">104</span>     <span class="comment">/*                                                                                              </span></span><br><span class="line"><span class="comment">105      *  For the initial release, this will just refer to the                                        </span></span><br><span class="line"><span class="comment">106      *  relevant UCD header files.                                                                  </span></span><br><span class="line"><span class="comment">107      *    In due course, the types and structures relevant to the                                   </span></span><br><span class="line"><span class="comment">108      *  Net-SNMP API will be identified, and defined here directly.                                 </span></span><br><span class="line"><span class="comment">109      *                                                                                              </span></span><br><span class="line"><span class="comment">110      *  But for the time being, this header file is primarily a placeholder,                        </span></span><br><span class="line"><span class="comment">111      *  to allow application writers to adopt the new header file names.                            </span></span><br><span class="line"><span class="comment">112      */</span>                                                                                             </span><br><span class="line"><span class="number">113</span>                                                                                                     </span><br><span class="line"><span class="number">114</span> typedef union &#123;                                                                                     </span><br><span class="line"><span class="number">115</span>    long           *<span class="type">integer</span>;                                                                         </span><br><span class="line"><span class="number">116</span>    u_char         *<span class="type">string</span>;                                                                          </span><br><span class="line"><span class="number">117</span>    oid            *objid;                                                                           </span><br><span class="line"><span class="number">118</span>    u_char         *bitstring;                                                                       </span><br><span class="line"><span class="number">119</span>    struct counter64 *counter64;                                                                     </span><br><span class="line"><span class="number">120</span> #ifdef NETSNMP_WITH_OPAQUE_SPECIAL_TYPES                                                            </span><br><span class="line"><span class="number">121</span>    <span class="type">float</span>          *floatVal;                                                                        </span><br><span class="line"><span class="number">122</span>    double         *doubleVal;                                                                       </span><br><span class="line"><span class="number">123</span>    <span class="comment">/*                                                                                               </span></span><br><span class="line"><span class="comment">124     * t_union *unionVal;                                                                            </span></span><br><span class="line"><span class="comment">125     */</span>                                                                                              </span><br><span class="line"><span class="number">126</span> #endif                          <span class="comment">/* NETSNMP_WITH_OPAQUE_SPECIAL_TYPES */</span>                             </span><br><span class="line"><span class="number">127</span> &#125; netsnmp_vardata;                                                                                  </span><br><span class="line"><span class="number">128</span>                                                                                                     </span><br><span class="line"><span class="number">129</span>                                                                                                     </span><br><span class="line"><span class="number">130</span> #define MAX_OID_LEN     <span class="number">128</span> <span class="comment">/* max subid's in an oid */</span>                                             </span><br><span class="line"><span class="number">131</span>                                                                                                     </span><br><span class="line"><span class="number">132</span> <span class="comment">/** @typedef struct variable_list netsnmp_variable_list                                             </span></span><br><span class="line"><span class="comment">133  * Typedefs the variable_list struct into netsnmp_variable_list */</span>                                  </span><br><span class="line"><span class="number">134</span> <span class="comment">/** @struct variable_list                                                                           </span></span><br><span class="line"><span class="comment">135  * The netsnmp variable list binding structure, it's typedef'd to                                   </span></span><br><span class="line"><span class="comment">136  * netsnmp_variable_list.                                                                           </span></span><br><span class="line"><span class="comment">137  */</span>                                                                                                 </span><br><span class="line"><span class="number">138</span> typedef struct variable_list &#123;                                                                      </span><br><span class="line"><span class="number">139</span>    <span class="comment">/** NULL for last variable */</span>                                                                    </span><br><span class="line"><span class="number">140</span>    struct variable_list *next_variable;                                                             </span><br><span class="line"><span class="number">141</span>    <span class="comment">/** Object identifier of variable */</span>                                                             </span><br><span class="line"><span class="number">142</span>    oid            *name;                                                                            </span><br><span class="line">  ⮀ NORMAL ⮀  net-snmp/types.h</span><br></pre></td></tr></table></figure>
+<p>log：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>sunyongfeng<span class="regexp">/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>cortexa9-vfp-neon-openswitch-linux-gnueabi<span class="regexp">/ops-lldpd/</span>gitAUTOINC+fd74e10ef2-r0<span class="regexp">/git/</span>src<span class="regexp">/snmp/</span>lldpPortConfigTable_interface.<span class="string">c:</span> In function <span class="string">'_lldpPortConfigTable_get_column'</span>:</span><br><span class="line"><span class="regexp">/home/</span>sunyongfeng<span class="regexp">/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>cortexa9-vfp-neon-openswitch-linux-gnueabi<span class="regexp">/ops-lldpd/</span>gitAUTOINC+fd74e10ef2-r0<span class="regexp">/git/</span>src<span class="regexp">/snmp/</span>lldpPortConfigTable_interface.<span class="string">c:</span><span class="number">323</span>:<span class="number">56</span>: <span class="string">warning:</span> cast increases required alignment of target type [-Wcast-align]</span><br><span class="line">         rc = lldpPortConfigAdminStatus_get(rowreq_ctx, (<span class="keyword">long</span> *)var-&gt;val.string);</span><br><span class="line">                                                        ^</span><br><span class="line"><span class="regexp">/home/</span>sunyongfeng<span class="regexp">/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>cortexa9-vfp-neon-openswitch-linux-gnueabi<span class="regexp">/ops-lldpd/</span>gitAUTOINC+fd74e10ef2-r0<span class="regexp">/git/</span>src<span class="regexp">/snmp/</span>lldpPortConfigTable_interface.<span class="string">c:</span><span class="number">329</span>:<span class="number">51</span>: <span class="string">warning:</span> cast increases required alignment of target type [-Wcast-align]</span><br><span class="line">                                                   (<span class="keyword">long</span> *)var-&gt;val.string);</span><br><span class="line">                                                   ^</span><br><span class="line"><span class="regexp">/home/</span>sunyongfeng<span class="regexp">/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>cortexa9-vfp-neon-openswitch-linux-gnueabi<span class="regexp">/ops-lldpd/</span>gitAUTOINC+fd74e10ef2-r0<span class="regexp">/git/</span>src<span class="regexp">/snmp/</span>lldpPortConfigTable_interface.<span class="string">c:</span><span class="number">336</span>:<span class="number">45</span>: <span class="string">warning:</span> cast increases required alignment of target type [-Wcast-align]</span><br><span class="line">                                             (u_long *)var-&gt;val.string);</span><br><span class="line">                                             ^</span><br><span class="line"><span class="regexp">/home/</span>sunyongfeng<span class="regexp">/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>cortexa9-vfp-neon-openswitch-linux-gnueabi<span class="regexp">/ops-lldpd/</span>gitAUTOINC+fd74e10ef2-r0<span class="regexp">/git/</span>src<span class="regexp">/snmp/</span>lldpPortConfigTable_interface.<span class="string">c:</span><span class="number">340</span>:<span class="number">19</span>: <span class="string">warning:</span> cast increases required alignment of target type [-Wcast-align]</span><br><span class="line">             <span class="keyword">if</span> (*((u_long *)var-&gt;val.string) &amp; mask)</span><br></pre></td></tr></table></figure>
+<h3 id="3-4-openswitch-disk-image-bb-task-do-rootfs-失败"><a href="#3-4-openswitch-disk-image-bb-task-do-rootfs-失败" class="headerlink" title="3.4. openswitch-disk-image.bb task do_rootfs 失败"></a>3.4. openswitch-disk-image.bb task <code>do_rootfs</code> 失败</h3><p>原因：usermod 命令找不到 group ovsdb-client 等 group。log：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">| NOTE: Performing usermod <span class="keyword">with</span> [-R /home/sunyongfeng/workshop/ops-build.rj/<span class="keyword">build</span>/tmp/<span class="keyword">work</span>/xxx-openswitch-linux-gnueabi/openswitch-disk-image/<span class="number">1.0</span>-r0/rootfs -g ovsdb-<span class="keyword">client</span> opsd] <span class="keyword">and</span> <span class="number">1</span> times <span class="keyword">of</span> retry</span><br><span class="line">| usermod: <span class="keyword">group</span> <span class="string">'ovsdb-client'</span> does <span class="keyword">not</span> exist</span><br><span class="line">| <span class="keyword">Server</span> refused shutdown.  Remaining <span class="keyword">client</span> fds: <span class="number">2</span></span><br><span class="line">| <span class="keyword">Client</span> pids: <span class="number">2799</span> <span class="number">8830</span></span><br><span class="line">| <span class="keyword">Server</span> will shut down <span class="keyword">after</span> <span class="keyword">all</span> clients exit.</span><br><span class="line">| <span class="keyword">WARNING</span>: usermod command did <span class="keyword">not</span> succeed. Retrying...</span><br><span class="line">| <span class="keyword">ERROR</span>: Tried running usermod command <span class="number">1</span> times <span class="keyword">without</span> <span class="keyword">success</span>, giving up</span><br><span class="line">| <span class="keyword">WARNING</span>: <span class="keyword">exit</span> code <span class="number">1</span> <span class="keyword">from</span> a shell command.</span><br><span class="line">| DEBUG: Python <span class="keyword">function</span> do_rootfs finished</span><br><span class="line">| <span class="keyword">ERROR</span>: <span class="keyword">Function</span> <span class="keyword">failed</span>: set_user_group (<span class="keyword">log</span> <span class="keyword">file</span> <span class="keyword">is</span> located <span class="keyword">at</span> /home/sunyongfeng/workshop/ops-build.rj/<span class="keyword">build</span>/tmp/<span class="keyword">work</span>/xxx-openswitch-linux-gnueabi/openswitch-disk-image/<span class="number">1.0</span>-r0/temp/log.do_rootfs<span class="number">.2799</span>)</span><br><span class="line"><span class="keyword">ERROR</span>: Task <span class="number">7</span> (/home/sunyongfeng/workshop/ops-build.rj/yocto/openswitch/meta-distro-openswitch/recipes-core/images/openswitch-disk-image.bb, do_rootfs) <span class="keyword">failed</span> <span class="keyword">with</span> <span class="keyword">exit</span> code <span class="string">'1'</span></span><br><span class="line">NOTE: Tasks Summary: Attempted <span class="number">4408</span> tasks <span class="keyword">of</span> which <span class="number">4407</span> didn<span class="string">'t need to be rerun and 1 failed.</span></span><br><span class="line"><span class="string">No currently running tasks (4405 of 4411)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Summary: 1 task failed:</span></span><br><span class="line"><span class="string">  /home/sunyongfeng/workshop/ops-build.rj/yocto/openswitch/meta-distro-openswitch/recipes-core/images/openswitch-disk-image.bb, do_rootfs</span></span><br><span class="line"><span class="string">Summary: There was 1 WARNING message shown.</span></span><br><span class="line"><span class="string">Summary: There was 1 ERROR message shown, returning a non-zero exit code.</span></span><br><span class="line"><span class="string">tools/Rules.make:216: recipe for target '</span>_fs<span class="string">' failed</span></span><br><span class="line"><span class="string">make: *** [_fs] Error 1</span></span><br></pre></td></tr></table></figure></p>
+<p>看 rootfs 里面，没有看到 group 没有 ops_admin、ovsdb-client 等。而  <code>yocto/openswitch/meta-distro-openswitch/classes/openswitch-image.bbclass</code> 中的 EXTRA_USER_PARAMS 有添加用户到这几个 group 中。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">inherit core-image extrausers </span><br><span class="line">EXTRA_USERS_PARAMS = <span class="string">"\ </span></span><br><span class="line"><span class="string">         useradd -N -M -r opsd; \ </span></span><br><span class="line"><span class="string">         usermod -s /bin/false opsd;\ </span></span><br><span class="line"><span class="string">         useradd -N -P netop netop; \ </span></span><br><span class="line"><span class="string">         useradd -N -P admin admin; \ </span></span><br><span class="line"><span class="string">         useradd -N -P remote_user remote_user; \   </span></span><br><span class="line"><span class="string">         usermod -g ops_admin admin;\ </span></span><br><span class="line"><span class="string">         usermod -g ops_netop netop;\</span></span><br><span class="line"><span class="string">         usermod -g ops_netop remote_user;\ </span></span><br><span class="line"><span class="string">         usermod -g ovsdb-client opsd;\ </span></span><br><span class="line"><span class="string">         usermod -G ovsdb-client netop;\ </span></span><br><span class="line"><span class="string">         usermod -G ovsdb-client remote_user;\</span></span><br><span class="line"><span class="string">         usermod -s /bin/bash admin;\ </span></span><br><span class="line"><span class="string">         usermod -s /usr/bin/vtysh netop;\ </span></span><br><span class="line"><span class="string">         usermod -s /usr/bin/vtysh remote_user;\</span></span><br><span class="line"><span class="string">         "</span> </span><br><span class="line">IMAGE_FEATURES += <span class="string">"ssh-server-openssh"</span> </span><br><span class="line">IMAGE_FEATURES += <span class="string">"package-management"</span></span><br><span class="line"></span><br><span class="line">IMAGE_GEN_DEBUGFS = <span class="string">"1"</span> </span><br><span class="line">IMAGE_FSTYPES += <span class="string">"dbg.tar"</span></span><br></pre></td></tr></table></figure>
+<p>而 <code>yocto/openswitch/meta-distro-openswitch/recipes-ops/openvswitch/ops-openvswitch.bb</code> 中有配置添加 group：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">GROUPADD_PARAM_</span><span class="variable">$&#123;PN&#125;</span> =<span class="string">"-g 1020 ovsdb-client;ops_netop;ops_admin"</span></span><br></pre></td></tr></table></figure>
+<p>这个配置没在 rootsf 中生效：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@openswitch</span>-OptiPlex<span class="number">-380</span>:<span class="regexp">~/workshop/</span>ops-build.rj<span class="regexp">/build/</span>tmp<span class="regexp">/work/</span>xxx-openswitch-linux-gnueabi<span class="regexp">/openswitch-disk-image/</span><span class="number">1.0</span>-r0<span class="regexp">/rootfs$ cat etc/</span>group </span><br><span class="line"><span class="string">root:</span><span class="string">x:</span><span class="number">0</span>:</span><br><span class="line"><span class="string">daemon:</span><span class="string">x:</span><span class="number">1</span>:</span><br><span class="line"><span class="string">bin:</span><span class="string">x:</span><span class="number">2</span>:</span><br><span class="line"><span class="string">sys:</span><span class="string">x:</span><span class="number">3</span>:</span><br><span class="line"><span class="string">adm:</span><span class="string">x:</span><span class="number">4</span>:</span><br><span class="line"><span class="string">tty:</span><span class="string">x:</span><span class="number">5</span>:</span><br><span class="line"><span class="string">disk:</span><span class="string">x:</span><span class="number">6</span>:</span><br><span class="line"><span class="string">lp:</span><span class="string">x:</span><span class="number">7</span>:</span><br><span class="line"><span class="string">mail:</span><span class="string">x:</span><span class="number">8</span>:</span><br><span class="line"><span class="string">news:</span><span class="string">x:</span><span class="number">9</span>:</span><br><span class="line"><span class="string">uucp:</span><span class="string">x:</span><span class="number">10</span>:</span><br><span class="line"><span class="string">man:</span><span class="string">x:</span><span class="number">12</span>:</span><br><span class="line"><span class="string">proxy:</span><span class="string">x:</span><span class="number">13</span>:</span><br><span class="line"><span class="string">kmem:</span><span class="string">x:</span><span class="number">15</span>:</span><br><span class="line"><span class="string">input:</span><span class="string">x:</span><span class="number">19</span>:</span><br><span class="line"><span class="string">dialout:</span><span class="string">x:</span><span class="number">20</span>:</span><br><span class="line"><span class="string">fax:</span><span class="string">x:</span><span class="number">21</span>:</span><br><span class="line"><span class="string">voice:</span><span class="string">x:</span><span class="number">22</span>:</span><br><span class="line"><span class="string">cdrom:</span><span class="string">x:</span><span class="number">24</span>:</span><br><span class="line"><span class="string">floppy:</span><span class="string">x:</span><span class="number">25</span>:</span><br><span class="line"><span class="string">tape:</span><span class="string">x:</span><span class="number">26</span>:</span><br><span class="line"><span class="string">sudo:</span><span class="string">x:</span><span class="number">27</span>:</span><br><span class="line"><span class="string">audio:</span><span class="string">x:</span><span class="number">29</span>:</span><br><span class="line"><span class="string">dip:</span><span class="string">x:</span><span class="number">30</span>:</span><br><span class="line">www-<span class="string">data:</span><span class="string">x:</span><span class="number">33</span>:</span><br><span class="line"><span class="string">backup:</span><span class="string">x:</span><span class="number">34</span>:</span><br><span class="line"><span class="string">operator:</span><span class="string">x:</span><span class="number">37</span>:</span><br><span class="line"><span class="string">list:</span><span class="string">x:</span><span class="number">38</span>:</span><br><span class="line"><span class="string">irc:</span><span class="string">x:</span><span class="number">39</span>:</span><br><span class="line"><span class="string">src:</span><span class="string">x:</span><span class="number">40</span>:</span><br><span class="line"><span class="string">gnats:</span><span class="string">x:</span><span class="number">41</span>:</span><br><span class="line"><span class="string">shadow:</span><span class="string">x:</span><span class="number">42</span>:</span><br><span class="line"><span class="string">utmp:</span><span class="string">x:</span><span class="number">43</span>:</span><br><span class="line"><span class="string">video:</span><span class="string">x:</span><span class="number">44</span>:</span><br><span class="line"><span class="string">sasl:</span><span class="string">x:</span><span class="number">45</span>:</span><br><span class="line"><span class="string">plugdev:</span><span class="string">x:</span><span class="number">46</span>:</span><br><span class="line"><span class="string">staff:</span><span class="string">x:</span><span class="number">50</span>:</span><br><span class="line"><span class="string">games:</span><span class="string">x:</span><span class="number">60</span>:</span><br><span class="line"><span class="string">shutdown:</span><span class="string">x:</span><span class="number">70</span>:</span><br><span class="line"><span class="string">users:</span><span class="string">x:</span><span class="number">100</span>:</span><br><span class="line"><span class="string">nogroup:</span><span class="string">x:</span><span class="number">65534</span>:</span><br><span class="line"><span class="string">rpc:</span><span class="string">x:</span><span class="number">999</span>:</span><br><span class="line"><span class="string">netdev:</span><span class="string">x:</span><span class="number">998</span>:</span><br><span class="line"><span class="string">messagebus:</span><span class="string">x:</span><span class="number">997</span>:</span><br><span class="line"><span class="string">sshd:</span><span class="string">x:</span><span class="number">996</span>:</span><br><span class="line"><span class="string">lock:</span><span class="string">x:</span><span class="number">995</span>:</span><br><span class="line">systemd-<span class="string">journal:</span><span class="string">x:</span><span class="number">994</span>:</span><br><span class="line">systemd-journal-<span class="string">gateway:</span><span class="string">x:</span><span class="number">993</span>:</span><br><span class="line">systemd-<span class="string">timesync:</span><span class="string">x:</span><span class="number">992</span>:</span><br></pre></td></tr></table></figure>
+<p>因此，在usermod 使用不存在的 group 前，先执行 groupadd。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">diff --git a<span class="regexp">/yocto/</span>openswitch<span class="regexp">/meta-distro-openswitch/</span>classes<span class="regexp">/openswitch-image.bbclass b/</span>yocto<span class="regexp">/openswitch/</span>meta-distro-openswitch<span class="regexp">/classes/</span>openswitch-image.bbclass</span><br><span class="line">index <span class="number">996503</span>c.<span class="number">.5e1</span>e9e8 <span class="number">100644</span></span><br><span class="line">--- a<span class="regexp">/yocto/</span>openswitch<span class="regexp">/meta-distro-openswitch/</span>classes/openswitch-image.bbclass</span><br><span class="line">+++ b<span class="regexp">/yocto/</span>openswitch<span class="regexp">/meta-distro-openswitch/</span>classes/openswitch-image.bbclass</span><br><span class="line">@@ <span class="number">-2</span>,<span class="number">6</span> +<span class="number">2</span>,<span class="number">9</span> @@ inherit core-image extrausers</span><br><span class="line"> EXTRA_USERS_PARAMS = <span class="string">"\</span></span><br><span class="line"><span class="string">          useradd -N -M -r opsd; \</span></span><br><span class="line"><span class="string">          usermod -s /bin/false opsd;\</span></span><br><span class="line"><span class="string">+         groupadd -g 1020 ovsdb-client; \</span></span><br><span class="line"><span class="string">+         groupadd ops_netop; \</span></span><br><span class="line"><span class="string">+         groupadd ops_admin; \</span></span><br><span class="line"><span class="string">          usermod -g ovsdb-client opsd;\</span></span><br><span class="line"><span class="string">          useradd -N -P netop netop; \</span></span><br><span class="line"><span class="string">          useradd -N -P admin admin; \</span></span><br></pre></td></tr></table></figure>
+<h2 id="4-编译太慢？"><a href="#4-编译太慢？" class="headerlink" title="4. 编译太慢？"></a>4. 编译太慢？</h2><h3 id="4-1-下载源码慢的问题"><a href="#4-1-下载源码慢的问题" class="headerlink" title="4.1. 下载源码慢的问题"></a>4.1. 下载源码慢的问题</h3><p>编译的时候，会实时下载要编译的源代码包，由于 GFW 的缘故，代码下载得很慢，导致整个工程编译时间超长。因此可一次下载，多次使用，改 <code>DL_DIR</code>。</p>
+<ul>
+<li>原始位置，<code>tools/config/local.conf.in</code> 和 <code>tools/config/site.conf.in</code></li>
+<li>在 <code>make configure xxx</code> 之后，亦可直接修订 <code>build/conf/local.conf</code></li>
+</ul>
+<h3 id="4-2-如果使用已编译的结果"><a href="#4-2-如果使用已编译的结果" class="headerlink" title="4.2. 如果使用已编译的结果"></a>4.2. 如果使用已编译的结果</h3><p>利用 yocto sstate 特性。配置 <code>SSTATE_DIR</code></p>
+<p>4.1. 和 4.2. 的配置修订如下：</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/tools/config/local.conf.<span class="keyword">in</span> b/tools/config/local.conf.<span class="keyword">in</span></span><br><span class="line">index <span class="number">80eefbe</span>..eaeb301 <span class="number">100644</span></span><br><span class="line">--- a/tools/config/local.conf.<span class="keyword">in</span></span><br><span class="line">+++ b/tools/config/local.conf.<span class="keyword">in</span></span><br><span class="line">@@ -<span class="number">39</span>,<span class="number">7</span> +<span class="number">39</span>,<span class="number">7</span> @@ MACHINE = <span class="string">"#<span class="subst">#PLATFORM</span>##"</span></span><br><span class="line"> <span class="comment">#</span></span><br><span class="line"> <span class="comment"># The default is a downloads directory under TOPDIR which is the build directory.</span></span><br><span class="line"> <span class="comment">#</span></span><br><span class="line">-<span class="comment">#DL_DIR ?= "$&#123;TOPDIR&#125;/downloads"</span></span><br><span class="line">+DL_DIR ?= <span class="string">"/home/sunyongfeng/backup/downloads"</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment">#</span></span><br><span class="line"> <span class="comment"># Where to place shared-state files</span></span><br><span class="line">@@ -<span class="number">55</span>,<span class="number">7</span> +<span class="number">55</span>,<span class="number">7</span> @@ MACHINE = <span class="string">"#<span class="subst">#PLATFORM</span>##"</span></span><br><span class="line"> <span class="comment">#</span></span><br><span class="line"> <span class="comment"># The default is a sstate-cache directory under TOPDIR.</span></span><br><span class="line"> <span class="comment">#</span></span><br><span class="line">-<span class="comment">#SSTATE_DIR ?= "$&#123;TOPDIR&#125;/sstate-cache"</span></span><br><span class="line">+SSTATE_DIR ?= <span class="string">"/home/sunyongfeng/backup/sstate-cache"</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment">#</span></span><br><span class="line"> <span class="comment"># Where to place the build output</span></span><br><span class="line">@@ -<span class="number">197</span>,<span class="number">10</span> +<span class="number">197</span>,<span class="number">14</span> @@ BB_DISKMON_DIRS = <span class="string">"\</span></span><br><span class="line"><span class="string"> # NOTE: if the mirror uses the same structure as SSTATE_DIR, you need to add PATH</span></span><br><span class="line"><span class="string"> # at the end as shown in the examples below. This will be substituted with the</span></span><br><span class="line"><span class="string"> # correct path within the directory structure.</span></span><br><span class="line"><span class="string">+<span class="subst">#SSTATE_MIRRORS</span> ?= "</span><span class="string">\</span></span><br><span class="line">+<span class="comment">#file://.* http://##DISTRO_SSTATE_ADDRESS##/PATH \</span></span><br><span class="line">+<span class="comment">#"</span></span><br><span class="line"> SSTATE_MIRRORS ?= <span class="string">"\</span></span><br><span class="line"><span class="string">-file://.* http://#<span class="subst">#DISTRO_SSTATE_ADDRESS</span>##/PATH"</span></span><br><span class="line">+file:<span class="regexp">///home/sunyongfeng/backup/sstate-cache http://</span><span class="comment">##DISTRO_SSTATE_ADDRESS##/PATH"</span></span><br><span class="line"> </span><br><span class="line">-SOURCE_MIRROR_URL ?= <span class="string">"http://#<span class="subst">#DISTRO_ARCHIVE_ADDRESS</span>##/"</span></span><br><span class="line">+<span class="comment">#SOURCE_MIRROR_URL ?= "http://##DISTRO_ARCHIVE_ADDRESS##/"</span></span><br><span class="line">+SOURCE_MIRROR_URL ?= <span class="string">"file:///home/sunyongfeng/backup/downloads/"</span></span><br><span class="line"> INHERIT += <span class="string">"own-mirrors"</span> </span><br><span class="line"> BB_GENERATE_MIRROR_TARBALLS = <span class="string">"1"</span></span><br><span class="line"></span><br><span class="line">diff --git a/tools/config/site.conf.<span class="keyword">in</span> b/tools/config/site.conf.<span class="keyword">in</span></span><br><span class="line">index <span class="number">9fa</span>46c5..<span class="number">4aa</span>4206 <span class="number">100644</span></span><br><span class="line">--- a/tools/config/site.conf.<span class="keyword">in</span></span><br><span class="line">+++ b/tools/config/site.conf.<span class="keyword">in</span></span><br><span class="line">@@ -<span class="number">21</span>,<span class="number">5</span> +<span class="number">21</span>,<span class="number">5</span> @@ SCONF_VERSION = <span class="string">"1"</span></span><br><span class="line"> <span class="comment">##ALL_PROXY##</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment"># Uncomment this to use a shared download directory</span></span><br><span class="line">-<span class="comment">#DL_DIR = "/some/shared/download/directory/"</span></span><br><span class="line">+DL_DIR = <span class="string">"/home/sunyongfeng/backup/downloads/"</span></span><br></pre></td></tr></table></figure>
+<h3 id="4-3-parse-recipe-实在太慢"><a href="#4-3-parse-recipe-实在太慢" class="headerlink" title="4.3. parse recipe 实在太慢"></a>4.3. parse recipe 实在太慢</h3><p>改 ops-* 的源码路径为 github。但是 ops-tunnel github 上面还没有，需要自己改 DL_DIR 中的 ops-tunnel 包名。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DL_DIR 请改成你自己的 DL_DIR</span><br><span class="line"></span><br><span class="line">mv DL_DIR/git2/git<span class="selector-class">.openswitch</span><span class="selector-class">.net</span><span class="selector-class">.openswitch</span><span class="selector-class">.ops-tunnel</span><span class="selector-class">.done</span> DL_DIR/git2/github<span class="selector-class">.com</span><span class="selector-class">.open-switch</span><span class="selector-class">.ops-tunnel</span><span class="selector-class">.done</span></span><br><span class="line">mv DL_DIR/git2/git<span class="selector-class">.openswitch</span><span class="selector-class">.net</span><span class="selector-class">.openswitch</span><span class="selector-class">.ops-tunnel</span> DL_DIR/git2/github<span class="selector-class">.com</span><span class="selector-class">.open-switch</span><span class="selector-class">.ops-tunnel</span></span><br></pre></td></tr></table></figure>
+<p>patch：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/yocto/openswitch/meta-distro-openswitch/conf/distro/openswitch.conf b/yocto/openswitch/meta-distro-openswitch/conf/distro/openswitch.conf</span><br><span class="line">index dd776f0..b6c18b3 <span class="number">100644</span></span><br><span class="line">--- a/yocto/openswitch/meta-distro-openswitch/conf/distro/openswitch.conf</span><br><span class="line">+++ b/yocto/openswitch/meta-distro-openswitch/conf/distro/openswitch.conf</span><br><span class="line">@@ -<span class="number">6</span>,<span class="number">8</span> +<span class="number">6</span>,<span class="number">11</span> @@ <span class="attr">DISTRO_CODENAME</span> = <span class="string">"epazote"</span></span><br><span class="line"> <span class="attr">SDK_VENDOR</span> = <span class="string">"-openswitchsdk"</span></span><br><span class="line"> SDK_VERSION := <span class="string">"<span class="subst">$&#123;@'$&#123;DISTRO_VERSION&#125;</span>'.replace('snapshot-<span class="subst">$&#123;DATE&#125;</span>','snapshot')&#125;"</span></span><br><span class="line"> </span><br><span class="line">-OPS_REPO_HOSTNAME ?= <span class="string">"git.openswitch.net"</span></span><br><span class="line">-OPS_REPO_PATH ?= <span class="string">"openswitch"</span></span><br><span class="line">+<span class="comment">#OPS_REPO_HOSTNAME ?= "git.openswitch.net"</span></span><br><span class="line">+<span class="comment">#OPS_REPO_PATH ?= "openswitch"</span></span><br><span class="line">+<span class="comment">#OPS_REPO_BASE_URL ?= "git://$&#123;OPS_REPO_HOSTNAME&#125;/$&#123;OPS_REPO_PATH&#125;"</span></span><br><span class="line">+OPS_REPO_HOSTNAME ?= <span class="string">"github.com"</span></span><br><span class="line">+OPS_REPO_PATH ?= <span class="string">"open-switch"</span></span><br><span class="line"> OPS_REPO_BASE_URL ?= <span class="string">"git://<span class="subst">$&#123;OPS_REPO_HOSTNAME&#125;</span>/<span class="subst">$&#123;OPS_REPO_PATH&#125;</span>"</span></span><br><span class="line"> OPS_REPO_PROTOCOL ?= <span class="string">"https"</span></span><br><span class="line"> OPS_REPO_BRANCH ?= <span class="string">"master"</span></span><br><span class="line">diff --git a/yocto/openswitch/meta-distro-openswitch/recipes-ops/infra/ops-website.bb b/yocto/openswitch/meta-distro-openswitch/recipes-ops/infra/ops-website.bb</span><br><span class="line">index <span class="number">79</span>c50f6..caa166d <span class="number">100644</span></span><br><span class="line">--- a/yocto/openswitch/meta-distro-openswitch/recipes-ops/infra/ops-website.bb</span><br><span class="line">+++ b/yocto/openswitch/meta-distro-openswitch/recipes-ops/infra/ops-website.bb</span><br><span class="line">@@ -<span class="number">4</span>,<span class="number">7</span> +<span class="number">4</span>,<span class="number">7</span> @@ <span class="attr">LIC_FILES_CHKSUM</span> = <span class="string">"file://<span class="subst">$&#123;COMMON_LICENSE_DIR&#125;</span>/Apache-2.0;md5=89aea4e17d99a7ca</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string"> BRANCH ?= "</span>$&#123;OPS_REPO_BRANCH&#125;<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">-SRC_URI = "</span>git://$&#123;OPS_REPO_HOSTNAME&#125;/infra/website;<span class="attr">protocol=$&#123;OPS_REPO_PROTOCOL&#125;;branch=$&#123;BRANCH&#125;</span> \</span><br><span class="line">+<span class="attr">SRC_URI</span> = <span class="string">"git://<span class="subst">$&#123;OPS_REPO_HOSTNAME&#125;</span>/open-switch/infra_website;protocol=<span class="subst">$&#123;OPS_REPO_PROTOCOL&#125;</span>;branch=<span class="subst">$&#123;BRANCH&#125;</span> \</span></span><br><span class="line"><span class="string"> "</span></span><br><span class="line"> </span><br><span class="line"> <span class="attr">SRCREV="$&#123;AUTOREV&#125;"</span></span><br><span class="line">diff --git a/yocto/openswitch/meta-distro-openswitch/recipes-ops/switchd/ops-switchd.bb b/yocto/openswitch/meta-distro-openswitch/recipes-ops/switchd/ops-switchd.bb</span><br><span class="line">index <span class="number">8</span>d622bd..d74cd9e <span class="number">100644</span></span><br><span class="line">--- a/yocto/openswitch/meta-distro-openswitch/recipes-ops/switchd/ops-switchd.bb</span><br><span class="line">+++ b/yocto/openswitch/meta-distro-openswitch/recipes-ops/switchd/ops-switchd.bb</span><br><span class="line">@@ -<span class="number">6</span>,<span class="number">7</span> +<span class="number">6</span>,<span class="number">7</span> @@ <span class="attr">DEPENDS</span> = <span class="string">"ops ops-openvswitch ops-ovsdb ops-utils libyaml jemalloc ops-cli"</span></span><br><span class="line"> </span><br><span class="line"> BRANCH ?= <span class="string">"<span class="subst">$&#123;OPS_REPO_BRANCH&#125;</span>"</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">-SRC_URI</span> = <span class="string">"<span class="subst">$&#123;OPS_REPO_BASE_URL&#125;</span>/ops-switchd;protocol=<span class="subst">$&#123;OPS_REPO_PROTOCOL&#125;</span>;branch=<span class="subst">$&#123;BRANCH&#125;</span> \</span></span><br><span class="line"><span class="string">+SRC_URI = "</span>$&#123;OPS_REPO_BASE_URL&#125;/ops-switchd.git;<span class="attr">protocol=$&#123;OPS_REPO_PROTOCOL&#125;;branch=$&#123;BRANCH&#125;</span> \</span><br><span class="line">    file://switchd_nnn.service \</span><br><span class="line">    file://switchd_sim.service \</span><br><span class="line">    file://switchd_p4sim.service \</span><br><span class="line">@@ -<span class="number">14</span>,<span class="number">7</span> +<span class="number">14</span>,<span class="number">7</span> @@ <span class="attr">SRC_URI</span> = <span class="string">"<span class="subst">$&#123;OPS_REPO_BASE_URL&#125;</span>/ops-switchd;protocol=<span class="subst">$&#123;OPS_REPO_PROTOCOL&#125;</span>;branch</span></span><br><span class="line"><span class="string">    file://switchd_sai.service \</span></span><br><span class="line"><span class="string"> "</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">-SRCREV</span> = <span class="string">"f17ef096d728b79c77a24cd908fdbcf9b18bcd6c"</span></span><br><span class="line">+<span class="attr">SRCREV</span> = <span class="string">"d345f87cd17ced3b97a73ace23c387de5db62842"</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment"># When using AUTOREV, we need to force the package version to the revision of git</span></span><br><span class="line"> <span class="comment"># in order to avoid stale shared states.</span></span><br><span class="line">@@ -<span class="number">33</span>,<span class="number">18</span> +<span class="number">33</span>,<span class="number">18</span> @@ FILES_$&#123;PN&#125; = <span class="string">"<span class="subst">$&#123;sbindir&#125;</span>/ops-switchd <span class="subst">$&#123;libdir&#125;</span>/libswitchd_plugins.so.1* <span class="subst">$&#123;libdi</span></span></span><br><span class="line"><span class="string"><span class="subst"> FILES_$&#123;PN&#125;</span> += "</span>/usr/lib/cli/plugins/<span class="string">"</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string"> do_install_append() &#123;</span></span><br><span class="line"><span class="string">-   install -d <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system</span></span><br><span class="line"><span class="string">-   if <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','nnnmmm','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">-      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_nnn.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">-   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','xpliant','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">-      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_xpliant.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">-   elif <span class="subst">$&#123;@bb.utils.contains('IMAGE_FEATURES','ops-p4','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">+    install -d <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system</span></span><br><span class="line"><span class="string">+#if <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','nnnmmm','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">+#      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_nnn.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">+#   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','xpliant','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">+#      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_xpliant.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">+#   elif <span class="subst">$&#123;@bb.utils.contains('IMAGE_FEATURES','ops-p4','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">       install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_p4sim.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">-   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','ops-container','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">-      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_sim.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">-   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','ops-sai','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">-      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_sai.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">-   fi</span></span><br><span class="line"><span class="string">+#   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','ops-container','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">+#      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_sim.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">+#   elif <span class="subst">$&#123;@bb.utils.contains('MACHINE_FEATURES','ops-sai','<span class="literal">true</span>','<span class="literal">false</span>',d)&#125;</span>; then</span></span><br><span class="line"><span class="string">+#      install -m 0644 <span class="subst">$&#123;WORKDIR&#125;</span>/switchd_sai.service <span class="subst">$&#123;D&#125;</span><span class="subst">$&#123;systemd_unitdir&#125;</span>/system/switchd.service</span></span><br><span class="line"><span class="string">+#   fi</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">    install -d <span class="subst">$&#123;D&#125;</span>/usr/share/opsplugins</span></span><br><span class="line"><span class="string">    for plugin in $(find <span class="subst">$&#123;S&#125;</span>/opsplugins -name "</span>*.py<span class="string">"); do \</span></span><br></pre></td></tr></table></figure>
+<h2 id="5-其他配置"><a href="#5-其他配置" class="headerlink" title="5. 其他配置"></a>5. 其他配置</h2><h3 id="5-1-如何新增-CFLAG、LDFLAG-选项？"><a href="#5-1-如何新增-CFLAG、LDFLAG-选项？" class="headerlink" title="5.1. 如何新增 CFLAG、LDFLAG 选项？"></a>5.1. 如何新增 CFLAG、LDFLAG 选项？</h3><p>在 local.conf 中添加对应 FLAG，以 -Wno-error 为例。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">BUILD_CFLAGS += <span class="string">" -Wno-error "</span></span><br><span class="line">BUILD_CPPFLAGS += <span class="string">" -Wno-error "</span></span><br><span class="line">BUILD_CXXFLAGS += <span class="string">" -Wno-error "</span></span><br><span class="line">TARGET_CFLAGS += <span class="string">" -Wno-error "</span></span><br><span class="line">TARGET_CPPFLAGS += <span class="string">" -Wno-error "</span></span><br><span class="line">TARGET_CXXFLAGS += <span class="string">" -Wno-error "</span></span><br></pre></td></tr></table></figure>
+<h3 id="5-2-使用-pre-built-交叉编译工具链（linaro）"><a href="#5-2-使用-pre-built-交叉编译工具链（linaro）" class="headerlink" title="5.2. 使用 pre-built 交叉编译工具链（linaro）"></a>5.2. 使用 pre-built 交叉编译工具链（linaro）</h3><p>FAIL。</p>
+<p>可研究 SDK，将交叉编译链一次编出，后续无需再编译。</p>
+<h3 id="5-3-配置-ops-switchd-p4switch-plugin"><a href="#5-3-配置-ops-switchd-p4switch-plugin" class="headerlink" title="5.3. 配置 ops-switchd-p4switch-plugin"></a>5.3. 配置 <code>ops-switchd-p4switch-plugin</code></h3><p>修改 machine 的 conf，<code>yocto/openswitch/meta-platform-openswitch-xxx/conf/machine/xxx.conf</code>：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PREFERRED_PROVIDER_virtual/ops-switchd-<span class="keyword">switch</span>-api-plugin ?= <span class="string">"ops-switchd-p4switch-plugin"</span></span><br></pre></td></tr></table></figure>
+<p>官方 README 的说明应已过时：</p>
+<blockquote>
+<p>The P4 plugin is activated adding the following line in /build/conf/local.conf EXTRA_IMAGE_FEATURES = “ops-p4” (use += if other image features are defined)<br><a href="https://github.com/open-switch/ops-switchd-p4switch-plugin" target="_blank" rel="noopener">https://github.com/open-switch/ops-switchd-p4switch-plugin</a></p>
+</blockquote>
+<h2 id="6-运行问题记录与解决"><a href="#6-运行问题记录与解决" class="headerlink" title="6. 运行问题记录与解决"></a>6. 运行问题记录与解决</h2><h3 id="6-1-ops-switchd-p4switch-plugin-没有打包到-rootfs"><a href="#6-1-ops-switchd-p4switch-plugin-没有打包到-rootfs" class="headerlink" title="6.1. ops-switchd-p4switch-plugin 没有打包到 rootfs"></a>6.1. ops-switchd-p4switch-plugin 没有打包到 rootfs</h3><h3 id="6-2-运行时出现-rsyslog、ops-init-servic-等业务起不来"><a href="#6-2-运行时出现-rsyslog、ops-init-servic-等业务起不来" class="headerlink" title="6.2. 运行时出现 rsyslog、ops-init.servic 等业务起不来"></a>6.2. 运行时出现 rsyslog、ops-init.servic 等业务起不来</h3><p>log 如下：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">20161110</span>:<span class="number">184441.388</span>][<span class="symbol">FAILED</span>] <span class="symbol">Failed</span> to start openswitch first boot process.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184441.388</span>]<span class="symbol">See</span> <span class="string">"systemctl status ops-first-boot.service"</span> for details.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184445.440</span>][<span class="symbol">FAILED</span>] <span class="symbol">Failed</span> to start <span class="symbol">OpenSwitch</span> system initialization script.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184445.440</span>]<span class="symbol">See</span> <span class="string">"systemctl status ops-init.service"</span> for details.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.615</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-powerd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.615</span>]systemd[<span class="number">1</span>]: ops-powerd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.646</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-lacpd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.646</span>]systemd[<span class="number">1</span>]: ops-lacpd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.677</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-portd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.677</span>]systemd[<span class="number">1</span>]: ops-portd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.708</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-tempd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.708</span>]systemd[<span class="number">1</span>]: ops-tempd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.740</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-zebra.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.740</span>]systemd[<span class="number">1</span>]: ops-zebra.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.771</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-ledd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.771</span>]systemd[<span class="number">1</span>]: ops-ledd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.802</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> aaautils.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.802</span>]systemd[<span class="number">1</span>]: aaautils.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.833</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-stpd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.833</span>]systemd[<span class="number">1</span>]: ops-stpd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.865</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-bgpd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.865</span>]systemd[<span class="number">1</span>]: ops-bgpd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.865</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-classifierd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.865</span>]systemd[<span class="number">1</span>]: ops-classifierd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.927</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-relay.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.927</span>]systemd[<span class="number">1</span>]: ops-relay.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.958</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-intfd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.958</span>]systemd[<span class="number">1</span>]: ops-intfd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.990</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-ospfd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184447.990</span>]systemd[<span class="number">1</span>]: ops-ospfd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.021</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-arpmgrd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.021</span>]systemd[<span class="number">1</span>]: ops-arpmgrd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.052</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> dhcp_tftp.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.052</span>]systemd[<span class="number">1</span>]: dhcp_tftp.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.083</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-fand.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.083</span>]systemd[<span class="number">1</span>]: ops-fand.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.115</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-sysd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.115</span>]systemd[<span class="number">1</span>]: ops-sysd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.146</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-lldpd.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.146</span>]systemd[<span class="number">1</span>]: ops-lldpd.service failed.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.146</span>]systemd[<span class="number">1</span>]: <span class="symbol">Unit</span> ops-vland.service entered failed state.</span><br><span class="line">[<span class="number">20161110</span>:<span class="number">184448.146</span>]systemd[<span class="number">1</span>]: ops-vland.service failed.</span><br></pre></td></tr></table></figure>
+<p>进一步看 log：所有问题都是 <code>open(&quot;/proc/self/ns/net&quot;): No such file or directory</code>，原因是内核配置 namespace 没有开启。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[20161110:184548.411]ops-xxx:~$ systemctl status ops-first-boot.service</span><br><span class="line">[20161110:184548.536]● ops-first-boot.service - openswitch first boot process</span><br><span class="line">[20161110:184548.536]   Loaded: loaded (/lib/systemd/system/ops-first-boot.service; enabled; vendor preset: enabled)</span><br><span class="line">[20161110:184548.536]   Active: failed (Result: exit-code) since Thu 1970-01-01 00:00:08 UTC; 1min 7s ago</span><br><span class="line">[20161110:184548.536]  Process: 100 <span class="attribute">ExecStart</span>=/usr/sbin/setcap cap_audit_write+eip /usr/bin/vtysh (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">[20161110:184548.551] Main PID: 100 (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">[20161110:184549.505]ops-xxx:~$ </span><br><span class="line">[20161110:184613.881]ops-xxx:~$ systemd[1]: Unit rsyslog.service entered failed state.</span><br><span class="line">[20161110:184622.878]systemd[1]: Unit rsyslog.service entered failed state.</span><br><span class="line">[20161110:184622.878]systemd[1]: rsyslog.service failed.</span><br><span class="line">[20161110:184624.488]systemctl status rsyslog.service</span><br><span class="line">[20161110:184624.534]● rsyslog.service -<span class="built_in"> System Logging </span>Service</span><br><span class="line">[20161110:184624.534]   Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; vendor preset: enabled)</span><br><span class="line">[20161110:184624.534]   Active: failed (Result: exit-code) since Thu 1970-01-01 00:01:51 UTC; 41ms ago</span><br><span class="line">[20161110:184624.534]  Process: 3112 <span class="attribute">ExecStart</span>=/sbin/ip netns exec swns /usr/sbin/rsyslogd -n (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">[20161110:184624.550] Main PID: 3112 (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">[20161110:184830.707]ops-xxx:~$ systemctl status ops-init.service</span><br><span class="line">[20161110:184830.770]● ops-init.service - OpenSwitch<span class="built_in"> system </span>initialization script</span><br><span class="line">[20161110:184830.770]   Loaded: loaded (/lib/systemd/system/ops-init.service; enabled; vendor preset: enabled)</span><br><span class="line">[20161110:184830.770]   Active: failed (Result: exit-code) since Thu 1970-01-01 00:00:11 UTC; 3min 46s ago</span><br><span class="line">[20161110:184830.770]  Process: 161 <span class="attribute">ExecStart</span>=/usr/sbin/ops-init (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">[20161110:184830.770] Main PID: 161 (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br></pre></td></tr></table></figure>
+<p>对应的 namespace 内核配置：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">CONFIG_NAMESPACES</span>=y</span><br><span class="line"><span class="attr">CONFIG_UTS_NS</span>=y</span><br><span class="line"><span class="attr">CONFIG_IPC_NS</span>=y</span><br><span class="line"><span class="comment"># CONFIG_USER_NS is not set</span></span><br><span class="line"><span class="attr">CONFIG_PID_NS</span>=y</span><br><span class="line"><span class="attr">CONFIG_NET_NS</span>=y</span><br><span class="line"><span class="attr">CONFIG_UIDGID_CONVERTED</span>=y</span><br></pre></td></tr></table></figure>
+<h3 id="6-3-P4-交换机模拟器启动失败"><a href="#6-3-P4-交换机模拟器启动失败" class="headerlink" title="6.3. P4 交换机模拟器启动失败"></a>6.3. P4 交换机模拟器启动失败</h3><p>log：</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[FAILED] Failed <span class="keyword">to</span> start P4 <span class="keyword">Switch</span> simulation Daemon.</span><br><span class="line">See <span class="string">"systemctl status simple_switch.service"</span> <span class="keyword">for</span> details.</span><br></pre></td></tr></table></figure>
+<p>原因：内核配置没有开启支持 VNET</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ops-xxx:~$ systemctl status simple_switch.service</span><br><span class="line">● simple_switch.service - P4 Switch simulation Daemon</span><br><span class="line">   Loaded: loaded (/lib/systemd/system/simple_switch.service; enabled; vendor preset: enabled)</span><br><span class="line">   Active: failed (Result: exit-code) since Thu 1970-01-01 00:00:13 UTC; 1min 26s ago</span><br><span class="line">  Process: 222 <span class="attribute">ExecStartPre</span>=/sbin/ip netns exec emulns<span class="built_in"> ip </span>link <span class="builtin-name">add</span> veth250<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name veth251 (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=2)</span><br><span class="line">  Process: 214 <span class="attribute">ExecStartPre</span>=/sbin/ip netns <span class="builtin-name">add</span> emulns (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=0/SUCCESS)</span><br><span class="line">  Process: 210 <span class="attribute">ExecStartPre</span>=/sbin/ip netns del emulns (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE)</span><br><span class="line">  Process: 206 <span class="attribute">ExecStartPre</span>=/bin/rm -f /var/run/simple_switch.pid (<span class="attribute">code</span>=exited, <span class="attribute">status</span>=0/SUCCESS)</span><br><span class="line">ops-xxx:~$ sudo/sbin<span class="built_in">/ip </span>netns exec emulns<span class="built_in"> ip </span>link <span class="builtin-name">add</span> veth250<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name</span><br><span class="line">RTNETLINK answers: Operation <span class="keyword">not</span> supported</span><br></pre></td></tr></table></figure>
+<h3 id="6-4-CLI-不可用"><a href="#6-4-CLI-不可用" class="headerlink" title="6.4. CLI 不可用"></a>6.4. CLI 不可用</h3><p>log：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@ops-xxx:~# vtysh </span><br><span class="line">ops-xxx# show<span class="built_in"> interface </span></span><br><span class="line">System is <span class="keyword">not</span> ready. Please retry after few seconds<span class="built_in">..</span></span><br></pre></td></tr></table></figure>
+<p>ip netns exec emulns ip tuntap add mode tap eth0<br>ip netns exec emulns ifconfig eth0 up</p>
+<p>查看 bmv2 runtime command line 命令：<a href="https://github.com/p4lang/behavioral-model/blob/master/tools/runtime_CLI.py" target="_blank" rel="noopener">https://github.com/p4lang/behavioral-model/blob/master/tools/runtime_CLI.py</a><br>runtime cli：ip netns exec emulns /usr/sbin/simple_switch -i 64@veth250 –thrift-port 10001 –nanolog ipc:///tmp/bm-log.ipc /usr/share/ovs_p4_plugin/switch_bmv2.json</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"><span class="builtin-name">set</span> -x</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> iface <span class="keyword">in</span> `seq 1 7` ; <span class="keyword">do</span></span><br><span class="line">  /sbin<span class="built_in">/ip </span>netns exec emulns<span class="built_in"> ip </span>tuntap <span class="builtin-name">add</span> mode tap eth<span class="variable">$iface</span></span><br><span class="line">  /sbin<span class="built_in">/ip </span>netns exec emulns /sbin<span class="built_in">/ip </span>ifconfig eth<span class="variable">$iface</span> up</span><br><span class="line">  echo port_add eth<span class="variable">$iface</span> `expr <span class="variable">$iface</span> - 1` | /sbin<span class="built_in">/ip </span>netns exec emulns /usr/bin/bm_tools/runtime_CLI.py --json /usr/share/ovs_p4_plugin/switch_bmv2.json --thrift-port 10001</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<p>可能需要配置的地方：</p>
+<ul>
+<li><a href="https://github.com/open-switch/ops-build/blob/55c9f56fd3fc7a87cd5c7273374b910998630203/yocto/openswitch/meta-platform-openswitch-genericx86-64/recipes-ops/platform/ops-hw-config.bbappend" target="_blank" rel="noopener">https://github.com/open-switch/ops-build/blob/55c9f56fd3fc7a87cd5c7273374b910998630203/yocto/openswitch/meta-platform-openswitch-genericx86-64/recipes-ops/platform/ops-hw-config.bbappend</a></li>
+<li><a href="https://github.com/open-switch/ops-hw-config/tree/master/Generic-x86/X86-64/P4" target="_blank" rel="noopener">https://github.com/open-switch/ops-hw-config/tree/master/Generic-x86/X86-64/P4</a></li>
+<li><a href="https://github.com/open-switch/ops-build/blob/55c9f56fd3fc7a87cd5c7273374b910998630203/yocto/openswitch/meta-distro-openswitch/recipes-ops/openvswitch/ops-openvswitch.bb" target="_blank" rel="noopener">https://github.com/open-switch/ops-build/blob/55c9f56fd3fc7a87cd5c7273374b910998630203/yocto/openswitch/meta-distro-openswitch/recipes-ops/openvswitch/ops-openvswitch.bb</a></li>
+<li>IMAGE_FEATURES[validitems] += “ops-p4”</li>
+</ul>
+<h2 id="7-其他问题"><a href="#7-其他问题" class="headerlink" title="7. 其他问题"></a>7. 其他问题</h2><h3 id="x86-64-上的一个-QA-问题"><a href="#x86-64-上的一个-QA-问题" class="headerlink" title="x86_64 上的一个 QA 问题"></a>x86_64 上的一个 QA 问题</h3><p>编译时提示：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">WARNING: </span>QA Issue: ops-cli rdepends on libcap, but it isn't a build dependency? [build-deps]</span><br></pre></td></tr></table></figure>
+<p>这个问题可能导致编译  ops-cli 时，configure 不过。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/openswitch/" rel="tag"># openswitch</a>
+          
+            <a href="/tags/yocto/" rel="tag"># yocto</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/programmer/python/xmind2excel.html" rel="next" title="xmind 转换成 excel">
+                <i class="fa fa-chevron-left"></i> xmind 转换成 excel
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/linux/xterm.html" rel="prev" title="xterm / gnome-terminal 无法 tab 补全">
+                xterm / gnome-terminal 无法 tab 补全 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-BSP-适配"><span class="nav-number">1.</span> <span class="nav-text">1. BSP 适配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-新增一个新产品"><span class="nav-number">1.1.</span> <span class="nav-text">1.1. 新增一个新产品</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-添加一个新内核版本支持"><span class="nav-number">1.2.</span> <span class="nav-text">1.2.  添加一个新内核版本支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-适配完成之后，使用-make-kernel-编译内核模块"><span class="nav-number">1.3.</span> <span class="nav-text">1.3. 适配完成之后，使用 make kernel 编译内核模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-调试问题汇总"><span class="nav-number">1.4.</span> <span class="nav-text">1.4. 调试问题汇总</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-kernel-defconfig"><span class="nav-number">1.5.</span> <span class="nav-text">1.5. kernel defconfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-支持-systemd-的-kernel-defconfig"><span class="nav-number">1.6.</span> <span class="nav-text">1.6. 支持 systemd 的 kernel defconfig</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-gcc-tune"><span class="nav-number">2.</span> <span class="nav-text">2. gcc tune</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-rootfs-不可用"><span class="nav-number">2.1.</span> <span class="nav-text">2.1.rootfs 不可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-tune-gcc"><span class="nav-number">2.2.</span> <span class="nav-text">2.2. tune gcc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-关于-xxx-CPU-是否支持-NEON-和-VFP"><span class="nav-number">2.3.</span> <span class="nav-text">2.3. 关于 xxx CPU 是否支持 NEON 和 VFP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-编译问题及修订记录"><span class="nav-number">3.</span> <span class="nav-text">3. 编译问题及修订记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-python-xattr-在-x86-平台上直接使用交叉编译结果"><span class="nav-number">3.1.</span> <span class="nav-text">3.1. python xattr 在 x86 平台上直接使用交叉编译结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-go-编译失败"><span class="nav-number">3.2.</span> <span class="nav-text">3.2. go 编译失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-ops-多地方出现-VLOG-format-和指针强转-Warning-导致编译失败"><span class="nav-number">3.3.</span> <span class="nav-text">3.3. ops-* 多地方出现 VLOG format 和指针强转 Warning 导致编译失败</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1-CMake-类处理"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1. CMake 类处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-autoconf-类处理"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2. autoconf 类处理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-openswitch-disk-image-bb-task-do-rootfs-失败"><span class="nav-number">3.4.</span> <span class="nav-text">3.4. openswitch-disk-image.bb task do_rootfs 失败</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-编译太慢？"><span class="nav-number">4.</span> <span class="nav-text">4. 编译太慢？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-下载源码慢的问题"><span class="nav-number">4.1.</span> <span class="nav-text">4.1. 下载源码慢的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-如果使用已编译的结果"><span class="nav-number">4.2.</span> <span class="nav-text">4.2. 如果使用已编译的结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-parse-recipe-实在太慢"><span class="nav-number">4.3.</span> <span class="nav-text">4.3. parse recipe 实在太慢</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-其他配置"><span class="nav-number">5.</span> <span class="nav-text">5. 其他配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-如何新增-CFLAG、LDFLAG-选项？"><span class="nav-number">5.1.</span> <span class="nav-text">5.1. 如何新增 CFLAG、LDFLAG 选项？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-使用-pre-built-交叉编译工具链（linaro）"><span class="nav-number">5.2.</span> <span class="nav-text">5.2. 使用 pre-built 交叉编译工具链（linaro）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-配置-ops-switchd-p4switch-plugin"><span class="nav-number">5.3.</span> <span class="nav-text">5.3. 配置 ops-switchd-p4switch-plugin</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-运行问题记录与解决"><span class="nav-number">6.</span> <span class="nav-text">6. 运行问题记录与解决</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-ops-switchd-p4switch-plugin-没有打包到-rootfs"><span class="nav-number">6.1.</span> <span class="nav-text">6.1. ops-switchd-p4switch-plugin 没有打包到 rootfs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-运行时出现-rsyslog、ops-init-servic-等业务起不来"><span class="nav-number">6.2.</span> <span class="nav-text">6.2. 运行时出现 rsyslog、ops-init.servic 等业务起不来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-P4-交换机模拟器启动失败"><span class="nav-number">6.3.</span> <span class="nav-text">6.3. P4 交换机模拟器启动失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-CLI-不可用"><span class="nav-number">6.4.</span> <span class="nav-text">6.4. CLI 不可用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-其他问题"><span class="nav-number">7.</span> <span class="nav-text">7. 其他问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#x86-64-上的一个-QA-问题"><span class="nav-number">7.1.</span> <span class="nav-text">x86_64 上的一个 QA 问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/programmer/yocto/porting_openswitch_to_arm.html";
+    this.page.identifier = "201704/programmer/yocto/porting_openswitch_to_arm.html";
+    this.page.title = '移植 openswitch 到 arm';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+<meta name="keywords" content="ubuntu,apt,网络配置,中文支持,fcitx,grub,Linux,静态IP配置,DNS配置,引导修复,大写提示,禁用触摸板,root密码,log,默认密码,添加用户,sudo 用户,network configuration,强制使用IPv4,配置源,中文支持,输入法,引导失败,ssh,慢">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux使用记录">
+<meta property="og:url" content="http://sunyongfeng.com/201509/linux/personal-faq.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux使用记录">
+<meta name="twitter:description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+  <link rel="canonical" href="http://sunyongfeng.com/201509/linux/personal-faq">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux使用记录 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201509/linux/personal-faq.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux使用记录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-09-02 20:03:22" itemprop="dateCreated datePublished" datetime="2015-09-02T20:03:22+08:00">2015-09-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201509/linux/personal-faq.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201509/linux/personal-faq.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Linux装机后的常用配置、软件说明，及使用问题记录。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="善用-var-log"><a href="#善用-var-log" class="headerlink" title="善用/var/log"></a>善用/var/log</h2><p>该目录存放系统日志，很多异常，比如进不了GUI、服务器连不上等问题，都可通过此目录内的log排查。</p>
+<p>比如samba连不上，可通过<code>cat /var/log/auth.log | grep samba</code>查看samba失败的原因。</p>
+<h2 id="服务重启"><a href="#服务重启" class="headerlink" title="服务重启"></a>服务重启</h2><p>很多服务如samba、tftp如果配置文件改了之后，需要通过<code>sudo service smbd/tftp restart</code>来重启服务。</p>
+<a id="more"></a>
+<h2 id="硬件相关"><a href="#硬件相关" class="headerlink" title="硬件相关"></a>硬件相关</h2><h3 id="网卡相关"><a href="#网卡相关" class="headerlink" title="网卡相关"></a>网卡相关</h3><p>以Ubuntu server 14.04为例。</p>
+<h4 id="没有-ifconfig-命令"><a href="#没有-ifconfig-命令" class="headerlink" title="没有 ifconfig 命令"></a>没有 ifconfig 命令</h4><p><code>sudo apt-get install net-tools</code></p>
+<h4 id="静态IP配置"><a href="#静态IP配置" class="headerlink" title="静态IP配置"></a>静态IP配置</h4><p>配置文件：<code>/etc/network/interfaces</code>，如eth0的配置。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sunnogo@sunyongfeng:~/Downloads$ cat /etc/network/interfaces</span><br><span class="line"><span class="comment"># This file describes the network interfaces available on your system</span></span><br><span class="line"><span class="comment"># and how to activate them. For more information, see interfaces(5).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The loopback network interface</span></span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line"><span class="comment"># eth0, Realtek Fast Ethernet NIC</span></span><br><span class="line">auto eth0</span><br><span class="line">iface eth0 inet static </span><br><span class="line">address 192.168.204.148</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.204.1</span><br></pre></td></tr></table></figure>
+<p>以上配置相当于命令：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ifconfig eth0 192.168.204.148 netmask 255.255.255.0</span><br><span class="line">route <span class="builtin-name">add</span><span class="built_in"> default </span>gw 192.168.204.1</span><br></pre></td></tr></table></figure></p>
+<h4 id="DNS配置"><a href="#DNS配置" class="headerlink" title="DNS配置"></a>DNS配置</h4><p>配置文件：<code>/etc/resolvconf/resolv.conf.d/base</code></p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sunnogo<span class="variable">@sunyongfeng</span><span class="symbol">:~/Downloads</span><span class="variable">$ </span>cat /etc/resolvconf/resolv.conf.d/base </span><br><span class="line">nameserver <span class="number">8.8</span>.<span class="number">8.8</span></span><br><span class="line">nameserver <span class="number">114.114</span>.<span class="number">114.114</span></span><br></pre></td></tr></table></figure>
+<h4 id="禁用IPv6"><a href="#禁用IPv6" class="headerlink" title="禁用IPv6"></a>禁用IPv6</h4><p>禁用的原因：ubuntu源默认使用IPv6，详见<a href="http://linux.cn/article-3373-1.html" target="_blank" rel="noopener">链接</a>。</p>
+<p>修订文件<code>/etc/sysctl.conf</code>，在该文件最后加上：<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># IPv6 disabled</span></span><br><span class="line"><span class="attr">net.ipv6.conf.all.disable_ipv6</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">net.ipv6.conf.default.disable_ipv6</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">net.ipv6.conf.lo.disable_ipv6</span> = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>保存关闭，并执行<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo sysctl -p</span><br></pre></td></tr></table></figure></p>
+<p>即时生效，可通过ifconfig检查。重启有效。</p>
+<h3 id="显示相关"><a href="#显示相关" class="headerlink" title="显示相关"></a>显示相关</h3><h4 id="屏幕分辨率问题"><a href="#屏幕分辨率问题" class="headerlink" title="屏幕分辨率问题"></a>屏幕分辨率问题</h4><p>处理elementary OS时的操作</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo xrandr --newmode <span class="string">"1440x900"</span> <span class="number">106.50</span> <span class="number">1440</span> <span class="number">1528</span> <span class="number">1672</span> <span class="number">1904</span> <span class="number">900</span> <span class="number">903</span> <span class="number">909</span> <span class="number">934</span> -hsync +vsync</span><br><span class="line">sudo xrandr --addmode VGA1 <span class="number">1440</span>x900</span><br><span class="line">sudo xrandr --output VGA1 --mode <span class="number">1440</span>x900</span><br></pre></td></tr></table></figure>
+<h2 id="日常使用"><a href="#日常使用" class="headerlink" title="日常使用"></a>日常使用</h2><h3 id="apt"><a href="#apt" class="headerlink" title="apt"></a>apt</h3><h4 id="配置源"><a href="#配置源" class="headerlink" title="配置源"></a>配置源</h4><ul>
+<li>安装ubuntu的图形工具<code>update-manager</code>，通过<code>Software &amp; Updates</code>，在“Ubuntu Software”标签页，点“Download from:”旁边的复选框，选择<code>http://mirrors.yun-idc.com/ubuntu</code>，这个源在福州的速度不错。</li>
+<li>亦可通过更改<code>/etc/apt/source.list</code>的内容实现源配置。</li>
+<li>debian可以通过<code>apt-spy</code>实现类似功能。</li>
+</ul>
+<h4 id="更新cache"><a href="#更新cache" class="headerlink" title="更新cache"></a>更新cache</h4><p><code>apt-get update</code></p>
+<h4 id="以关键字查找包"><a href="#以关键字查找包" class="headerlink" title="以关键字查找包"></a>以关键字查找包</h4><p><code>apt-cache search your-keyword</code></p>
+<h4 id="强制使用IPv4更新"><a href="#强制使用IPv4更新" class="headerlink" title="强制使用IPv4更新"></a>强制使用IPv4更新</h4><p>默认使用IPv6源更新，不过国内目前还未全力推广IPv6。通过<code>Software &amp; Updates</code>图形界面配置中文源后，无此问题。</p>
+<p>强制使用IPv4更新的方法，说明详见<a href="http://unix.stackexchange.com/questions/9940/convince-apt-get-not-to-use-ipv6-method" target="_blank" rel="noopener">链接</a>。</p>
+<ul>
+<li>使用<code>apt-get install</code>时，加入选项 <code>-o Acquire::ForceIPv4=true</code>。</li>
+<li>添加一个配置文件<code>/etc/apt/apt.conf.d/99force-ipv4</code>，在配置文件中写入<code>Acquire::ForceIPv4 &quot;true&quot;;</code>。</li>
+</ul>
+<h4 id="安装失败"><a href="#安装失败" class="headerlink" title="安装失败"></a>安装失败</h4><p>出现如下错误：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@R04220 ~<span class="regexp">/smoking/ci</span> $ sudo apt-get install npm</span><br><span class="line">[sudo] password <span class="keyword">for</span> <span class="symbol">sunyongfeng:</span> </span><br><span class="line">	正在读取软件包列表... 有错误！</span><br><span class="line">	<span class="symbol">E:</span> Encountered a section <span class="keyword">with</span> no <span class="symbol">Package:</span> header</span><br><span class="line"><span class="symbol">E:</span> Problem <span class="keyword">with</span> MergeList /var/<span class="class"><span class="keyword">lib</span>/<span class="title">apt</span>/<span class="title">lists</span>/<span class="title">packages</span>.<span class="title">linuxmint</span>.<span class="title">com_dists_rebecca_import_i18n_Translation</span>-<span class="title">en</span></span></span><br><span class="line">	<span class="symbol">E:</span> 无法解析或打开软件包的列表或是状态文件。</span><br></pre></td></tr></table></figure>
+<p>解决，简单粗暴地删除cache，再更新一下。<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo rm /var/<span class="class"><span class="keyword">lib</span>/<span class="title">apt</span>/<span class="title">lists</span>/* -<span class="title">vf</span></span></span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure></p>
+<h3 id="中文支持"><a href="#中文支持" class="headerlink" title="中文支持"></a>中文支持</h3><h4 id="Ubuntu-server-14-04中文支持"><a href="#Ubuntu-server-14-04中文支持" class="headerlink" title="Ubuntu server 14.04中文支持"></a>Ubuntu server 14.04中文支持</h4><p>默认使用English，之后装gdm，想在英文环境中显示中文。</p>
+<p>安装的包：</p>
+<ul>
+<li>中文支持<br> gnome中文支持包：<ul>
+<li><code>language-pack-zh-han*</code></li>
+<li><code>language-pack-gnome-zh-han*</code></li>
+</ul>
+</li>
+<li>中文字体<ul>
+<li><code>ttf-wqy-microhei</code></li>
+<li><code>ttf-wqy-zenhei</code></li>
+<li><code>ttf-ubuntu-font-family</code>，这个不是中文字体，只是装一下而已。</li>
+<li><code>fonts-arphic-uming</code>，个人很喜欢的一个中文字体，不过其英文显示有点难看。 </li>
+</ul>
+</li>
+</ul>
+<h3 id="输入法"><a href="#输入法" class="headerlink" title="输入法"></a>输入法</h3><p>使用经典的<code>fcitx</code>。</p>
+<h4 id="Ubuntu-server-14-04-fcitx"><a href="#Ubuntu-server-14-04-fcitx" class="headerlink" title="Ubuntu server 14.04 fcitx"></a>Ubuntu server 14.04 fcitx</h4><ul>
+<li>安装的包<ul>
+<li><code>fcitx</code></li>
+<li><code>fcitx-config-gtk2</code>，图形配置工具</li>
+<li><code>fcitx-table-wbpy</code>，五笔拼音输出法</li>
+<li><code>fcitx-module-*</code>，有<code>dbus</code>、<code>kimpanel</code>等</li>
+<li><code>fcitx-frontend-*</code>，在gdm中，不需要装这个。为<code>fbterm</code>准备。</li>
+</ul>
+</li>
+<li>配置<ul>
+<li>卸载ibus，<code>apt-get remove ibus</code>，5M多；原理不明。</li>
+<li>通过<code>fcitx-config-gtk2</code>，点击“Input Method”标签页左下方的“+”号，搜索出WubiPinyin，添加即可。</li>
+</ul>
+</li>
+</ul>
+<h4 id="fcitx旧安装方式记录"><a href="#fcitx旧安装方式记录" class="headerlink" title="fcitx旧安装方式记录"></a>fcitx旧安装方式记录</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get <span class="keyword">install</span> fcitx fcitx-frontend-qt5 fcitx-<span class="keyword">table</span>-wbpy fcitx-ui-classic fcitx-config-gtk3</span><br><span class="line">sudo apt-<span class="keyword">get</span> remove ibus</span><br><span class="line">ps -e | grep ibus, <span class="keyword">kill</span>掉带ibus_daemon的那条进程</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> im-<span class="keyword">switch</span></span><br><span class="line"><span class="keyword">in</span>-<span class="keyword">switch</span> -s fcitx</span><br></pre></td></tr></table></figure>
+<p>fcitx-table-xxx，这里用的wbpy是五笔拼音，其他输入法如拼音由使用者自己选择。<br>执行：fcitx-autostart可开机自启动打开fcitx。</p>
+<h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>安装的包：（安装完后，默认的中文字体意外地显示得很好<code>AR PL UMing CN</code>和<code>Monospace</code>）</p>
+<ul>
+<li><code>chromium-browser</code></li>
+<li><code>pepperflashplugin-nonfree</code></li>
+</ul>
+<h3 id="文件管理器（File-Manager）"><a href="#文件管理器（File-Manager）" class="headerlink" title="文件管理器（File Manager）"></a>文件管理器（File Manager）</h3><p>注意与窗口管理器（Window Manager）的概念不一样。</p>
+<p>安装包：</p>
+<ul>
+<li>gnome，<code>nautilus</code></li>
+<li>kde，<code>dolphin</code></li>
+</ul>
+<h3 id="文本编辑器"><a href="#文本编辑器" class="headerlink" title="文本编辑器"></a>文本编辑器</h3><p>安装包：</p>
+<ul>
+<li>gnome，<code>gdeit</code></li>
+<li>kde，<code>kate</code></li>
+</ul>
+<h3 id="引导失败"><a href="#引导失败" class="headerlink" title="引导失败"></a>引导失败</h3><p>一般是先装Linux再装Windows出现。解决方法：</p>
+<ul>
+<li>用<code>Docker</code>吧，不用再装Windows了。</li>
+<li>通过Linux USB启动盘进入U盘中的Linux，通过grub一般都能修复，然后替换掉windows的引导，先通过grub引导。<ul>
+<li><code>update-grub</code>或<code>update-grub2</code></li>
+<li><code>grub-install</code></li>
+</ul>
+</li>
+<li>通过<code>EasyBCD</code>配置，重启后进入Linux，然后再进行grub修复。</li>
+</ul>
+<h3 id="键鼠"><a href="#键鼠" class="headerlink" title="键鼠"></a>键鼠</h3><h4 id="提示CapsLock键"><a href="#提示CapsLock键" class="headerlink" title="提示CapsLock键"></a>提示CapsLock键</h4><p>大写提示工具：<code>indicators-keylock</code>，先导入源，再安装。</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo<span class="built_in"> add-apt-repository </span>ppa:tsbarnes/indicator-keylock &amp;&amp; sudo apt-get update</span><br><span class="line">sudo apt-get install indicator-keylock</span><br></pre></td></tr></table></figure>
+<h4 id="禁用触摸板"><a href="#禁用触摸板" class="headerlink" title="禁用触摸板"></a>禁用触摸板</h4><p>Ubuntu配置禁用触摸板<a href="http://wiki.ubuntu.org.cn/%E8%A7%A6%E6%91%B8%E6%9D%BF" target="_blank" rel="noopener">wiki</a>。</p>
+<p>命令：<code>synclient touchpadoff=1</code>。</p>
+<p>可以使用工具<code>GPointingDeviceSettings</code>。</p>
+<h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><h4 id="Add-user-and-add-to-sudoers-group"><a href="#Add-user-and-add-to-sudoers-group" class="headerlink" title="Add user and add to sudoers group"></a>Add user and add to sudoers group</h4><p>From <a href="http://askubuntu.com/questions/7477/how-can-i-add-a-new-user-as-sudoer-using-the-command-line" target="_blank" rel="noopener">How can I add a new user as sudoer using the command line?</a>, ændrük’s answer.<br>From <a href="https://help.ubuntu.com/community/RootSudo#Allowing_other_users_to_run_sudo" target="_blank" rel="noopener">RootSudo#Allowing_other_users_to_run_sudo</a>:</p>
+<blockquote>
+<p>Allowing other users to run sudo</p>
+<p>To add a new user to sudo, open the <strong>Users and Groups</strong> tool from <strong>System-&gt;Administration</strong> menu. First click <strong>Unlock</strong>, then you can select a user from the list and hit <strong>Properties</strong>. Choose the <strong>User Privileges</strong> tab and check <strong>Administer the system</strong>.</p>
+<p>In the terminal (for Precise Pangolin, 12.04), this would be:</p>
+<p><code>sudo adduser &lt;username&gt; sudo</code></p>
+<p>where you replace <username> with the name of the user (without the &lt;&gt;).</username></p>
+<p>In previous version of Ubuntu</p>
+<p><code>sudo adduser &lt;username&gt; admin</code></p>
+<p>would have been appropriate, but the admin group has been deprecated and no longer exists in Ubuntu 12.04.</p>
+</blockquote>
+<h4 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h4><p>命令：</p>
+<ul>
+<li><code>useradd</code>, 如果想类似 adduser 那样默认创建用户 home 目录，命令样例为 <code>useradd -m -d /home/newuser -p yourPaSsWoRd newuser</code>，又如 <code>useradd -G sudo,docker jeromesun -m -s /bin/bash</code></li>
+<li><code>usermod</code></li>
+<li><code>userdel</code></li>
+<li><code>adduser</code>, user adduser can default add a /home/username directory.</li>
+</ul>
+<p>批量创建大量用户：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">GRP=(</span><br><span class="line"><span class="string">"aaa"</span></span><br><span class="line"><span class="string">"bbb"</span></span><br><span class="line"><span class="string">"ccc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$&#123;GRP[@]&#125;</span> ; </span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    short=<span class="variable">$&#123;i:0:2&#125;</span></span><br><span class="line">    pass=<span class="string">"XX.<span class="variable">$&#123;short&#125;</span>.123"</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"add <span class="variable">$i</span> passwd <span class="variable">$&#123;pass&#125;</span>"</span></span><br><span class="line">    <span class="comment"># centos wheel group has sudo permission</span></span><br><span class="line">    useradd -G wheel <span class="variable">$&#123;i&#125;</span> -m -s /bin/bash -p `openssl passwd -1 <span class="variable">$&#123;pass&#125;</span>`</span><br><span class="line">    <span class="comment">#userdel $&#123;i&#125;</span></span><br><span class="line">    <span class="comment">#rm -rf /home/$&#123;i&#125;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h4 id="修改密码"><a href="#修改密码" class="headerlink" title="修改密码"></a>修改密码</h4><p>命令：<code>passwd username</code></p>
+<h5 id="修改root密码"><a href="#修改root密码" class="headerlink" title="修改root密码"></a>修改root密码</h5><p>ubuntu的默认root密码随机，通过<code>sudo passwd root</code>修改</p>
+<h4 id="添加sudo用户"><a href="#添加sudo用户" class="headerlink" title="添加sudo用户"></a>添加sudo用户</h4><p>如果用户不是sudo用户，且使用sudo命令，则会提示“xxx is not in the sudoers file. This incident will be reported”。解决方法：</p>
+<ul>
+<li>拿到root权限，添加文件<code>/etc/sudoers</code>读权限</li>
+<li>修改<code>/etc/sudoers</code>，在<code>User privilege specification</code>下，类似root那样，添加一行<code>usernamexxxx    ALL=(ALL:ALL) ALL</code></li>
+</ul>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># User privilege specification</span></span><br><span class="line"><span class="attribute">root</span>	<span class="literal">ALL</span>=(<span class="literal">ALL</span>:<span class="literal">ALL</span>) <span class="literal">ALL</span></span><br><span class="line"><span class="attribute">usernamexxxx</span>	<span class="literal">ALL</span>=(<span class="literal">ALL</span>:<span class="literal">ALL</span>) <span class="literal">ALL</span></span><br></pre></td></tr></table></figure>
+<h4 id="添加-sudo-用户的另一种简易方法"><a href="#添加-sudo-用户的另一种简易方法" class="headerlink" title="添加 sudo 用户的另一种简易方法"></a>添加 sudo 用户的另一种简易方法</h4><p>详见：<a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart" target="_blank" rel="noopener">How To Create a Sudo User on Ubuntu [Quickstart]</a>。</p>
+<ul>
+<li>以 root 用户登陆你的设备</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ssh</span> root<span class="variable">@server_ip_address</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 adduser 命令创建新用户。<br>以下内容请替换 username 为你想创建的用户名。</li>
+</ul>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">adduser </span>username</span><br></pre></td></tr></table></figure>
+<p>设置和确认新用户的密码。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Set</span> <span class="keyword">password</span> prompts:</span><br><span class="line">Enter <span class="keyword">new</span> UNIX <span class="keyword">password</span>:</span><br><span class="line">Retype <span class="keyword">new</span> UNIX <span class="keyword">password</span>:</span><br><span class="line">passwd: <span class="keyword">password</span> <span class="keyword">updated</span> successfully</span><br></pre></td></tr></table></figure>
+<p>接下来提示设置用户信息，可以全部不填，直接敲回车键。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">User information prompts:</span><br><span class="line">Changing the<span class="built_in"> user </span>information <span class="keyword">for</span> username</span><br><span class="line">Enter the new value, <span class="keyword">or</span> press ENTER <span class="keyword">for</span> the default</span><br><span class="line">    Full Name []:</span><br><span class="line">    Room Number []:</span><br><span class="line">    Work Phone []:</span><br><span class="line">    Home Phone []:</span><br><span class="line">    Other []:</span><br><span class="line">Is the information correct? [Y/n]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 usermod 命令添加用户到 sudo 组。</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">usermod -aG sudo username</span></span><br></pre></td></tr></table></figure>
+<p>Ubuntu 上 sudo 组的成员默认拥有 sudo 权限。</p>
+<ul>
+<li>测试新用户账号的 sudo 权限。<br>使用 su 命令切换到新用户。</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">su - username</span></span><br></pre></td></tr></table></figure>
+<p>在你的命令前加 sudo 尝试新用户权限：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">command</span>_to_run</span><br></pre></td></tr></table></figure>
+<p>例如，查看 /root 目录的内容：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">ls</span> -la <span class="string">/root</span></span><br></pre></td></tr></table></figure>
+<p>如果是本会话中第一次使用 sudo，将系统会提示你输入密码。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ sudo ls -al /root</span><br><span class="line">[sudo] password for sunyongfeng: </span><br><span class="line">total 3308</span><br><span class="line">drwx------ <span class="number"> 4 </span>root root   <span class="number"> 4096 </span>Nov<span class="number"> 28 </span>14:22 .</span><br><span class="line">drwxr-xr-x<span class="number"> 22 </span>root root   <span class="number"> 4096 </span>Nov <span class="number"> 4 </span>14:52 ..</span><br><span class="line">-rw------- <span class="number"> 1 </span>root root     <span class="number"> 92 </span>Nov<span class="number"> 28 </span>10:01 .bash_history</span><br><span class="line">-rw-r--r-- <span class="number"> 1 </span>root root   <span class="number"> 3106 </span>Feb<span class="number"> 20 </span><span class="number"> 2014 </span>.bashrc</span><br><span class="line">drwx------ <span class="number"> 2 </span>root root   <span class="number"> 4096 </span>Nov <span class="number"> 4 </span>15:25 .cache</span><br><span class="line">-rw-r--r-- <span class="number"> 1 </span>root root    <span class="number"> 140 </span>Feb<span class="number"> 20 </span><span class="number"> 2014 </span>.profile</span><br><span class="line">-rw------- <span class="number"> 1 </span>root root   <span class="number"> 2024 </span>Nov<span class="number"> 28 </span>14:22 .viminfo</span><br></pre></td></tr></table></figure>
+<h3 id="配置字体"><a href="#配置字体" class="headerlink" title="配置字体"></a>配置字体</h3><ul>
+<li>拷贝字体</li>
+<li>配置字体</li>
+<li>刷新字体</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo cp -a msfonts <span class="regexp">/usr/</span>share<span class="regexp">/fonts/m</span>sfonts</span><br><span class="line">sudo fc-cache -f -v</span><br><span class="line">fc-cache -f -s -v</span><br></pre></td></tr></table></figure>
+<h3 id="ssh"><a href="#ssh" class="headerlink" title="ssh"></a>ssh</h3><h4 id="ssh-远程登陆后很久才提示输入密码"><a href="#ssh-远程登陆后很久才提示输入密码" class="headerlink" title="ssh 远程登陆后很久才提示输入密码"></a>ssh 远程登陆后很久才提示输入密码</h4><p>原因：配置 <code>GSSAPIAuthentication</code> 为 <code>yes</code> 了。默认情况下该配置并未开启，详见 <code>/etc/ssh/sshd_config</code></p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># GSSAPI options</span></span><br><span class="line"><span class="meta">#GSSAPIAuthentication no</span></span><br><span class="line"><span class="meta">#GSSAPICleanupCredentials yes</span></span><br></pre></td></tr></table></figure>
+<p>详见 <a href="http://jaminzhang.github.io/linux/GSSAPI-related-options-in-ssh-configuration/" target="_blank" rel="noopener">SSH 中的 GSSAPI 相关选项</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/apt/" rel="tag"># apt</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201507/windows/Vmplayer-ubuntu-install-vmtools.html" rel="next" title="【解决】Win7虚拟机ubuntu安装vm-tools的问题">
+                <i class="fa fa-chevron-left"></i> 【解决】Win7虚拟机ubuntu安装vm-tools的问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201509/linux/dev-conf.html" rel="prev" title="Linux开发环境配置记录">
+                Linux开发环境配置记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#善用-var-log"><span class="nav-number">1.</span> <span class="nav-text">善用/var/log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务重启"><span class="nav-number">2.</span> <span class="nav-text">服务重启</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#硬件相关"><span class="nav-number">3.</span> <span class="nav-text">硬件相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网卡相关"><span class="nav-number">3.1.</span> <span class="nav-text">网卡相关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#没有-ifconfig-命令"><span class="nav-number">3.1.1.</span> <span class="nav-text">没有 ifconfig 命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#静态IP配置"><span class="nav-number">3.1.2.</span> <span class="nav-text">静态IP配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DNS配置"><span class="nav-number">3.1.3.</span> <span class="nav-text">DNS配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#禁用IPv6"><span class="nav-number">3.1.4.</span> <span class="nav-text">禁用IPv6</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示相关"><span class="nav-number">3.2.</span> <span class="nav-text">显示相关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#屏幕分辨率问题"><span class="nav-number">3.2.1.</span> <span class="nav-text">屏幕分辨率问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日常使用"><span class="nav-number">4.</span> <span class="nav-text">日常使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apt"><span class="nav-number">4.1.</span> <span class="nav-text">apt</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置源"><span class="nav-number">4.1.1.</span> <span class="nav-text">配置源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新cache"><span class="nav-number">4.1.2.</span> <span class="nav-text">更新cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#以关键字查找包"><span class="nav-number">4.1.3.</span> <span class="nav-text">以关键字查找包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#强制使用IPv4更新"><span class="nav-number">4.1.4.</span> <span class="nav-text">强制使用IPv4更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装失败"><span class="nav-number">4.1.5.</span> <span class="nav-text">安装失败</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中文支持"><span class="nav-number">4.2.</span> <span class="nav-text">中文支持</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ubuntu-server-14-04中文支持"><span class="nav-number">4.2.1.</span> <span class="nav-text">Ubuntu server 14.04中文支持</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入法"><span class="nav-number">4.3.</span> <span class="nav-text">输入法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ubuntu-server-14-04-fcitx"><span class="nav-number">4.3.1.</span> <span class="nav-text">Ubuntu server 14.04 fcitx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#fcitx旧安装方式记录"><span class="nav-number">4.3.2.</span> <span class="nav-text">fcitx旧安装方式记录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器"><span class="nav-number">4.4.</span> <span class="nav-text">浏览器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件管理器（File-Manager）"><span class="nav-number">4.5.</span> <span class="nav-text">文件管理器（File Manager）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文本编辑器"><span class="nav-number">4.6.</span> <span class="nav-text">文本编辑器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引导失败"><span class="nav-number">4.7.</span> <span class="nav-text">引导失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键鼠"><span class="nav-number">4.8.</span> <span class="nav-text">键鼠</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#提示CapsLock键"><span class="nav-number">4.8.1.</span> <span class="nav-text">提示CapsLock键</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#禁用触摸板"><span class="nav-number">4.8.2.</span> <span class="nav-text">禁用触摸板</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户管理"><span class="nav-number">4.9.</span> <span class="nav-text">用户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Add-user-and-add-to-sudoers-group"><span class="nav-number">4.9.1.</span> <span class="nav-text">Add user and add to sudoers group</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加用户"><span class="nav-number">4.9.2.</span> <span class="nav-text">添加用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改密码"><span class="nav-number">4.9.3.</span> <span class="nav-text">修改密码</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#修改root密码"><span class="nav-number">4.9.3.1.</span> <span class="nav-text">修改root密码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加sudo用户"><span class="nav-number">4.9.4.</span> <span class="nav-text">添加sudo用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加-sudo-用户的另一种简易方法"><span class="nav-number">4.9.5.</span> <span class="nav-text">添加 sudo 用户的另一种简易方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置字体"><span class="nav-number">4.10.</span> <span class="nav-text">配置字体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh"><span class="nav-number">4.11.</span> <span class="nav-text">ssh</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ssh-远程登陆后很久才提示输入密码"><span class="nav-number">4.11.1.</span> <span class="nav-text">ssh 远程登陆后很久才提示输入密码</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201509/linux/personal-faq.html";
+    this.page.identifier = "201509/linux/personal-faq.html";
+    this.page.title = 'Linux使用记录';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

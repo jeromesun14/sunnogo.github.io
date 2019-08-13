@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="p4app 仓库使用说明。">
+<meta name="keywords" content="p4,p4app,快速验证,p4lang,github,repo,topo,stf,bmv2,build,compile,docker,mininet,仓库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="p4app 仓库 —— 用于快速验证 P4 程序">
+<meta property="og:url" content="http://sunyongfeng.com/201705/networks/p4/repo_p4app.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="p4app 仓库使用说明。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.073Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="p4app 仓库 —— 用于快速验证 P4 程序">
+<meta name="twitter:description" content="p4app 仓库使用说明。">
+  <link rel="canonical" href="http://sunyongfeng.com/201705/networks/p4/repo_p4app">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>p4app 仓库 —— 用于快速验证 P4 程序 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201705/networks/p4/repo_p4app.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">p4app 仓库 —— 用于快速验证 P4 程序
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-05-10 16:41:00" itemprop="dateCreated datePublished" datetime="2017-05-10T16:41:00+08:00">2017-05-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/p4/" itemprop="url" rel="index"><span itemprop="name">p4</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201705/networks/p4/repo_p4app.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201705/networks/p4/repo_p4app.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">p4app 仓库使用说明。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文译自 <a href="https://github.com/p4lang/p4app/blob/master/README.md" target="_blank" rel="noopener">p4app README</a>，对内容结构进行少量调整，并附上运行 log。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a href="https://github.com/p4lang/p4app" target="_blank" rel="noopener">p4app</a> 仓库创建于 2017-02-23，是一种构建、运行、调试和测试 P4 程序的工具。哲学是“简单的东西应尽可能简单”，旨在使小而简单的 P4 程序易于编写、易于与他人分享。</p>
+<p><a href="https://github.com/p4lang/p4factory" target="_blank" rel="noopener">p4factory</a> 或 <a href="https://github.com/p4lang/switch" target="_blank" rel="noopener">switch</a> 等 P4 样例依赖安装步骤复杂、编译时间超长。p4app 可很好地解决此问题，降低 P4 入门门槛。与预期的相符，p4app 将 bmv2 等基础组件整合成一个 docker image。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li>下载 p4app</li>
+</ul>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">https</span>://github.com/p4lang/p4app</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Bug fix.</li>
+</ul>
+<p>p4app bug: <a href="https://github.com/p4lang/p4app/pull/17" target="_blank" rel="noopener">pull request 17</a>，docker 镜像名已由 <code>p4lang/p4app:stable</code> 改为 <code>p4lang/p4app:latest</code>。修改 <code>p4app</code> L16 为: </p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">-P4APP_IMAGE</span>=<span class="variable">$&#123;P4APP_IMAGE:-p4lang/p4app:latest&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>如果没有安装 <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="noopener">docker</a> ，需先安装。一键搞定：<code>wget -qO- https://get.docker.com/ | sh</code>。</p>
+</li>
+<li><p>为方便，建议把 <code>p4app</code> 脚本拷贝到 PATH 路径，例如：</p>
+</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp p4app /usr/<span class="keyword">local</span>/bin</span><br></pre></td></tr></table></figure>
+<p>程序安装到此结束！</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>p4app 运行以 <code>.p4app</code> 为后缀的目录，称 p4app 包。p4app 仓库中包含多个样例，例如 <code>simple_router.p4app</code>，运行方法：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p4app <span class="keyword">run</span><span class="bash"> examples/simple_router.p4app</span></span><br></pre></td></tr></table></figure>
+<p>此样例最终进入 mininet 命令行，在此之前，p4app 进行如下处理：</p>
+<ol>
+<li>【首次运行 p4app 命令时】自动下载 docker 镜像 <code>p4lang/p4app:latest</code>，该镜像包含 P4 编译器、抓包工具 tshark、发包工具 scapy、net-tools 和 nmap 套件等工具</li>
+<li>编译 <code>simper_router.p4</code></li>
+<li>设置并启动一个容器做为软件交换机</li>
+<li>设置并启动 mininet 模拟实验网络</li>
+</ol>
+<h2 id="p4app-命令参数"><a href="#p4app-命令参数" class="headerlink" title="p4app 命令参数"></a>p4app 命令参数</h2><ul>
+<li>run，运行 p4app，可带 target 参数。</li>
+<li>pack，压缩 p4app 包为单独文件，便于分享。使用 gzip 压缩</li>
+<li>unpack，解压上述压缩包</li>
+<li>update，更新 p4app 本地缓存的 P4 编译器和相关工具到最新版本。p4app 在本地缓存P4编译器和工具，因此不必每次都重新下载。</li>
+</ul>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~/workshop/p4app$ ./p4app -h</span><br><span class="line">Usage:</span><br><span class="line">  p4app run &lt;program.p4app&gt;</span><br><span class="line">      Run <span class="keyword">a</span> p4app.</span><br><span class="line">  p4app run &lt;program.p4app&gt; &lt;target&gt;</span><br><span class="line">      Run <span class="keyword">a</span> p4app, specifying <span class="keyword">a</span> target.</span><br><span class="line">  p4app pack &lt;program.p4app&gt;</span><br><span class="line">      Compress <span class="keyword">a</span> p4app <span class="built_in">directory</span> <span class="keyword">into</span> <span class="keyword">a</span> single <span class="built_in">file</span>, <span class="keyword">in</span>-place.</span><br><span class="line">  p4app unpack &lt;program.p4app&gt;</span><br><span class="line">      Expand <span class="keyword">a</span> p4app <span class="built_in">file</span> <span class="keyword">into</span> <span class="keyword">a</span> <span class="built_in">directory</span>, <span class="keyword">in</span>-place.</span><br><span class="line">  p4app update</span><br><span class="line">      Update <span class="keyword">the</span> toolchain <span class="built_in">to</span> <span class="keyword">the</span> newest <span class="built_in">version</span>.</span><br></pre></td></tr></table></figure>
+<h3 id="target-与-backend"><a href="#target-与-backend" class="headerlink" title="target 与 backend"></a>target 与 backend</h3><p>p4app 包最终将怎么运行，由配置文件 manifest file <code>p4app.json</code> 的参数<code>targets</code> 指定。目前支持有多种运行方式，例如仅编译成 bmv2 目标、进行 stf 测试、mininet 单交换机测试、mininet 多交换机测试等。本文将这些运行方式称为 backend，一个 p4app 包可以有多个 target，每个 target 必须指定其 backend。</p>
+<p>通过在 <code>p4app run</code> 时指定 target 运行非默认 target，例如运行 simple_counter.p4app 的 debug target：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p4app <span class="keyword">run</span><span class="bash"> examples/simple_couter.p4app debug</span></span><br></pre></td></tr></table></figure>
+<p>如果有多个 target，且使用者没有通过名字指定默认 target，则 p4app 随机运行其中一个。可使用 <code>default-target</code> 选项，设置默认 backend。例如：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"program"</span>: <span class="string">"my_program.p4"</span>,</span><br><span class="line">  <span class="attr">"language"</span>: <span class="string">"p4-14"</span>,</span><br><span class="line">  <span class="attr">"default-target"</span>: <span class="string">"debug"</span>,</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">    <span class="attr">"debug"</span>: &#123; <span class="attr">"use"</span>: <span class="string">"mininet"</span>, <span class="attr">"num-hosts"</span>: <span class="number">2</span> &#125;,</span><br><span class="line">    <span class="attr">"test1"</span>: &#123; <span class="attr">"use"</span>: <span class="string">"stf"</span>, <span class="attr">"test"</span>: <span class="string">"test1.stf"</span> &#125;,</span><br><span class="line">    <span class="attr">"test2"</span>: &#123; <span class="attr">"use"</span>: <span class="string">"stf"</span>, <span class="attr">"test"</span>: <span class="string">"test2.stf"</span> &#125;,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里定义一个名为 “debug” 的 mininet backend，以及两个 STF backend，分别名为 “test1” 和 “test2”。<code>&quot;user&quot;:&quot;mininet&quot;</code> 用于指明每个 target 使用哪个 backend，如果不使用 user 字段，则 target 名同时被认定为 backend 名。这也是为什么，在之前的样例中，不需要指明<code>&quot;use&quot;: &quot;mininet&quot;</code> ，因为 target 名就已经是 mininet，如果直接被用成 backend 名，p4app 也可以识别。</p>
+<p>目前支持以下几种 backend，具体见后文详述。</p>
+<ul>
+<li>mininet</li>
+<li>multiswitch</li>
+<li>custom</li>
+<li>stf</li>
+<li>compile-bmv2</li>
+</ul>
+<h2 id="创建一个-p4app-包"><a href="#创建一个-p4app-包" class="headerlink" title="创建一个 p4app 包"></a>创建一个 p4app 包</h2><p>p4app 包的目录结构一般为：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">my_program.p4app</span><br><span class="line">  <span class="string">|</span></span><br><span class="line">  <span class="string">|- p4app.json</span></span><br><span class="line">  <span class="string">|</span></span><br><span class="line">  <span class="string">|- my_program.p4</span></span><br><span class="line">  <span class="string">|</span></span><br><span class="line">  <span class="string">|- ...other files...</span></span><br></pre></td></tr></table></figure>
+<p><code>p4app.json</code>  是这个包的 manifest 文件，说明如何构建和运行 p4 程序，功能有点像 Makefile 文件。样例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"program"</span>: <span class="string">"my_program.p4"</span>,</span><br><span class="line">  <span class="attr">"language"</span>: <span class="string">"p4-14"</span>,</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">    <span class="attr">"mininet"</span>: &#123;</span><br><span class="line">      <span class="attr">"num-hosts"</span>: <span class="number">2</span>,</span><br><span class="line">      <span class="attr">"switch-config"</span>: <span class="string">"my_program.config"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>样例 manifest 告诉 p4app 应该运行 <code>my_program.p4</code>，该 p4 程序使用 <code>p4-14</code> 编写（同样也可以用 <code>p4-16</code>，P4-16 版本）。该样例定义一个 target，该 target 的 backend 为 <code>mininet</code>，同时提供一些 mininet 配置选项：测试网络有两个 host，一个模拟交换机，该交换机启机默认加载 <code>my_program.config</code> 中的配置。如果你在 <code>p4app.json</code> 中引用像 <code>my_program.config</code> 时，则需要将 <code>my_program.config</code> 文件包在 p4app 包中，p4app 将确保相应工具可找到它。</p>
+<h2 id="Backend"><a href="#Backend" class="headerlink" title="Backend"></a>Backend</h2><h3 id="mininet"><a href="#mininet" class="headerlink" title="mininet"></a>mininet</h3><p>该后端编译 p4 程序，并加载到 BMv2 <a href="https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md" target="_blank" rel="noopener">simple_switch</a>，然后创建 mininet 实验环境。</p>
+<p>支持以下配置值（皆为可选）：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"mininet"</span>: &#123;</span><br><span class="line">  <span class="string">"num-hosts"</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="string">"switch-config"</span>: <span class="string">"file.config"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>mininet 将创建星形拓扑网络，并创建 <code>num-hosts</code> 个数的 host，通过不同端口连接到模拟交换机。</p>
+<p>模拟交换机的启机默认配置可通过 <code>switch-config</code> 配置。配置的文件是一系列 BMV2 <a href="https://github.com/p4lang/behavioral-model#using-the-cli-to-populate-tables" target="_blank" rel="noopener">simple_switch_CLI</a> 命令。</p>
+<p>在启机过程中，有信息提示网络配置信息以及如何使用 logging 和 debugging 工具。</p>
+<p>BMV2 debugger 很方便，<a href="https://github.com/p4lang/behavioral-model/blob/master/docs/p4dbg_user_guide.md" target="_blank" rel="noopener">这里</a> 阅读如何使用。</p>
+<p>该 backend 还支持<code>compile-bmv2</code> 配置编译选项，详见下文相应章节。</p>
+<h3 id="multiswitch"><a href="#multiswitch" class="headerlink" title="multiswitch"></a>multiswitch</h3><p>和 <code>mininet</code> 一样，这个 target 包含 P4 程序，并运行在 mininet 环境。但是这个 backend 支持配置多个交换机、自定义拓扑并在 host 上执行自定义命令。这些交换机默认自动配置 l2/l3 规则，用于所有 host 之间的互通，即假设 P4 程序有 <code>ipv4_lpm</code>、<code>send_frame</code> 和 <code>forward</code> 表，详见 simple_router.p4。</p>
+<p>配置样例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"multiswitch"</span>: &#123;</span><br><span class="line">  <span class="string">"links"</span>: [</span><br><span class="line">    [<span class="string">"h1"</span>, <span class="string">"s1"</span>],</span><br><span class="line">    [<span class="string">"s1"</span>, <span class="string">"s2"</span>],</span><br><span class="line">    [<span class="string">"s2"</span>, <span class="string">"h2"</span>, 50]</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"hosts"</span>: &#123;</span><br><span class="line">    <span class="string">"h1"</span>: &#123;</span><br><span class="line">      <span class="string">"cmd"</span>: <span class="string">"python echo_server.py <span class="variable">$port</span>"</span>,</span><br><span class="line">      <span class="string">"startup_sleep"</span>: 0.2,</span><br><span class="line">      <span class="string">"wait"</span>: <span class="literal">false</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"h2"</span>: &#123;</span><br><span class="line">      <span class="string">"cmd"</span>: <span class="string">"python echo_client.py h1 <span class="variable">$port</span> <span class="variable">$echo_msg</span>"</span>,</span><br><span class="line">      <span class="string">"wait"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"parameters"</span>: &#123;</span><br><span class="line">    <span class="string">"port"</span>: 8000,</span><br><span class="line">    <span class="string">"echo_msg"</span>: <span class="string">"foobar"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该配置创建以下拓扑：</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">h1 &lt;---&gt; s1 &lt;---&gt; s2 &lt;---&gt; h2</span><br></pre></td></tr></table></figure>
+<p>其中 <code>s2-h2</code> 链路人工配置 50ms 的延迟。host 配置选项：</p>
+<ul>
+<li><code>cmd</code> - 在 host 上运行的命令</li>
+<li><code>wait</code> - 等待命令执行结束。如果配置成 false，表示在后台运行此命令。</li>
+<li><code>startup_sleep</code> - 启动命令后应等待的时间（以秒为单位）。</li>
+<li><code>latency</code> - 主机与交换机之间的延迟。配置值是数字（解释为秒）或具有时间单位的字符串（例如<code>50ms</code>或<code>1s</code>）。该配置将覆盖“links”对象中设置的延迟。</li>
+</ul>
+<p>通过将主机名（例如 “h1”）替换为相应的 IP 地址来格式化该命令。 目标中指定的参数将作为环境变量（即<code>$</code>后跟变量名称）可用于命令，详见 multiswitch 样例。</p>
+<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><p>目前每个 host 最多只能连一个 switch。</p>
+<h4 id="指定每个交换机表项"><a href="#指定每个交换机表项" class="headerlink" title="指定每个交换机表项"></a>指定每个交换机表项</h4><p>路由表（<code>ipv4_lpm</code>，<code>send_frame</code> 和 <code>forward</code>）在本 target 中自动下发。使用者可根据自己的需要下发表项到每个交换机中，形式为包含一个命令文件或命令数组。这些自定义的表项优先级比路由表的自动生成的高。例如：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"multiswitch"</span>: &#123;</span><br><span class="line">  <span class="string">"links"</span>: [ <span class="string">...</span> ],</span><br><span class="line">  <span class="string">"hosts"</span>: &#123; <span class="string">...</span> &#125;,</span><br><span class="line">  <span class="string">"switches"</span>: &#123;</span><br><span class="line">    <span class="string">"s1"</span>: &#123;</span><br><span class="line">      <span class="string">"entries"</span>: <span class="string">"s1_commands.txt"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"s2"</span>: &#123;</span><br><span class="line">      <span class="string">"entries"</span>: [</span><br><span class="line">        <span class="string">"table_add ipv4_lpm set_nhop 10.0.1.10/32 =&gt; 10.0.1.10 1"</span>,</span><br><span class="line">        <span class="string">"table_add ipv4_lpm set_nhop 10.0.2.10/32 =&gt; 10.0.2.10 2"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果上述 <code>s2</code> 表项与自动生成的表项一样（例如自动生成的表项 <code>set_nhop 10.0.1.10 / 32</code>），这些自定义表项将具有更高的优先权，在下发表项时将警告表项重复。</p>
+<h4 id="自定义拓扑类"><a href="#自定义拓扑类" class="headerlink" title="自定义拓扑类"></a>自定义拓扑类</h4><p>通过 <code>topo_module</code> 选项指定自己的 mininet 拓扑类。例如：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"multiswitch"</span>: &#123;</span><br><span class="line">  <span class="string">...</span></span><br><span class="line">  <span class="string">"topo_module"</span>: <span class="string">"mytopo"</span></span><br><span class="line">  <span class="string">...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这将 import <code>mytopo</code> 模块 <code>mytopo.py</code>，该文件应与 manifest 文件（<code>p4app.json</code>）放在同一目录下，同时应实现 <code>CustomAppTopo</code> 类。可 extend 默认的 topo 类 <a href="https://github.com/p4lang/p4app/blob/master/docker/scripts/mininet/apptopo.py" target="_blank" rel="noopener">apptopo.AppTopo</a>。例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mytopo.py</span></span><br><span class="line"><span class="keyword">from</span> apptopo <span class="keyword">import</span> AppTopo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomAppTopo</span><span class="params">(AppTopo)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        AppTopo.__init__(self, *args, **kwargs)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">print</span> self.links()</span><br></pre></td></tr></table></figure>
+<p>详见样例 <a href="https://github.com/p4lang/p4app/blob/master/examples/customtopo.p4app/mytopo.py" target="_blank" rel="noopener">customtopo.p4app</a>。</p>
+<h4 id="自定义控制器"><a href="#自定义控制器" class="headerlink" title="自定义控制器"></a>自定义控制器</h4><p>类似 <code>topo_module</code> 选项，通过 <code>controller_module</code> 选项自定义控制器。该模块应实现 <code>CustomAppController</code> 类。默认的控制器类为 <a href="https://github.com/p4lang/p4app/blob/master/docker/scripts/mininet/appcontroller.py" target="_blank" rel="noopener">appcontroller.AppController</a>，可直接对该类进行扩展。详见样例 <a href="https://github.com/p4lang/p4app/blob/master/examples/customtopo.p4app/mycontroller.py" target="_blank" rel="noopener">customtopo.p4app</a>。</p>
+<h4 id="Logging"><a href="#Logging" class="headerlink" title="Logging"></a>Logging</h4><p>当本 target 运行时，host 上的临时目录 <code>/tmp/p4app_log</code> 将加载到 guest 的 <code>/tmp/p4app_log</code>。运行 p4app 后， host 上保存有所有的 log。 host 命令的标准输出 stdout 将保存在该目录，如果需要保存某个命令的 log，将可以将其输出到该目录。</p>
+<p>设置 <code>&quot;bmv2_log&quot;:true</code>，保存 P4 交换机的调试 log。<br>设置 <code>&quot;pcap_dump&quot;:true</code>，抓取所有交换机的报文，交保存为 PCAP 格式。</p>
+<p>以上文件将被保存到 <code>/tmp/p4app_log</code>。详见样例 <a href="https://github.com/p4lang/p4app/blob/master/examples/broadcast.p4app/p4app.json" target="_blank" rel="noopener">broadcast.p4app</a> </p>
+<h4 id="Cleanup-commands"><a href="#Cleanup-commands" class="headerlink" title="Cleanup commands"></a>Cleanup commands</h4><p>运行 target 后（在 mininet stop 之前），如果需要在 docker 容器内执行命令，可使用 <code>after</code> 选项，其后必须包含 <code>cmd</code>，可以是一个或多个命令，例如：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"multiswitch"</span>: &#123;</span><br><span class="line">  <span class="string">"links"</span>: [ <span class="string">...</span> ],</span><br><span class="line">  <span class="string">"hosts"</span>: &#123; <span class="string">...</span> &#125;,</span><br><span class="line">  <span class="string">"after"</span>: &#123;</span><br><span class="line">    <span class="string">"cmd"</span>: [</span><br><span class="line">      <span class="string">"echo register_read my_register 1 | simple_switch_CLI --json p4src/my_router.p4.json"</span>,</span><br><span class="line">      <span class="string">"echo register_read my_register 2 | simple_switch_CLI --json p4src/my_router.p4.json"</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="custom"><a href="#custom" class="headerlink" title="custom"></a>custom</h3><p>该 backend 允许使用者指定 python <code>program</code>，该 <code>program</code> 使用 Mininet python API 指定网络拓扑和配置。例如：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"program"</span>: <span class="string">"source_routing.p4"</span>,</span><br><span class="line">  <span class="attr">"language"</span>: <span class="string">"p4-14"</span>,</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">      <span class="attr">"custom"</span>: &#123;</span><br><span class="line">	       <span class="attr">"program"</span>: <span class="string">"topo.py"</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该 target 在启动 Mninet 时运行 <code>topy.py</code> 脚本。将使用以下参数调用 <code>program</code>：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>–behavioral-exe</td>
+<td>switch 可执行文件</td>
+</tr>
+<tr>
+<td>–json</td>
+<td>P4 程序编译结果</td>
+</tr>
+<tr>
+<td>–cli</td>
+<td>switch_CLI 命令</td>
+</tr>
+</tbody>
+</table>
+<p>样例：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PYTHONPATH=<span class="variable">$PYTHONPATH</span><span class="symbol">:/scripts/mininet/</span> python2 topo.py \</span><br><span class="line">                        --behavioral-exe simple_switch \</span><br><span class="line">                        --json SOME_FILE \</span><br><span class="line">                        --cli simple_switch_CLI</span><br></pre></td></tr></table></figure>
+<p>同时可以指定其他参数传递给自定义拓扑程序，方法是将它们包含在 <code>program</code> 定义中，如下所示：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"program"</span>: <span class="string">"source_routing.p4"</span>,</span><br><span class="line">  <span class="attr">"language"</span>: <span class="string">"p4-14"</span>,</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">      <span class="attr">"custom"</span>: &#123;</span><br><span class="line">	       <span class="attr">"program"</span>: <span class="string">"topo.py --num-hosts 2 --switch-config simple_router.config"</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>program</code> 可通过 <code>HOSTNAME</code> 变量获取 docker 容器 ID。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">container = os.environ[<span class="string">'HOSTNAME'</span>]</span><br><span class="line"><span class="keyword">print</span> <span class="string">'Run the switch CLI as follows:'</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">'  docker exec -t -i %s %s'</span> % (container, args.cli)</span><br></pre></td></tr></table></figure>
+<h3 id="stf"><a href="#stf" class="headerlink" title="stf"></a>stf</h3><p>stf 后端编译给定的 p4 程序，并运行 stf 测试用例。</p>
+<p>stf，simple testing framework，一种模拟网络测试框架。</p>
+<blockquote>
+<p>“simple testing framework”, which can help you test small P4 programs and ensure they behave the way you expect.</p>
+</blockquote>
+<p><code>simple_counter.p4app</code> 样例使用 stf 测试框架，运行该样例：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p4app <span class="keyword">run</span><span class="bash"> examples/simple_counter.p4app</span></span><br></pre></td></tr></table></figure>
+<p>运行后，p4app 启动 docker 容器，并在容器中：</p>
+<ul>
+<li>自动编译 <code>simple_counter.p4</code></li>
+<li>运行 simple_switch 交换机</li>
+<li>stf 下发默认表项</li>
+<li>stf 发送定义在 <code>simple_counter.stf</code> 中的报文，并验证 simple_switch 是否转发出预期的报文</li>
+</ul>
+<p>和 mininet 不一样的是， stf 最终直接退出。</p>
+<h4 id="simple-counter-p4app-stf-配置"><a href="#simple-counter-p4app-stf-配置" class="headerlink" title="simple_counter.p4app stf 配置"></a>simple_counter.p4app stf 配置</h4><ul>
+<li><code>p4app.json</code> 配置</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"program"</span>: <span class="string">"simple_counter.p4"</span>,</span><br><span class="line">  <span class="attr">"language"</span>: <span class="string">"p4-14"</span>,</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">    <span class="attr">"stf"</span>: &#123;</span><br><span class="line">      <span class="attr">"test"</span>: <span class="string">"simple_counter.stf"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"debug"</span>: &#123;</span><br><span class="line">      <span class="attr">"use"</span>: <span class="string">"mininet"</span>,</span><br><span class="line">      <span class="attr">"num-hosts"</span>: <span class="number">2</span>,</span><br><span class="line">      <span class="attr">"switch-config"</span>: <span class="string">"simple_counter.config"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>stf 文件 simple_counter.stf 配置</li>
+</ul>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">add test1 data.f1:0x01010101 c1_2(val1:0x01, val2:0x02)</span><br><span class="line">add test1 data.f1:0x02020202 c1_2(val1:0x10, val2:0x20)</span><br><span class="line"></span><br><span class="line">add test2 data.f2:0x03030303 c3_4(val3:0x03, val4:0x04, port:1)</span><br><span class="line">add test2 data.f2:0x04040404 c3_4(val3:0x30, val4:0x40, port:2)</span><br><span class="line"></span><br><span class="line">expect<span class="number"> 1 </span>01010101<span class="number"> 03030303 </span>01<span class="number"> 02 </span>03 04</span><br><span class="line">packet<span class="number"> 0 </span>01010101<span class="number"> 03030303 </span>55<span class="number"> 66 </span>77 88</span><br><span class="line">expect<span class="number"> 2 </span>01010101<span class="number"> 04040404 </span>01<span class="number"> 02 </span>30 40</span><br><span class="line">packet<span class="number"> 0 </span>01010101<span class="number"> 04040404 </span>55<span class="number"> 66 </span>77 88</span><br><span class="line">expect<span class="number"> 1 </span>02020202<span class="number"> 03030303 </span>10<span class="number"> 20 </span>03 04</span><br><span class="line">packet<span class="number"> 0 </span>02020202<span class="number"> 03030303 </span>99<span class="number"> 88 </span>77 66</span><br><span class="line">expect<span class="number"> 2 </span>02020202<span class="number"> 04040404 </span>10<span class="number"> 20 </span>30 40</span><br><span class="line">packet<span class="number"> 0 </span>02020202<span class="number"> 04040404 </span>14<span class="number"> 25 </span>36 47</span><br></pre></td></tr></table></figure>
+<p>必须使用 stf 格式编写 stf target 指定的配置文件，目前还没有该格式的说明文档。（如果您想反向工程并提供一些文档，请提交PR！）请参阅 p4app 相关样例，参考其中的基本用法。</p>
+<p>此后端还支持 <code>compile-bmv2</code> target 的配置值。</p>
+<h3 id="compile-bmv2"><a href="#compile-bmv2" class="headerlink" title="compile-bmv2"></a>compile-bmv2</h3><p>一个简单的后端，将 p4 程序编译成 BMV2 目标。</p>
+<p>支持以下可选配置值：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"compile-bmv2"</span>: &#123;</span><br><span class="line">  <span class="string">"compiler-flags"</span>: [<span class="string">"-v"</span>, <span class="string">"-E"</span>],</span><br><span class="line">  <span class="string">"run-before-compile"</span>: [<span class="string">"date"</span>],</span><br><span class="line">  <span class="string">"run-after-compile"</span>: [<span class="string">"date"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="高级功能"><a href="#高级功能" class="headerlink" title="高级功能"></a>高级功能</h2><h3 id="指定-docker-image"><a href="#指定-docker-image" class="headerlink" title="指定 docker image"></a>指定 docker image</h3><p>如果想使用自定义的 P4 工具链或 p4app，可通过 <code>P4APP_IMAGE</code> 环境变量配置 Docker image，替代标准 p4lang image。例如：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">P4APP_IMAGE</span>=me/my_p4app_image:latest p4app <span class="builtin-name">run</span> examples/simple_router.p4app</span><br></pre></td></tr></table></figure>
+<h3 id="指定-manifest-文件"><a href="#指定-manifest-文件" class="headerlink" title="指定 manifest 文件"></a>指定 manifest 文件</h3><p>默认情况下，p4app 使用 app 目录下一个名为 <code>p4app.json</code> 的 manifest 文件。如果你的 manifest 文件名称不是 <code>p4app.json</code>，则可通过 <code>--manifest</code> 选项指定 manifest 文件。例如：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p4app run myapp.p4app --manifest testing.p4app</span><br></pre></td></tr></table></figure>
+<h3 id="指定-log-目录"><a href="#指定-log-目录" class="headerlink" title="指定 log 目录"></a>指定 log 目录</h3><p>默认情况下，p4app 挂载 host 目录 <code>/tmp/p4app_logs</code> 到 docker 容器 guest 目录 <code>/tmp/p4app_logs</code>。bmv2 以及其他程序的输出将保存在此目录。可通过 <code>$P4APP_LOGDIR</code> 环境变量指定其他目录为 log 目录，例如：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">P4APP_LOGDIR</span>=./out p4app <span class="builtin-name">run</span> myapp.p4app</span><br></pre></td></tr></table></figure>
+<h2 id="运行-log-汇总"><a href="#运行-log-汇总" class="headerlink" title="运行 log 汇总"></a>运行 log 汇总</h2><h3 id="运行-simple-router-p4app"><a href="#运行-simple-router-p4app" class="headerlink" title="运行 simple_router.p4app"></a>运行 simple_router.p4app</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$</span> <span class="string">sudo</span> <span class="string">cp</span> <span class="string">p4app</span> <span class="string">/usr/local/bin/</span></span><br><span class="line"><span class="string">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$</span> <span class="string">p4app</span> <span class="string">run</span> <span class="string">examples/simple_router.p4app/</span></span><br><span class="line"><span class="string">Unable</span> <span class="string">to</span> <span class="string">find</span> <span class="string">image</span> <span class="string">'p4lang/p4app:latest'</span> <span class="string">locally</span></span><br><span class="line"><span class="attr">latest:</span> <span class="string">Pulling</span> <span class="string">from</span> <span class="string">p4lang/p4app</span></span><br><span class="line"><span class="attr">c62795f78da9:</span> <span class="string">Already</span> <span class="string">exists</span> </span><br><span class="line"><span class="attr">d4fceeeb758e:</span> <span class="string">Already</span> <span class="string">exists</span> </span><br><span class="line"><span class="number">5</span><span class="attr">c9125a401ae:</span> <span class="string">Already</span> <span class="string">exists</span> </span><br><span class="line"><span class="number">0062</span><span class="attr">f774e994:</span> <span class="string">Already</span> <span class="string">exists</span> </span><br><span class="line"><span class="number">6</span><span class="attr">b33fd031fac:</span> <span class="string">Already</span> <span class="string">exists</span> </span><br><span class="line"><span class="attr">c0bc589d658e:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">d304998c3f88:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">9</span><span class="attr">a10b2f1580d:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">0</span><span class="attr">f3b81cccf80:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">d32e2c3a5556:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">421</span><span class="attr">d6ade42fb:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">ed336ba6d94a:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">15</span><span class="attr">d9b8c3dfdb:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">d7df888c0624:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">09</span><span class="attr">b889a34f73:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">8e46</span><span class="attr">ef6cc28e:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">53625</span><span class="attr">fe57a43:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">a1cfe7751ecf:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">098</span><span class="attr">b357129cf:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">ecb46f207e83:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">25</span><span class="attr">df5d0fdf2a:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">a2592a836f76:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">ba5f1dc63b79:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">d8fe27124ef4:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">b6c4e12d947a:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">24342178e654</span><span class="string">:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">21146199</span><span class="attr">f8e0:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">41e02212</span><span class="attr">e6ab:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">885</span><span class="attr">ba0b6073a:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">28805</span><span class="attr">cf1e6e6:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">d5f002ec605e:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">07</span><span class="attr">b6dd17ef27:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">b91909b6c11f:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">f0f07a64cc7e:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="number">202436</span><span class="attr">ed05da:</span> <span class="string">Pull</span> <span class="string">complete</span> </span><br><span class="line"><span class="attr">Digest:</span> <span class="attr">sha256:7d8a140c7160992f693b9d5fab08f7aeaacdb448050d17da81c4ae05dd5465d0</span></span><br><span class="line"><span class="attr">Status:</span> <span class="string">Downloaded</span> <span class="string">newer</span> <span class="string">image</span> <span class="string">for</span> <span class="string">p4lang/p4app:latest</span></span><br><span class="line"><span class="string">Entering</span> <span class="string">build</span> <span class="string">directory.</span></span><br><span class="line"><span class="string">Extracting</span> <span class="string">package.</span></span><br><span class="line"><span class="string">Reading</span> <span class="string">package</span> <span class="string">manifest.</span></span><br><span class="line"><span class="string">&gt; p4c-bm2-ss --p4v 16 "simple_router.p4" -o "simple_router.p4.json"</span></span><br><span class="line"><span class="string">&gt; python2 "/scripts/mininet/single_switch_mininet.py" --log-file "/var/log/simple_router.p4.log" --cli-message "mininet_message.txt" --num-hosts 2 --switch-config "simple_router.config" --behavioral-exe "simple_switch" --json "simple_router.p4.json"</span></span><br><span class="line"><span class="string">Adding host h1</span></span><br><span class="line"><span class="string">Adding host h2</span></span><br><span class="line"><span class="string">*** Error setting resource limits. Mininet's performance may be affected.</span></span><br><span class="line"><span class="string">*** Creating network</span></span><br><span class="line"><span class="string">*** Adding hosts:</span></span><br><span class="line"><span class="string">h1 h2 </span></span><br><span class="line"><span class="string">*** Adding switches:</span></span><br><span class="line"><span class="string">s1 </span></span><br><span class="line"><span class="string">*** Adding links:</span></span><br><span class="line"><span class="string">(h1, s1) (h2, s1) </span></span><br><span class="line"><span class="string">*** Configuring hosts</span></span><br><span class="line"><span class="string">h1 h2 </span></span><br><span class="line"><span class="string">*** Starting controller</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">*** Starting 1 switches</span></span><br><span class="line"><span class="string">s1 Starting P4 switch s1.</span></span><br><span class="line"><span class="string">simple_switch -i 1@s1-eth1 -i 2@s1-eth2 --thrift-port 9090 --nanolog ipc:///tmp/bm-0-log.ipc --device-id 0 simple_router.p4.json --debugger --log-console</span></span><br><span class="line"><span class="string">P4 switch s1 has been started.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">**********</span></span><br><span class="line"><span class="string">Network configuration for: h1</span></span><br><span class="line"><span class="string">Default interface: h1-eth0	10.0.0.10	00:04:00:00:00:00</span></span><br><span class="line"><span class="string">Default route to switch: 10.0.0.1 (00:aa:bb:00:00:00)</span></span><br><span class="line"><span class="string">**********</span></span><br><span class="line"><span class="string">**********</span></span><br><span class="line"><span class="string">Network configuration for: h2</span></span><br><span class="line"><span class="string">Default interface: h2-eth0	10.0.1.10	00:04:00:00:00:01</span></span><br><span class="line"><span class="string">Default route to switch: 10.0.1.1 (00:aa:bb:00:00:01)</span></span><br><span class="line"><span class="string">**********</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Reading switch configuration script: simple_router.config</span></span><br><span class="line"><span class="string">Configuring switch...</span></span><br><span class="line"><span class="string">Obtaining JSON from switch...</span></span><br><span class="line"><span class="string">Done</span></span><br><span class="line"><span class="string">Control utility for runtime P4 table manipulation</span></span><br><span class="line"><span class="string"></span><span class="attr">RuntimeCmd:</span> <span class="string">Setting</span> <span class="string">default</span> <span class="string">action</span> <span class="string">of</span> <span class="string">send_frame</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">_drop</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        </span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Setting</span> <span class="string">default</span> <span class="string">action</span> <span class="string">of</span> <span class="string">forward</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">_drop</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        </span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Setting</span> <span class="string">default</span> <span class="string">action</span> <span class="string">of</span> <span class="string">ipv4_lpm</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">_drop</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        </span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">exact</span> <span class="string">match</span> <span class="string">table</span> <span class="string">send_frame</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">EXACT-00:01</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">rewrite_mac</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">00</span><span class="string">:aa:bb:00:00:00</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">0</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">exact</span> <span class="string">match</span> <span class="string">table</span> <span class="string">send_frame</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">EXACT-00:02</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">rewrite_mac</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">00</span><span class="string">:aa:bb:00:00:01</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">1</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">exact</span> <span class="string">match</span> <span class="string">table</span> <span class="string">forward</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">EXACT-0a:00:00:0a</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">set_dmac</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">00</span><span class="string">:04:00:00:00:00</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">0</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">exact</span> <span class="string">match</span> <span class="string">table</span> <span class="string">forward</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">EXACT-0a:00:01:0a</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">set_dmac</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">00</span><span class="string">:04:00:00:00:01</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">1</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">lpm</span> <span class="string">match</span> <span class="string">table</span> <span class="string">ipv4_lpm</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">LPM-0a:00:00:0a/32</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">set_nhop</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">0</span><span class="attr">a:00:00:0a</span>	<span class="number">00</span><span class="string">:01</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">0</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> <span class="string">Adding</span> <span class="string">entry</span> <span class="string">to</span> <span class="string">lpm</span> <span class="string">match</span> <span class="string">table</span> <span class="string">ipv4_lpm</span></span><br><span class="line"><span class="string">match</span> <span class="attr">key:</span>           <span class="attr">LPM-0a:00:01:0a/32</span></span><br><span class="line"><span class="attr">action:</span>              <span class="string">set_nhop</span></span><br><span class="line"><span class="string">runtime</span> <span class="attr">data:</span>        <span class="number">0</span><span class="attr">a:00:01:0a</span>	<span class="number">00</span><span class="string">:02</span></span><br><span class="line"><span class="string">Entry</span> <span class="string">has</span> <span class="string">been</span> <span class="string">added</span> <span class="string">with</span> <span class="string">handle</span> <span class="number">1</span></span><br><span class="line"><span class="attr">RuntimeCmd:</span> </span><br><span class="line"><span class="string">Configuration</span> <span class="string">complete.</span></span><br><span class="line"></span><br><span class="line"><span class="string">Ready</span> <span class="string">!</span></span><br><span class="line"></span><br><span class="line"><span class="string">======================================================================</span></span><br><span class="line"><span class="string">Welcome</span> <span class="string">to</span> <span class="string">the</span> <span class="string">BMV2</span> <span class="string">Mininet</span> <span class="string">CLI!</span></span><br><span class="line"><span class="string">======================================================================</span></span><br><span class="line"><span class="string">Your</span> <span class="string">P4</span> <span class="string">program</span> <span class="string">is</span> <span class="string">installed</span> <span class="string">into</span> <span class="string">the</span> <span class="string">BMV2</span> <span class="string">software</span> <span class="string">switch</span></span><br><span class="line"><span class="string">and</span> <span class="string">your</span> <span class="string">initial</span> <span class="string">configuration</span> <span class="string">is</span> <span class="string">loaded.</span> <span class="string">You</span> <span class="string">can</span> <span class="string">interact</span></span><br><span class="line"><span class="string">with</span> <span class="string">the</span> <span class="string">network</span> <span class="string">using</span> <span class="string">the</span> <span class="string">mininet</span> <span class="string">CLI</span> <span class="string">below.</span></span><br><span class="line"></span><br><span class="line"><span class="string">To</span> <span class="string">inspect</span> <span class="string">or</span> <span class="string">change</span> <span class="string">the</span> <span class="string">switch</span> <span class="string">configuration,</span> <span class="string">connect</span> <span class="string">to</span></span><br><span class="line"><span class="string">its</span> <span class="string">CLI</span> <span class="string">from</span> <span class="string">your</span> <span class="string">host</span> <span class="string">operating</span> <span class="string">system</span> <span class="string">using</span> <span class="string">this</span> <span class="attr">command:</span></span><br><span class="line">  <span class="string">docker</span> <span class="string">exec</span> <span class="bullet">-t</span> <span class="bullet">-i</span> <span class="number">66</span><span class="string">d97e58a61f</span> <span class="string">simple_switch_CLI</span></span><br><span class="line"></span><br><span class="line"><span class="string">To</span> <span class="string">view</span> <span class="string">the</span> <span class="string">switch</span> <span class="string">log,</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">from</span> <span class="string">your</span> <span class="string">host</span> <span class="attr">OS:</span></span><br><span class="line">  <span class="string">docker</span> <span class="string">exec</span> <span class="bullet">-t</span> <span class="bullet">-i</span> <span class="number">66</span><span class="string">d97e58a61f</span> <span class="string">tail</span> <span class="bullet">-f</span> <span class="string">/var/log/simple_router.p4.log</span></span><br><span class="line"></span><br><span class="line"><span class="string">To</span> <span class="string">run</span> <span class="string">the</span> <span class="string">switch</span> <span class="string">debugger,</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">from</span> <span class="string">your</span> <span class="string">host</span> <span class="attr">OS:</span></span><br><span class="line">  <span class="string">docker</span> <span class="string">exec</span> <span class="bullet">-t</span> <span class="bullet">-i</span> <span class="number">66</span><span class="string">d97e58a61f</span> <span class="string">bm_p4dbg</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">***</span> <span class="string">Starting</span> <span class="attr">CLI:</span></span><br><span class="line"><span class="string">mininet&gt;</span> <span class="string">h1</span> <span class="string">ping</span> <span class="string">h2</span></span><br><span class="line"><span class="string">PING</span> <span class="number">10.0</span><span class="number">.1</span><span class="number">.10</span> <span class="string">(10.0.1.10)</span> <span class="number">56</span><span class="string">(84)</span> <span class="string">bytes</span> <span class="string">of</span> <span class="string">data.</span></span><br><span class="line"><span class="number">64</span> <span class="string">bytes</span> <span class="string">from</span> <span class="number">10.0</span><span class="number">.1</span><span class="number">.10</span><span class="string">:</span> <span class="string">icmp_seq=1</span> <span class="string">ttl=63</span> <span class="string">time=1.42</span> <span class="string">ms</span></span><br><span class="line"><span class="number">64</span> <span class="string">bytes</span> <span class="string">from</span> <span class="number">10.0</span><span class="number">.1</span><span class="number">.10</span><span class="string">:</span> <span class="string">icmp_seq=2</span> <span class="string">ttl=63</span> <span class="string">time=1.65</span> <span class="string">ms</span></span><br><span class="line"><span class="string">^C</span></span><br><span class="line"><span class="bullet">-</span><span class="bullet">--</span> <span class="number">10.0</span><span class="number">.1</span><span class="number">.10</span> <span class="string">ping</span> <span class="string">statistics</span> <span class="meta">---</span></span><br><span class="line"><span class="number">2</span> <span class="string">packets</span> <span class="string">transmitted,</span> <span class="number">2</span> <span class="string">received,</span> <span class="number">0</span><span class="string">%</span> <span class="string">packet</span> <span class="string">loss,</span> <span class="string">time</span> <span class="number">1000</span><span class="string">ms</span></span><br><span class="line"><span class="string">rtt</span> <span class="string">min/avg/max/mdev</span> <span class="string">=</span> <span class="number">1.421</span><span class="string">/1.540/1.659/0.119</span> <span class="string">ms</span></span><br><span class="line"><span class="string">mininet&gt;</span> </span><br><span class="line"><span class="string">mininet&gt;</span> </span><br><span class="line"><span class="string">mininet&gt;</span> <span class="string">exit</span></span><br><span class="line"><span class="string">***</span> <span class="string">Stopping</span> <span class="number">0</span> <span class="string">controllers</span></span><br><span class="line"></span><br><span class="line"><span class="string">***</span> <span class="string">Stopping</span> <span class="number">2</span> <span class="string">links</span></span><br><span class="line"><span class="string">..</span></span><br><span class="line"><span class="string">***</span> <span class="string">Stopping</span> <span class="number">1</span> <span class="string">switches</span></span><br><span class="line"><span class="string">s1</span> </span><br><span class="line"><span class="string">***</span> <span class="string">Stopping</span> <span class="number">2</span> <span class="string">hosts</span></span><br><span class="line"><span class="string">h1</span> <span class="string">h2</span> </span><br><span class="line"><span class="string">***</span> <span class="string">Done</span></span><br></pre></td></tr></table></figure>
+<h3 id="运行-simple-counter-p4app"><a href="#运行-simple-counter-p4app" class="headerlink" title="运行 simple_counter.p4app"></a>运行 simple_counter.p4app</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$ p4app <span class="builtin-name">run</span> examples/simple_counter.p4app/</span><br><span class="line">Entering build directory.</span><br><span class="line">Extracting package.</span><br><span class="line">Reading package manifest.</span><br><span class="line">&gt; p4c-bm2-ss --p4v 14 <span class="string">"simple_counter.p4"</span> -o <span class="string">"simple_counter.p4.json"</span></span><br><span class="line">warning: cnt: Direct counter <span class="keyword">not</span> used; ignoring</span><br><span class="line">&gt; python2 <span class="string">"/scripts/stf/bmv2stf.py"</span> -v /tmp/simple_counter.p4.json /tmp/simple_counter.stf</span><br><span class="line">WARNING: <span class="literal">No</span><span class="built_in"> route </span>found <span class="keyword">for</span><span class="built_in"> IPv6 </span>destination :: (<span class="literal">no</span><span class="built_in"> default </span>route?)</span><br><span class="line">Running model</span><br><span class="line">Running simple_switch --log-file switch.log --log-flush --use-files 0 --thrift-port 9232 --device-id 142 -i 0@pcap0 -i 1@pcap1 -i 2@pcap2 /tmp/simple_counter.p4.json</span><br><span class="line">Calling target program-options parser</span><br><span class="line">Adding<span class="built_in"> interface </span>pcap0 as<span class="built_in"> port </span>0 (files)</span><br><span class="line">Adding<span class="built_in"> interface </span>pcap1 as<span class="built_in"> port </span>1 (files)</span><br><span class="line">Adding<span class="built_in"> interface </span>pcap2 as<span class="built_in"> port </span>2 (files)</span><br><span class="line">Running simple_switch_CLI --thrift-port 9232</span><br><span class="line">Thrift<span class="built_in"> server </span>was started</span><br><span class="line">STF Command: </span><br><span class="line">STF Command: <span class="builtin-name">add</span> test1 data.f1:0x01010101 c1_2(val1:0x01, val2:0x02)</span><br><span class="line">table_add test1 c1_2 0x01010101 =&gt; 0x01 0x02</span><br><span class="line">STF Command: <span class="builtin-name">add</span> test1 data.f1:0x02020202 c1_2(val1:0x10, val2:0x20)</span><br><span class="line">table_add test1 c1_2 0x02020202 =&gt; 0x10 0x20</span><br><span class="line">STF Command: </span><br><span class="line">STF Command: <span class="builtin-name">add</span> test2 data.f2:0x03030303 c3_4(val3:0x03, val4:0x04, port:1)</span><br><span class="line">table_add test2 c3_4 0x03030303 =&gt; 0x03 0x04 1</span><br><span class="line">STF Command: <span class="builtin-name">add</span> test2 data.f2:0x04040404 c3_4(val3:0x30, val4:0x40, port:2)</span><br><span class="line">table_add test2 c3_4 0x04040404 =&gt; 0x30 0x40 2</span><br><span class="line">STF Command: </span><br><span class="line">STF Command: expect 1 01010101 03030303 01 02 03 04</span><br><span class="line">STF Command: packet 0 01010101 03030303 55 66 77 88</span><br><span class="line">Obtaining JSON <span class="keyword">from</span> switch<span class="built_in">..</span>.</span><br><span class="line">Done</span><br><span class="line">Control utility <span class="keyword">for</span> runtime P4 table manipulation</span><br><span class="line">RuntimeCmd: Adding entry <span class="keyword">to</span> exact match table test1</span><br><span class="line">match key:           EXACT-01:01:01:01</span><br><span class="line">action:              c1_2</span><br><span class="line">runtime data:        01 02</span><br><span class="line">Entry has been added with handle 0</span><br><span class="line">RuntimeCmd: Adding entry <span class="keyword">to</span> exact match table test1</span><br><span class="line">match key:           EXACT-02:02:02:02</span><br><span class="line">action:              c1_2</span><br><span class="line">runtime data:        10 20</span><br><span class="line">Entry has been added with handle 1</span><br><span class="line">RuntimeCmd: Adding entry <span class="keyword">to</span> exact match table test2</span><br><span class="line">match key:           EXACT-03:03:03:03</span><br><span class="line">action:              c3_4</span><br><span class="line">runtime data:        03 04      00:01</span><br><span class="line">Entry has been added with handle 0</span><br><span class="line">RuntimeCmd: Adding entry <span class="keyword">to</span> exact match table test2</span><br><span class="line">match key:           EXACT-04:04:04:04</span><br><span class="line">action:              c3_4</span><br><span class="line">runtime data:        30 40      00:02</span><br><span class="line">Entry has been added with handle 1</span><br><span class="line">STF Command: expect 2 01010101 04040404 01 02 30 40</span><br><span class="line">STF Command: packet 0 01010101 04040404 55 66 77 88</span><br><span class="line">STF Command: expect 1 02020202 03030303 10 20 03 04</span><br><span class="line">STF Command: packet 0 02020202 03030303 99 88 77 66</span><br><span class="line">STF Command: expect 2 02020202 04040404 10 20 30 40</span><br><span class="line">STF Command: packet 0 02020202 04040404 14 25 36 47</span><br><span class="line">RuntimeCmd: </span><br><span class="line">simple_switch exit code -15</span><br><span class="line">Execution completed</span><br><span class="line">Comparing outputs</span><br><span class="line">WARNING: PcapReader: unknown LL<span class="built_in"> type </span>[0]/[0x0]. Using<span class="built_in"> Raw </span>packets</span><br><span class="line">WARNING: PcapReader: unknown LL<span class="built_in"> type </span>[0]/[0x0]. Using<span class="built_in"> Raw </span>packets</span><br><span class="line">SUCCESS</span><br></pre></td></tr></table></figure>
+<h3 id="pack-amp-unpack-样例-log"><a href="#pack-amp-unpack-样例-log" class="headerlink" title="pack &amp; unpack 样例 log"></a>pack &amp; unpack 样例 log</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>ls multiswitch.p4app/</span><br><span class="line">echo_client.py  echo_server.py  header.p4  p4app.json  parser.p4  simple_router.p4</span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>p4app pack multiswitch.p4app/  </span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>ls</span><br><span class="line">broadcast.p4app     customtopo.p4app   multiswitch.p4app     simple_counter.p4app  source_routing.p4app</span><br><span class="line">compile_only.p4app  multi_iface.p4app  paxos_acceptor.p4app  simple_router.p4app</span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>file multiswitch.p4app </span><br><span class="line"><span class="symbol">multiswitch.p4app:</span> gzip compressed data, last <span class="symbol">modified:</span> Mon May <span class="number">29</span> 08<span class="symbol">:</span><span class="number">25</span><span class="symbol">:</span><span class="number">21</span> <span class="number">2017</span>, from Unix</span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>p4app unpack multiswitch.p4app </span><br><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app/examples</span><span class="variable">$ </span>ls multiswitch.p4app/</span><br><span class="line">echo_client.py  echo_server.py  header.p4  p4app.json  parser.p4  simple_router.p4</span><br></pre></td></tr></table></figure>
+<h3 id="compile-bmv2-backend-样例"><a href="#compile-bmv2-backend-样例" class="headerlink" title="compile-bmv2 backend 样例"></a>compile-bmv2 backend 样例</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$ p4app <span class="keyword">run</span> examples/compile_only.p4app/</span><br><span class="line">Entering build directory.</span><br><span class="line">Extracting package.</span><br><span class="line">Reading package manifest.</span><br><span class="line">&gt; p4c-bm2-ss --p4v 14 -v --p4runtime-<span class="keyword">file</span> <span class="keyword">out</span>.bin --p4runtime-<span class="keyword">as</span>-json <span class="string">"compile_only.p4"</span> -o <span class="string">"compile_only.p4.json"</span></span><br><span class="line"><span class="keyword">error</span>: Unknown option --p4runtime-<span class="keyword">as</span>-json</span><br><span class="line">p4c-bm2-ss: Compile a P4 <span class="keyword">program</span></span><br><span class="line">--<span class="keyword">help</span>                                  <span class="keyword">Print</span> this <span class="keyword">help</span> message</span><br><span class="line">--<span class="keyword">version</span>                               <span class="keyword">Print</span> compiler <span class="keyword">version</span></span><br><span class="line">-I path                                 Specify <span class="keyword">include</span> path (passed to preprocessor)</span><br><span class="line">-<span class="keyword">D</span> arg=value                            Define <span class="keyword">macro</span> (passed to preprocessor)</span><br><span class="line">-<span class="keyword">U</span> arg                                  Undefine <span class="keyword">macro</span> (passed to preprocessor)</span><br><span class="line">-<span class="keyword">E</span>                                      Preprocess only, <span class="keyword">do</span> not compile (prints <span class="keyword">program</span> <span class="keyword">on</span> stdout)</span><br><span class="line">--nocpp                                 Skip preprocess, assume <span class="keyword">input</span> <span class="keyword">file</span> is already preprocessed.</span><br><span class="line">--p4v &#123;14|16&#125;                           Specify language <span class="keyword">version</span> to compile</span><br><span class="line">--target target                         Compile <span class="keyword">for</span> the specified target</span><br><span class="line">--pp <span class="keyword">file</span>                               Pretty-<span class="keyword">print</span> the <span class="keyword">program</span> <span class="keyword">in</span> the specified <span class="keyword">file</span>.</span><br><span class="line">--toJSON <span class="keyword">file</span>                           Dump <span class="keyword">IR</span> to JSON <span class="keyword">in</span> the specified <span class="keyword">file</span>.</span><br><span class="line">--testJson                              Dump and undump the <span class="keyword">IR</span></span><br><span class="line">--p4runtime-<span class="keyword">file</span> <span class="keyword">file</span>                   Write a P4Runtime control plane API description to the specified <span class="keyword">file</span>.</span><br><span class="line">--p4runtime-<span class="keyword">format</span> &#123;binary,json,text&#125;   Choose output <span class="keyword">format</span> <span class="keyword">for</span> the P4Runtime API description (default is binary).</span><br><span class="line">-o <span class="keyword">outfile</span>                              Write output to <span class="keyword">outfile</span></span><br><span class="line">--Werror                                Treat all warnings <span class="keyword">as</span> errors</span><br><span class="line">-T loglevel                             [Compiler debugging] <span class="keyword">Adjust</span> logging level per <span class="keyword">file</span> (see below)</span><br><span class="line">-v                                      [Compiler debugging] Increase verbosity level (can be repeated)</span><br><span class="line">--top4 pass1[,pass2]                    [Compiler debugging] Dump the P4 representation after</span><br><span class="line">                                        passes whose name contains <span class="keyword">one</span> of <span class="symbol">`passX'</span> substrings.</span><br><span class="line">                                        When '-v' is used this will <span class="keyword">include</span> the compiler <span class="keyword">IR</span>.</span><br><span class="line">--dump folder                           [Compiler debugging] Folder where P4 programs are dumped</span><br><span class="line">loglevel <span class="keyword">format</span> is:</span><br><span class="line">  sourceFile:level,...,sourceFile:level</span><br><span class="line">where 'sourceFile' is a compiler source <span class="keyword">file</span> and</span><br><span class="line">'level' is the verbosity level <span class="keyword">for</span> <span class="keyword">LOG</span> messages <span class="keyword">in</span> that <span class="keyword">file</span></span><br><span class="line">&gt; <span class="keyword">cat</span> <span class="keyword">out</span>.bin</span><br><span class="line"><span class="keyword">cat</span>: <span class="keyword">out</span>.bin: <span class="keyword">No</span> such <span class="keyword">file</span> or directory</span><br><span class="line">Compile failed.</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$ vi examples/compile_only.p4app/p4app.json</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$ p4app <span class="keyword">run</span> examples/compile_only.p4app/</span><br><span class="line">Entering build directory.</span><br><span class="line">Extracting package.</span><br><span class="line">Reading package manifest.</span><br><span class="line">&gt; p4c-bm2-ss --p4v 14 -v --p4runtime-<span class="keyword">file</span> <span class="keyword">out</span>.bin --p4runtime-<span class="keyword">format</span> json <span class="string">"compile_only.p4"</span> -o <span class="string">"compile_only.p4.json"</span></span><br><span class="line">Invoking preprocessor </span><br><span class="line">cpp -C -undef -nostdinc  -D__TARGET_BMV2__ -I/usr/<span class="keyword">local</span>/share/p4c/p4_14include compile_only.p4</span><br><span class="line">Invoking preprocessor </span><br><span class="line">cpp -C -undef -nostdinc  -I/usr/<span class="keyword">local</span>/share/p4c/p4include /usr/<span class="keyword">local</span>/share/p4c/p4include/v1model.p4</span><br><span class="line">Parsing P4-16 <span class="keyword">program</span> /usr/<span class="keyword">local</span>/share/p4c/p4include/v1model.p4</span><br><span class="line">Parsing P4-14 <span class="keyword">program</span> compile_only.p4</span><br><span class="line">Converting to P4-16</span><br><span class="line">Converter_0_DoConstantFolding</span><br><span class="line">Converter_1_CheckHeaderTypes</span><br><span class="line">Converter_2_TypeCheck</span><br><span class="line">Converter_3_DiscoverStructure</span><br><span class="line">Converter_4_ComputeCallGraph</span><br><span class="line">Converter_5_Rewriter</span><br><span class="line">Converter_6_FixExtracts</span><br><span class="line">FrontEnd_0_PrettyPrint</span><br><span class="line">FrontEnd_1_ValidateParsedProgram</span><br><span class="line">FrontEnd_2_CreateBuiltins</span><br><span class="line">FrontEnd_3_ResolveReferences</span><br><span class="line">FrontEnd_4_ConstantFolding</span><br><span class="line">FrontEnd_5_InstantiateDirectCalls</span><br><span class="line">FrontEnd_6_ResolveReferences</span><br><span class="line">FrontEnd_7_TypeInference</span><br><span class="line">FrontEnd_8_BindTypeVariables</span><br><span class="line">FrontEnd_9_ClearTypeMap</span><br><span class="line">FrontEnd_10_TableKeyNames</span><br><span class="line">FrontEnd_11_ConstantFolding</span><br><span class="line">FrontEnd_12_StrengthReduction</span><br><span class="line">FrontEnd_13_UselessCasts</span><br><span class="line">FrontEnd_14_SimplifyControlFlow</span><br><span class="line">FrontEnd_15_FrontEndDump</span><br><span class="line">FrontEnd_16_RemoveAllUnusedDeclarations</span><br><span class="line">FrontEnd_17_SimplifyParsers</span><br><span class="line">FrontEnd_18_ResetHeaders</span><br><span class="line">FrontEnd_19_UniqueNames</span><br><span class="line">FrontEnd_20_MoveDeclarations</span><br><span class="line">FrontEnd_21_MoveInitializers</span><br><span class="line">FrontEnd_22_SideEffectOrdering</span><br><span class="line">FrontEnd_23_SetHeaders</span><br><span class="line">FrontEnd_24_SimplifyControlFlow</span><br><span class="line">FrontEnd_25_MoveDeclarations</span><br><span class="line">FrontEnd_26_SimplifyDefUse</span><br><span class="line">FrontEnd_27_UniqueParameters</span><br><span class="line">FrontEnd_28_SimplifyControlFlow</span><br><span class="line">FrontEnd_29_SpecializeAll</span><br><span class="line">FrontEnd_30_RemoveParserControlFlow</span><br><span class="line">FrontEnd_31_FrontEndLast</span><br><span class="line">MidEnd_0_ConvertEnums</span><br><span class="line">MidEnd_1_VisitFunctor</span><br><span class="line">MidEnd_2_RemoveReturns</span><br><span class="line">MidEnd_3_MoveConstructors</span><br><span class="line">MidEnd_4_RemoveAllUnusedDeclarations</span><br><span class="line">MidEnd_5_ClearTypeMap</span><br><span class="line">MidEnd_6_Evaluator</span><br><span class="line">MidEnd_7_VisitFunctor</span><br><span class="line">MidEnd_8_Inline</span><br><span class="line">MidEnd_9_InlineActions</span><br><span class="line">MidEnd_10_LocalizeAllActions</span><br><span class="line">MidEnd_11_UniqueNames</span><br><span class="line">MidEnd_12_UniqueParameters</span><br><span class="line">MidEnd_13_SimplifyControlFlow</span><br><span class="line">MidEnd_14_RemoveActionParameters</span><br><span class="line">MidEnd_15_SimplifyKey</span><br><span class="line">MidEnd_16_ConstantFolding</span><br><span class="line">MidEnd_17_StrengthReduction</span><br><span class="line">MidEnd_18_SimplifySelectCases</span><br><span class="line">MidEnd_19_ExpandLookahead</span><br><span class="line">MidEnd_20_SimplifyParsers</span><br><span class="line">MidEnd_21_StrengthReduction</span><br><span class="line">MidEnd_22_EliminateTuples</span><br><span class="line">MidEnd_23_CopyStructures</span><br><span class="line">MidEnd_24_NestedStructs</span><br><span class="line">MidEnd_25_SimplifySelectList</span><br><span class="line">MidEnd_26_RemoveSelectBooleans</span><br><span class="line">MidEnd_27_Predication</span><br><span class="line">MidEnd_28_MoveDeclarations</span><br><span class="line">MidEnd_29_ConstantFolding</span><br><span class="line">MidEnd_30_LocalCopyPropagation</span><br><span class="line">MidEnd_31_ConstantFolding</span><br><span class="line">MidEnd_32_MoveDeclarations</span><br><span class="line">MidEnd_33_ValidateTableProperties</span><br><span class="line">MidEnd_34_SimplifyControlFlow</span><br><span class="line">MidEnd_35_CompileTimeOperations</span><br><span class="line">MidEnd_36_TableHit</span><br><span class="line">MidEnd_37_SynthesizeActions</span><br><span class="line">MidEnd_38_MoveActionsToTables</span><br><span class="line">MidEnd_39_TypeChecking</span><br><span class="line">MidEnd_40_SimplifyControlFlow</span><br><span class="line">MidEnd_41_RemoveLeftSlices</span><br><span class="line">MidEnd_42_TypeChecking</span><br><span class="line">MidEnd_43_LowerExpressions</span><br><span class="line">MidEnd_44_ConstantFolding</span><br><span class="line">MidEnd_45_TypeChecking</span><br><span class="line">MidEnd_46_RemoveComplexExpressions</span><br><span class="line">MidEnd_47_FixupChecksum</span><br><span class="line">MidEnd_48_SimplifyControlFlow</span><br><span class="line">MidEnd_49_RemoveAllUnusedDeclarations</span><br><span class="line">MidEnd_50_Evaluator</span><br><span class="line">MidEnd_51_VisitFunctor</span><br><span class="line">MidEnd_52_MidEndLast</span><br><span class="line">&gt; <span class="keyword">cat</span> <span class="keyword">out</span>.bin</span><br><span class="line">&#123;</span><br><span class="line"> <span class="string">"tables"</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">"preamble"</span>: &#123;</span><br><span class="line">    <span class="string">"id"</span>: 33588198,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"t1"</span>,</span><br><span class="line">    <span class="string">"alias"</span>: <span class="string">"t1"</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="string">"actionRefs"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">     <span class="string">"id"</span>: 16792110</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">     <span class="string">"id"</span>: 16800567,</span><br><span class="line">     <span class="string">"annotations"</span>: [</span><br><span class="line">      <span class="string">"@default_only()"</span></span><br><span class="line">     ]</span><br><span class="line">    &#125;</span><br><span class="line">   ],</span><br><span class="line">   <span class="string">"size"</span>: <span class="string">"1024"</span></span><br><span class="line">  &#125;</span><br><span class="line"> ],</span><br><span class="line"> <span class="string">"actions"</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">"preamble"</span>: &#123;</span><br><span class="line">    <span class="string">"id"</span>: 16800567,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"NoAction"</span>,</span><br><span class="line">    <span class="string">"alias"</span>: <span class="string">"NoAction"</span></span><br><span class="line">   &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">"preamble"</span>: &#123;</span><br><span class="line">    <span class="string">"id"</span>: 16792110,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"a1"</span>,</span><br><span class="line">    <span class="string">"alias"</span>: <span class="string">"a1"</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="string">"params"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">     <span class="string">"id"</span>: 1,</span><br><span class="line">     <span class="string">"name"</span>: <span class="string">"port"</span>,</span><br><span class="line">     <span class="string">"bitwidth"</span>: 9</span><br><span class="line">    &#125;</span><br><span class="line">   ]</span><br><span class="line">  &#125;</span><br><span class="line"> ]</span><br><span class="line">&#125;</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/p4app$</span><br></pre></td></tr></table></figure>
+<h3 id="logging-功能样例"><a href="#logging-功能样例" class="headerlink" title="logging 功能样例"></a>logging 功能样例</h3><p>运行样例 bcast_router.p4app，虽然运行后有提示错误，但是不影响 logging 样例展示。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~/workshop/p4app/examples$ p4app run broadcast.p4app/</span><br><span class="line">Entering build directory.</span><br><span class="line">Extracting package.</span><br><span class="line">Reading package manifest.</span><br><span class="line">&gt; p4c-bm2-ss --p4v <span class="number">16</span> <span class="string">"bcast_router.p4"</span> -o <span class="string">"bcast_router.p4.json"</span></span><br><span class="line">&gt; python2 <span class="string">"/scripts/mininet/multi_switch_mininet.py"</span> --log-dir <span class="string">"/tmp/p4app_logs"</span> --manifest <span class="string">"./p4app.json"</span> --target <span class="string">"multiswitch"</span> --auto-control-plane --behavioral-exe <span class="string">"simple_switch"</span> --json <span class="string">"bcast_router.p4.json"</span></span><br><span class="line">*** Error setting resource limits. Mininet's performance may be affected.</span><br><span class="line">*** Creating network</span><br><span class="line">*** Adding hosts:</span><br><span class="line">h1 h2 h3 </span><br><span class="line">*** Adding switches:</span><br><span class="line">s1 </span><br><span class="line">*** Adding links:</span><br><span class="line">(0ms delay) (0ms delay) (h1, s1) (0ms delay) (0ms delay) (h2, s1) (0ms delay) (0ms delay) (h3, s1) </span><br><span class="line">*** Configuring hosts</span><br><span class="line">h1 h2 h3 </span><br><span class="line">*** Starting controller</span><br><span class="line"></span><br><span class="line">*** Starting <span class="number">1</span> switches</span><br><span class="line">s1 Starting P4 switch s1.</span><br><span class="line">simple_switch -i <span class="number">1</span>@s1-eth1 -i <span class="number">2</span>@s1-eth2 -i <span class="number">3</span>@s1-eth3 --pcap --thrift-port <span class="number">9090</span> --nanolog ipc:///tmp/bm-<span class="number">0</span>-log.ipc --device-id <span class="number">0</span> bcast_router.p4.json --log-console</span><br><span class="line">P4 switch s1 has been started.</span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">table_add ipv4_lpm broadcast <span class="number">255.255.255.255</span>/<span class="number">32</span> =&gt;</span><br><span class="line">table_add forward set_dmac <span class="number">255.255.255.255</span> =&gt; ff:ff:ff:ff:ff:ff</span><br><span class="line">mc_mgrp_create <span class="number">1</span></span><br><span class="line">mc_node_create <span class="number">0</span> <span class="number">1</span> <span class="number">2</span> <span class="number">3</span></span><br><span class="line">mc_node_associate <span class="number">1</span> <span class="number">0</span></span><br><span class="line">table_add ipv4_lpm broadcast <span class="number">255.255.255.255</span>/<span class="number">32</span> =&gt;</span><br><span class="line">table_add forward set_dmac <span class="number">255.255.255.255</span> =&gt; ff:ff:ff:ff:ff:ff</span><br><span class="line">mc_mgrp_create <span class="number">1</span></span><br><span class="line">mc_node_create <span class="number">0</span> <span class="number">1</span> <span class="number">2</span> <span class="number">3</span></span><br><span class="line">mc_node_associate <span class="number">1</span> <span class="number">0</span></span><br><span class="line">table_set_default send_frame _drop</span><br><span class="line">table_set_default forward _drop</span><br><span class="line">table_set_default ipv4_lpm _drop</span><br><span class="line">table_add send_frame rewrite_mac <span class="number">2</span> =&gt; <span class="number">00</span>:aa:<span class="number">00</span>:<span class="number">01</span>:<span class="number">00</span>:<span class="number">02</span></span><br><span class="line">table_add forward set_dmac <span class="number">10.0.2.10</span> =&gt; <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">02</span></span><br><span class="line">table_add ipv4_lpm set_nhop <span class="number">10.0.2.10</span>/<span class="number">32</span> =&gt; <span class="number">10.0.2.10</span> <span class="number">2</span></span><br><span class="line">table_add send_frame rewrite_mac <span class="number">3</span> =&gt; <span class="number">00</span>:aa:<span class="number">00</span>:<span class="number">01</span>:<span class="number">00</span>:<span class="number">03</span></span><br><span class="line">table_add forward set_dmac <span class="number">10.0.3.10</span> =&gt; <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">03</span></span><br><span class="line">table_add ipv4_lpm set_nhop <span class="number">10.0.3.10</span>/<span class="number">32</span> =&gt; <span class="number">10.0.3.10</span> <span class="number">3</span></span><br><span class="line">table_add send_frame rewrite_mac <span class="number">1</span> =&gt; <span class="number">00</span>:aa:<span class="number">00</span>:<span class="number">01</span>:<span class="number">00</span>:<span class="number">01</span></span><br><span class="line">table_add forward set_dmac <span class="number">10.0.1.10</span> =&gt; <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">01</span></span><br><span class="line">table_add ipv4_lpm set_nhop <span class="number">10.0.1.10</span>/<span class="number">32</span> =&gt; <span class="number">10.0.1.10</span> <span class="number">1</span></span><br><span class="line">Obtaining JSON from switch...</span><br><span class="line">Done</span><br><span class="line">Control utility for runtime P4 table manipulation</span><br><span class="line">RuntimeCmd: Adding entry to lpm match table ipv4_lpm</span><br><span class="line">match key:           LPM-ff:ff:ff:ff/<span class="number">32</span></span><br><span class="line">action:              broadcast</span><br><span class="line">runtime data:        </span><br><span class="line">Entry has been added with handle <span class="number">0</span></span><br><span class="line">RuntimeCmd: Adding entry to exact match table forward</span><br><span class="line">match key:           EXACT-ff:ff:ff:ff</span><br><span class="line">action:              set_dmac</span><br><span class="line">runtime data:        ff:ff:ff:ff:ff:ff</span><br><span class="line">Entry has been added with handle <span class="number">0</span></span><br><span class="line">RuntimeCmd: Creating multicast group <span class="number">1</span></span><br><span class="line">RuntimeCmd: Creating node with rid <span class="number">0</span> , port map <span class="number">1110</span> and lag map </span><br><span class="line">node was created with handle <span class="number">0</span></span><br><span class="line">RuntimeCmd: Associating node <span class="number">0</span> to multicast group <span class="number">1</span></span><br><span class="line">RuntimeCmd: Adding entry to lpm match table ipv4_lpm</span><br><span class="line">match key:           LPM-ff:ff:ff:ff/<span class="number">32</span></span><br><span class="line">action:              broadcast</span><br><span class="line">runtime data:        </span><br><span class="line">Invalid table operation (DUPLICATE_ENTRY)</span><br><span class="line">RuntimeCmd: Adding entry to exact match table forward</span><br><span class="line">match key:           EXACT-ff:ff:ff:ff</span><br><span class="line">action:              set_dmac</span><br><span class="line">runtime data:        ff:ff:ff:ff:ff:ff</span><br><span class="line">Invalid table operation (DUPLICATE_ENTRY)</span><br><span class="line">RuntimeCmd: Creating multicast group <span class="number">1</span></span><br><span class="line">RuntimeCmd: Creating node with rid <span class="number">0</span> , port map <span class="number">1110</span> and lag map </span><br><span class="line">node was created with handle <span class="number">1</span></span><br><span class="line">RuntimeCmd: Associating node <span class="number">0</span> to multicast group <span class="number">1</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"/usr/local/bin/simple_switch_CLI"</span>, line <span class="number">31</span>, in &lt;module&gt;</span><br><span class="line">    sswitch_CLI.main()</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/sswitch_CLI.py"</span>, line <span class="number">93</span>, in main</span><br><span class="line">    SimpleSwitchAPI(args.pre, standard_client, mc_client, sswitch_client).cmdloop()</span><br><span class="line">  File <span class="string">"/usr/lib/python2.7/cmd.py"</span>, line <span class="number">142</span>, in cmdloop</span><br><span class="line">    stop = self.onecmd(line)</span><br><span class="line">  File <span class="string">"/usr/lib/python2.7/cmd.py"</span>, line <span class="number">221</span>, in onecmd</span><br><span class="line">    return func(arg)</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/runtime_CLI.py"</span>, line <span class="number">585</span>, in handle</span><br><span class="line">    return f(*args, **kwargs)</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/runtime_CLI.py"</span>, line <span class="number">1543</span>, in do_mc_node_associate</span><br><span class="line">    self.mc_client.bm_mc_node_associate(<span class="number">0</span>, mgrp, l1_hdl)</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/bm_runtime/simple_pre_lag/SimplePreLAG.py"</span>, line <span class="number">222</span>, in bm_mc_node_associate</span><br><span class="line">    self.recv_bm_mc_node_associate()</span><br><span class="line">  File <span class="string">"/usr/local/lib/python2.7/dist-packages/bm_runtime/simple_pre_lag/SimplePreLAG.py"</span>, line <span class="number">246</span>, in recv_bm_mc_node_associate</span><br><span class="line">    raise result.ouch</span><br><span class="line">bm_runtime.simple_pre_lag.ttypes.InvalidMcOperation: InvalidMcOperation(code=<span class="number">4</span>)</span><br><span class="line">**********</span><br><span class="line">Network configuration for: h1</span><br><span class="line">Default interface: h1-eth0      <span class="number">10.0.0.1</span>        <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">01</span></span><br><span class="line">**********</span><br><span class="line">**********</span><br><span class="line">Network configuration for: h2</span><br><span class="line">Default interface: h2-eth0      <span class="number">10.0.0.2</span>        <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">02</span></span><br><span class="line">**********</span><br><span class="line">**********</span><br><span class="line">Network configuration for: h3</span><br><span class="line">Default interface: h3-eth0      <span class="number">10.0.0.3</span>        <span class="number">00</span>:<span class="number">04</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">03</span></span><br><span class="line">**********</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">h1 ./bcast_listen.py</span><br><span class="line">h2 ./bcast_listen.py</span><br><span class="line">h3 ./bcast_send.py</span><br><span class="line">(None, '')</span><br><span class="line">(None, <span class="string">"received 'hello everyone' from ('10.0.3.10', 60592)\n"</span>)</span><br><span class="line">(None, <span class="string">"received 'hello everyone' from ('10.0.3.10', 60592)\n"</span>)</span><br><span class="line">*** Stopping <span class="number">0</span> controllers</span><br><span class="line"></span><br><span class="line">*** Stopping <span class="number">3</span> links</span><br><span class="line">...</span><br><span class="line">*** Stopping <span class="number">1</span> switches</span><br><span class="line">s1 </span><br><span class="line">*** Stopping <span class="number">3</span> hosts</span><br><span class="line">h1 h2 h3 </span><br><span class="line">*** Done</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~/workshop/p4app/examples$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~/workshop/p4app/examples$ ls /tmp/p4app_logs/</span><br><span class="line">h1.stdout     h2.stdout     h3.stdout     p4s.s1.log    s1-eth1.pcap  s1-eth2.pcap  s1-eth3.pcap  </span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~/workshop/p4app/examples$ cat /tmp/p4app_logs/p4s.s1.log   </span><br><span class="line">Calling target program-options parser</span><br><span class="line"><span class="string">[09:22:09.326]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Set default entry for table 'ipv4_lpm': NoAction - </span><br><span class="line"><span class="string">[09:22:09.326]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Set default entry for table 'forward': NoAction - </span><br><span class="line"><span class="string">[09:22:09.326]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Set default entry for table 'send_frame': NoAction - </span><br><span class="line">Adding interface s1-eth1 as port <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:09.326]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Adding interface s1-eth1 as port <span class="number">1</span></span><br><span class="line">Adding interface s1-eth2 as port <span class="number">2</span></span><br><span class="line"><span class="string">[09:22:09.355]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Adding interface s1-eth2 as port <span class="number">2</span></span><br><span class="line">Adding interface s1-eth3 as port <span class="number">3</span></span><br><span class="line"><span class="string">[09:22:09.395]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 83]</span> Adding interface s1-eth3 as port <span class="number">3</span></span><br><span class="line">Thrift server was started</span><br><span class="line"><span class="string">[09:22:10.462]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_get_config</span><br><span class="line"><span class="string">[09:22:10.465]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_table_add_entry</span><br><span class="line"><span class="string">[09:22:10.465]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> Entry <span class="number">0</span> added to table 'ipv4_lpm'</span><br><span class="line"><span class="string">[09:22:10.465]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> Dumping entry <span class="number">0</span></span><br><span class="line">Match key:</span><br><span class="line">* ipv4.dstAddr        : LPM       ffffffff/<span class="number">32</span></span><br><span class="line">Action entry: broadcast - </span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_table_add_entry</span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> Entry <span class="number">0</span> added to table 'forward'</span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> Dumping entry <span class="number">0</span></span><br><span class="line">Match key:</span><br><span class="line">* ingress_metadata.nhop_ipv4: EXACT     ffffffff</span><br><span class="line">Action entry: set_dmac - ffffffffffff,</span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_mgrp_create</span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> mgrp node created for mgid <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_node_create</span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> node created for rid <span class="number">0</span></span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_node_associate</span><br><span class="line"><span class="string">[09:22:10.466]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> node associated with mgid <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:10.467]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_table_add_entry</span><br><span class="line"><span class="string">[09:22:10.467]</span> <span class="string">[bmv2]</span> <span class="string">[E]</span> <span class="string">[thread 97]</span> Error when trying to add entry to table 'ipv4_lpm'</span><br><span class="line"><span class="string">[09:22:10.487]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_table_add_entry</span><br><span class="line"><span class="string">[09:22:10.487]</span> <span class="string">[bmv2]</span> <span class="string">[E]</span> <span class="string">[thread 97]</span> Error when trying to add entry to table 'forward'</span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_mgrp_create</span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> mgrp node created for mgid <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_node_create</span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 97]</span> node created for rid <span class="number">0</span></span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 97]</span> bm_mc_node_associate</span><br><span class="line"><span class="string">[09:22:10.488]</span> <span class="string">[bmv2]</span> <span class="string">[E]</span> <span class="string">[thread 97]</span> node associate failed, node is already associated</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Processing packet received on port <span class="number">3</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Parser 'parser': start</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Extracting header 'ethernet'</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Parser state 'start': key is <span class="number">0800</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Bytes parsed: <span class="number">14</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Extracting header 'ipv4'</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Parser state 'parse_ipv4' has no switch, going to default next state</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Bytes parsed: <span class="number">34</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Parser 'parser': end</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Pipeline 'ingress': start</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">76</span>) Condition <span class="string">"hdr.ipv4.isValid()"</span> is true</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Applying table 'ipv4_lpm'</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Looking up key:</span><br><span class="line">* ipv4.dstAddr        : ffffffff</span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Table 'ipv4_lpm': hit with handle <span class="number">0</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Dumping entry <span class="number">0</span></span><br><span class="line">Match key:</span><br><span class="line">* ipv4.dstAddr        : LPM       ffffffff/<span class="number">32</span></span><br><span class="line">Action entry: broadcast - </span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Action entry is broadcast - </span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">42</span>) Executing action broadcast</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Applying table 'forward'</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Looking up key:</span><br><span class="line">* ingress_metadata.nhop_ipv4: ffffffff</span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Table 'forward': hit with handle <span class="number">0</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Dumping entry <span class="number">0</span></span><br><span class="line">Match key:</span><br><span class="line">* ingress_metadata.nhop_ipv4: EXACT     ffffffff</span><br><span class="line">Action entry: set_dmac - ffffffffffff,</span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Action entry is set_dmac - ffffffffffff,</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">47</span>) Executing action set_dmac</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Pipeline 'ingress': end</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Multicast requested for packet</span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> number of packets replicated : <span class="number">3</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Replicating packet on port <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Replicating packet on port <span class="number">2</span></span><br><span class="line"><span class="string">[09:22:10.819]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 89]</span> <span class="string">[0.0]</span> <span class="string">[cxt 0]</span> Replicating packet on port <span class="number">3</span></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">27</span>) Condition <span class="string">"hdr.ipv4.isValid()"</span> is true</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Applying table 'send_frame'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Looking up key:</span><br><span class="line">* standard_metadata.egress_port: <span class="number">0001</span></span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Table 'send_frame': miss</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Action entry is NoAction - </span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> /usr/local/share/p4c/p4include/core.p4(<span class="number">55</span>) Executing action NoAction</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Updating checksum 'cksum'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Deparsing header 'ethernet'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Deparsing header 'ipv4'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 91]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">27</span>) Condition <span class="string">"hdr.ipv4.isValid()"</span> is true</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Applying table 'send_frame'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Looking up key:</span><br><span class="line">* standard_metadata.egress_port: <span class="number">0002</span></span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Table 'send_frame': miss</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Action entry is NoAction - </span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> /usr/local/share/p4c/p4include/core.p4(<span class="number">55</span>) Executing action NoAction</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Updating checksum 'cksum'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Deparsing header 'ethernet'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Deparsing header 'ipv4'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 92]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> bcast_router.p4(<span class="number">27</span>) Condition <span class="string">"hdr.ipv4.isValid()"</span> is true</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Applying table 'send_frame'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Looking up key:</span><br><span class="line">* standard_metadata.egress_port: <span class="number">0003</span></span><br><span class="line"></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Table 'send_frame': miss</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Action entry is NoAction - </span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[T]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> /usr/local/share/p4c/p4include/core.p4(<span class="number">55</span>) Executing action NoAction</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Pipeline 'egress': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': start</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Updating checksum 'cksum'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Deparsing header 'ethernet'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Deparsing header 'ipv4'</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 93]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Deparser 'deparser': end</span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 94]</span> <span class="string">[0.1]</span> <span class="string">[cxt 0]</span> Transmitting packet of size <span class="number">56</span> out of port <span class="number">1</span></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 94]</span> <span class="string">[0.2]</span> <span class="string">[cxt 0]</span> Transmitting packet of size <span class="number">56</span> out of port <span class="number">2</span></span><br><span class="line"><span class="string">[09:22:10.820]</span> <span class="string">[bmv2]</span> <span class="string">[D]</span> <span class="string">[thread 94]</span> <span class="string">[0.3]</span> <span class="string">[cxt 0]</span> Transmitting packet of size <span class="number">56</span> out of port <span class="number">3</span></span><br><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~/workshop/p4app/examples$</span><br></pre></td></tr></table></figure>
+<h3 id="docker-镜像大小"><a href="#docker-镜像大小" class="headerlink" title="docker 镜像大小"></a>docker 镜像大小</h3><p>当前版本 docker 镜像只有 908MB，已集成 tshark / scapy 等工具，不算大。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="variable">@openswitch</span>-OptiPlex-<span class="number">380</span><span class="symbol">:~/workshop/p4app</span><span class="variable">$ </span>docker images</span><br><span class="line">REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">p4lang/p4app          latest              <span class="number">07024040</span>be0e        <span class="number">6</span> hours ago         <span class="number">908</span>MB</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/p4/" rel="tag"># p4</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201705/networks/quagga/quickstart.html" rel="next" title="Quagga 入门">
+                <i class="fa fa-chevron-left"></i> Quagga 入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201705/networks/nat.html" rel="prev" title="NAT 知识汇总">
+                NAT 知识汇总 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#p4app-命令参数"><span class="nav-number">4.</span> <span class="nav-text">p4app 命令参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#target-与-backend"><span class="nav-number">4.1.</span> <span class="nav-text">target 与 backend</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一个-p4app-包"><span class="nav-number">5.</span> <span class="nav-text">创建一个 p4app 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Backend"><span class="nav-number">6.</span> <span class="nav-text">Backend</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mininet"><span class="nav-number">6.1.</span> <span class="nav-text">mininet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#multiswitch"><span class="nav-number">6.2.</span> <span class="nav-text">multiswitch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#限制"><span class="nav-number">6.2.1.</span> <span class="nav-text">限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定每个交换机表项"><span class="nav-number">6.2.2.</span> <span class="nav-text">指定每个交换机表项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义拓扑类"><span class="nav-number">6.2.3.</span> <span class="nav-text">自定义拓扑类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义控制器"><span class="nav-number">6.2.4.</span> <span class="nav-text">自定义控制器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Logging"><span class="nav-number">6.2.5.</span> <span class="nav-text">Logging</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cleanup-commands"><span class="nav-number">6.2.6.</span> <span class="nav-text">Cleanup commands</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#custom"><span class="nav-number">6.3.</span> <span class="nav-text">custom</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stf"><span class="nav-number">6.4.</span> <span class="nav-text">stf</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#simple-counter-p4app-stf-配置"><span class="nav-number">6.4.1.</span> <span class="nav-text">simple_counter.p4app stf 配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compile-bmv2"><span class="nav-number">6.5.</span> <span class="nav-text">compile-bmv2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高级功能"><span class="nav-number">7.</span> <span class="nav-text">高级功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#指定-docker-image"><span class="nav-number">7.1.</span> <span class="nav-text">指定 docker image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定-manifest-文件"><span class="nav-number">7.2.</span> <span class="nav-text">指定 manifest 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定-log-目录"><span class="nav-number">7.3.</span> <span class="nav-text">指定 log 目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行-log-汇总"><span class="nav-number">8.</span> <span class="nav-text">运行 log 汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运行-simple-router-p4app"><span class="nav-number">8.1.</span> <span class="nav-text">运行 simple_router.p4app</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行-simple-counter-p4app"><span class="nav-number">8.2.</span> <span class="nav-text">运行 simple_counter.p4app</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pack-amp-unpack-样例-log"><span class="nav-number">8.3.</span> <span class="nav-text">pack &amp; unpack 样例 log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compile-bmv2-backend-样例"><span class="nav-number">8.4.</span> <span class="nav-text">compile-bmv2 backend 样例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#logging-功能样例"><span class="nav-number">8.5.</span> <span class="nav-text">logging 功能样例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-镜像大小"><span class="nav-number">8.6.</span> <span class="nav-text">docker 镜像大小</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201705/networks/p4/repo_p4app.html";
+    this.page.identifier = "201705/networks/p4/repo_p4app.html";
+    this.page.title = 'p4app 仓库 —— 用于快速验证 P4 程序';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

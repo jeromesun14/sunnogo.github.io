@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="介绍 Linux 内核发包工具 pktgen 及其配置、使用方法和样例。">
+<meta name="keywords" content="发包,pktgen,linux,网络测试,packet,generate,内核,高速,high spped,kernel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pktgen">
+<meta property="og:url" content="http://sunyongfeng.com/201603/networks/pktgen.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="介绍 Linux 内核发包工具 pktgen 及其配置、使用方法和样例。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.074Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pktgen">
+<meta name="twitter:description" content="介绍 Linux 内核发包工具 pktgen 及其配置、使用方法和样例。">
+  <link rel="canonical" href="http://sunyongfeng.com/201603/networks/pktgen">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>pktgen | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201603/networks/pktgen.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">pktgen
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-03-18 12:00:30" itemprop="dateCreated datePublished" datetime="2016-03-18T12:00:30+08:00">2016-03-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201603/networks/pktgen.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201603/networks/pktgen.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">介绍 Linux 内核发包工具 pktgen 及其配置、使用方法和样例。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是-pktgen"><a href="#什么是-pktgen" class="headerlink" title="什么是 pktgen"></a>什么是 pktgen</h2><p>pktgen 是一款 Linux 发包工具，可在内核高速发包。 </p>
+<blockquote>
+<p>Linux packet generator is a tool to generate packets at very high speed in the kernel.</p>
+</blockquote>
+<h2 id="使能-pktgen"><a href="#使能-pktgen" class="headerlink" title="使能 pktgen"></a>使能 pktgen</h2><p>内核配置文件开启 <code>CONFIG_NET_PKTGEN</code>，通过查看是否有 <code>/proc/net/pktgen/</code> 目录确认是否编译 OK。</p>
+<h2 id="使用-pktgen-发包"><a href="#使用-pktgen-发包" class="headerlink" title="使用 pktgen 发包"></a>使用 pktgen 发包</h2><ul>
+<li>添加设备</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">"add_device eth3"</span> &gt; <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>kpktgend_0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置报文<br>配置方法，样例仅给出部分配置<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">"pkt_size 64"</span> &gt; <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>eth3</span><br><span class="line">echo <span class="string">"count 1000000"</span> &gt; <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>eth3</span><br><span class="line">echo <span class="string">"dst_mac aa:bb:cc:dd:ee:ff"</span> &gt; <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>eth3</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>查看配置结果：<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>eth3</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>发送报文</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">"start"</span> &gt; <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>pgctrl</span><br></pre></td></tr></table></figure>
+<p>查看发送结果：<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat <span class="regexp">/proc/</span>net<span class="regexp">/pktgen/</span>eth3</span><br></pre></td></tr></table></figure></p>
+<h2 id="发包样例"><a href="#发包样例" class="headerlink" title="发包样例"></a>发包样例</h2><figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1209</span><span class="number">-20</span>:<span class="number">29</span>:<span class="number">14</span>:<span class="number">517</span>] root@ubuntu:/<span class="keyword">proc</span>/net/pktgen#<span class="title"> echo</span> "pkt_size 1500" &gt; /<span class="keyword">proc</span>/net/pktgen/eth3   </span><br><span class="line">[1209-20:29:26:980]<span class="title"> root@ubuntu:/proc/net/pktgen#</span> echo "count 1000000" &gt; /<span class="keyword">proc</span>/net/pktgen/eth3         </span><br><span class="line">[1209-20:29:29:862]<span class="title"> root@ubuntu:/proc/net/pktgen#</span> echo "start" &gt; /<span class="keyword">proc</span>/net/pktgen/pgctrl      </span><br><span class="line">[1209-20:29:48:407]<span class="title"> root@ubuntu:/proc/net/pktgen#</span> cat /<span class="keyword">proc</span>/net/pktgen/eth3                   </span><br><span class="line">[1209-20:29:48:430]<span class="title"> Params:</span> count 1000000<span class="title">  min_pkt_size:</span> 1500<span class="title">  max_pkt_size:</span> 1500</span><br><span class="line">[1209-20:29:48:435]<span class="title">      frags:</span> 0<span class="title">  delay:</span> 0<span class="title">  clone_skb:</span> 0<span class="title">  ifname:</span> eth3</span><br><span class="line">[1209-20:29:48:437]<span class="title">      flows:</span> 0<span class="title"> flowlen:</span> 0</span><br><span class="line">[1209-20:29:48:441]<span class="title">      queue_map_min:</span> 0<span class="title">  queue_map_max:</span> 0</span><br><span class="line">[1209-20:29:48:444]<span class="title">      dst_min:</span> <span class="title">  dst_max:</span> </span><br><span class="line">[1209-20:29:48:447]<span class="title">         src_min:</span> <span class="title">  src_max:</span> </span><br><span class="line">[1209-20:29:48:452]<span class="title">      src_mac:</span> 02:10:18:2c:f8:0e<span class="title"> dst_mac:</span> 00:00:00:00:00:00</span><br><span class="line">[1209-20:29:48:458]<span class="title">      udp_src_min:</span> 9<span class="title">  udp_src_max:</span> 9<span class="title">  udp_dst_min:</span> 9<span class="title">  udp_dst_max:</span> 9</span><br><span class="line">[1209-20:29:48:460]<span class="title">      src_mac_count:</span> 0<span class="title">  dst_mac_count:</span> 0</span><br><span class="line">[1209-20:29:48:464]<span class="title">      Flags:</span> </span><br><span class="line">[1209-20:29:48:464]<span class="title"> Current:</span></span><br><span class="line"><span class="title">[1209-20:29:48:467]</span> <span class="title">     pkts-sofar:</span> 1000000<span class="title">  errors:</span> 0</span><br><span class="line">[1209-20:29:48:472]<span class="title">      started:</span> 3219370012us<span class="title">  stopped:</span> 3233111900us<span class="title"> idle:</span> 299798us</span><br><span class="line">[1209-20:29:48:477]<span class="title">      seq_num:</span> 1000001<span class="title">  cur_dst_mac_offset:</span> 0<span class="title">  cur_src_mac_offset:</span> 0</span><br><span class="line">[1209-20:29:48:481]<span class="title">      cur_saddr:</span> 192.168.2.1<span class="title">  cur_daddr:</span> 0.0.0.0</span><br><span class="line">[1209-20:29:48:486]<span class="title">      cur_udp_dst:</span> 9<span class="title">  cur_udp_src:</span> 9</span><br><span class="line">[1209-20:29:48:490]<span class="title">      cur_queue_map:</span> 0</span><br><span class="line">[1209-20:29:48:491]<span class="title">      flows:</span> 0</span><br><span class="line">[1209-20:29:48:496]<span class="title"> Result:</span> OK: 13741888(c13442090+d299798)<span class="title"> usec,</span> 1000000 (1500byte,0frags)</span><br><span class="line">[1209-20:29:48:499]   72770pps 873Mb/sec (873240000bps)<span class="title"> errors:</span> 0</span><br><span class="line">[1209-20:30:05:839]<span class="title"> root@ubuntu:/proc/net/pktgen#</span></span><br></pre></td></tr></table></figure>
+<h2 id="完整说明"><a href="#完整说明" class="headerlink" title="完整说明"></a>完整说明</h2><blockquote>
+<p>From <a href="http://www.linuxfoundation.org/collaborate/workgroups/networking/pktgen" target="_blank" rel="noopener">linuxfoundation.org pktgen</a>：</p>
+<h3 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h3><p>Enable CONFIG_NET_PKTGEN to compile and build pktgen.o either in kernel or as module. Module is preferred. insmod pktgen if needed. Once running pktgen creates a thread on each CPU where each thread has affinty it’s CPU. Monitoring and controlling is done via /proc. Easiest to select a suitable a sample script and configure.</p>
+<p>On a dual CPU:</p>
+</blockquote>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep pkt</span><br><span class="line">root      <span class="number"> 129 </span> 0.3  0.0    <span class="number"> 0 </span>  <span class="number"> 0 </span>?        SW   <span class="number"> 2003 </span>523:20 [pktgen/0]</span><br><span class="line">root      <span class="number"> 130 </span> 0.3  0.0    <span class="number"> 0 </span>  <span class="number"> 0 </span>?        SW   <span class="number"> 2003 </span>509:50 [pktgen/1]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>For montoring and control pktgen creates:</p>
+<ul>
+<li>/proc/net/pktgen/pgctrl</li>
+<li>/proc/net/pktgen/kpktgend_X<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat /proc/net/pktgen/kpktgend_0 </span></span><br><span class="line"><span class="attr">Name:</span> <span class="string">kpktgend_0</span>  <span class="attr">max_before_softirq:</span> <span class="number">10000</span></span><br><span class="line"><span class="attr">Running:</span> </span><br><span class="line"><span class="attr">Stopped:</span> <span class="string">eth1</span> </span><br><span class="line"><span class="attr">Result:</span> <span class="attr">OK:</span> <span class="string">max_before_softirq=10000</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Most important the devices assigned to thread. Note! A device can only belong to one thread.<br>*/proc/net/pktgen/ethX<br>Param section holds configured info. Current hold running stats. Result is printed after run or after interruption. Example:<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat /proc/net/pktgen/eth1</span></span><br><span class="line"><span class="attr">Params:</span> <span class="string">count</span> <span class="number">10000000</span>  <span class="attr">min_pkt_size:</span> <span class="number">60</span>  <span class="attr">max_pkt_size:</span> <span class="number">60</span></span><br><span class="line"><span class="attr">     frags:</span> <span class="number">0</span>  <span class="attr">delay:</span> <span class="number">0</span>  <span class="attr">clone_skb:</span> <span class="number">1000000</span>  <span class="attr">ifname:</span> <span class="string">eth1</span></span><br><span class="line"><span class="attr">     flows:</span> <span class="number">0</span> <span class="attr">flowlen:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">     dst_min:</span> <span class="number">10.10</span><span class="number">.11</span><span class="number">.2</span>  <span class="attr">dst_max:</span> </span><br><span class="line"><span class="attr">     src_min:</span>   <span class="attr">src_max:</span> </span><br><span class="line"><span class="attr">     src_mac:</span> <span class="number">00</span><span class="string">:00:00:00:00:00</span>  <span class="attr">dst_mac:</span> <span class="number">00</span><span class="string">:04:23:AC:FD:82</span></span><br><span class="line"><span class="attr">     udp_src_min:</span> <span class="number">9</span>  <span class="attr">udp_src_max:</span> <span class="number">9</span>  <span class="attr">udp_dst_min:</span> <span class="number">9</span>  <span class="attr">udp_dst_max:</span> <span class="number">9</span></span><br><span class="line"><span class="attr">     src_mac_count:</span> <span class="number">0</span>  <span class="attr">dst_mac_count:</span> <span class="number">0</span> </span><br><span class="line"><span class="attr">     Flags:</span> </span><br><span class="line"><span class="attr">Current:</span></span><br><span class="line"><span class="attr">     pkts-sofar:</span> <span class="number">10000000</span>  <span class="attr">errors:</span> <span class="number">39664</span></span><br><span class="line"><span class="attr">     started:</span> <span class="number">1103053986245187</span><span class="string">us</span>  <span class="attr">stopped:</span> <span class="number">1103053999346329</span><span class="string">us</span> <span class="attr">idle:</span> <span class="number">880401</span><span class="string">us</span></span><br><span class="line"><span class="attr">     seq_num:</span> <span class="number">10000011</span>  <span class="attr">cur_dst_mac_offset:</span> <span class="number">0</span>  <span class="attr">cur_src_mac_offset:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">     cur_saddr:</span> <span class="number">0x10a0a0a</span>  <span class="attr">cur_daddr:</span> <span class="number">0x20b0a0a</span></span><br><span class="line"><span class="attr">     cur_udp_dst:</span> <span class="number">9</span>  <span class="attr">cur_udp_src:</span> <span class="number">9</span></span><br><span class="line"><span class="attr">     flows:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">Result:</span> <span class="attr">OK:</span> <span class="number">13101142</span><span class="string">(c12220741+d880401)</span> <span class="string">usec,</span> <span class="number">10000000</span> <span class="string">(60byte,0frags)</span></span><br><span class="line">  <span class="number">763292</span><span class="string">pps</span> <span class="number">390</span><span class="string">Mb/sec</span> <span class="string">(390805504bps)</span> <span class="attr">errors:</span> <span class="number">39664</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<h4 id="Confguring"><a href="#Confguring" class="headerlink" title="Confguring"></a>Confguring</h4><p>This is done via the /proc interface easiest done via pgset in the scripts</p>
+<p>Examples:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">pgset "clone_skb 1"     sets the number of copies of the same packet</span><br><span class="line">pgset "clone_skb 0"     <span class="keyword">use</span> single SKB <span class="keyword">for</span> <span class="keyword">all</span> transmits</span><br><span class="line">pgset <span class="string">"pkt_size 9014"</span>   <span class="keyword">sets</span> packet <span class="keyword">size</span> <span class="keyword">to</span> <span class="number">9014</span></span><br><span class="line">pgset <span class="string">"frags 5"</span>         packet will consist <span class="keyword">of</span> <span class="number">5</span> fragments</span><br><span class="line">pgset <span class="string">"count 200000"</span>    <span class="keyword">sets</span> <span class="built_in">number</span> <span class="keyword">of</span> packets <span class="keyword">to</span> send, <span class="keyword">set</span> <span class="keyword">to</span> zero</span><br><span class="line">                       <span class="keyword">for</span> continious sends untill explicitl stopped.</span><br><span class="line">pgset <span class="string">"delay 5000"</span>      adds delay <span class="keyword">to</span> hard_start_xmit(). nanoseconds</span><br><span class="line">pgset <span class="string">"dst 10.0.0.1"</span>    <span class="keyword">sets</span> IP destination addres</span><br><span class="line">                       (BEWARE! This generator <span class="keyword">is</span> very aggressive!)</span><br><span class="line">pgset <span class="string">"dst_min 10.0.0.1"</span>            Same <span class="keyword">as</span> dst</span><br><span class="line">pgset <span class="string">"dst_max 10.0.0.254"</span>          <span class="keyword">Set</span> the maximum destination IP.</span><br><span class="line">pgset <span class="string">"src_min 10.0.0.1"</span>            <span class="keyword">Set</span> the <span class="keyword">minimum</span> (<span class="keyword">or</span> <span class="keyword">only</span>) <span class="keyword">source</span> IP.</span><br><span class="line">pgset <span class="string">"src_max 10.0.0.254"</span>          <span class="keyword">Set</span> the maximum <span class="keyword">source</span> IP.</span><br><span class="line">pgset <span class="string">"dst6 fec0::1"</span>     IPV6 destination address</span><br><span class="line">pgset <span class="string">"src6 fec0::2"</span>     IPV6 <span class="keyword">source</span> address</span><br><span class="line">pgset <span class="string">"dstmac 00:00:00:00:00:00"</span>    <span class="keyword">sets</span> MAC destination address</span><br><span class="line">pgset <span class="string">"srcmac 00:00:00:00:00:00"</span>    <span class="keyword">sets</span> MAC <span class="keyword">source</span> address</span><br><span class="line">pgset <span class="string">"src_mac_count 1"</span> <span class="keyword">Sets</span> the <span class="built_in">number</span> <span class="keyword">of</span> MACs we<span class="string">'ll range through.  </span></span><br><span class="line"><span class="string">                       The '</span><span class="keyword">minimum</span><span class="string">' MAC is what you set with srcmac.</span></span><br><span class="line"><span class="string">pgset "dst_mac_count 1" Sets the number of MACs we'</span>ll <span class="keyword">range</span> through.</span><br><span class="line">                       The <span class="string">'minimum'</span> MAC <span class="keyword">is</span> what you <span class="keyword">set</span> <span class="keyword">with</span> dstmac.</span><br><span class="line">pgset <span class="string">"flag [name]"</span>     <span class="keyword">Set</span> a flag <span class="keyword">to</span> determine behaviour.  <span class="keyword">Current</span> flags</span><br><span class="line">                       <span class="keyword">are</span>: IPSRC_RND <span class="comment">#IP Source is random (between min/max),</span></span><br><span class="line">                            IPDST_RND, UDPSRC_RND,</span><br><span class="line">                            UDPDST_RND, MACSRC_RND, MACDST_RND </span><br><span class="line"> pgset <span class="string">"udp_src_min 9"</span>   <span class="keyword">set</span> UDP <span class="keyword">source</span> port <span class="keyword">min</span>, <span class="keyword">If</span> &lt; udp_src_max, <span class="keyword">then</span></span><br><span class="line">                       <span class="keyword">cycle</span> <span class="keyword">through</span> the port range.</span><br><span class="line"> pgset <span class="string">"udp_src_max 9"</span>   <span class="keyword">set</span> UDP <span class="keyword">source</span> port max.</span><br><span class="line"> pgset <span class="string">"udp_dst_min 9"</span>   <span class="keyword">set</span> UDP destination port <span class="keyword">min</span>, <span class="keyword">If</span> &lt; udp_dst_max, <span class="keyword">then</span></span><br><span class="line">                       <span class="keyword">cycle</span> <span class="keyword">through</span> the port range.</span><br><span class="line"> pgset <span class="string">"udp_dst_max 9"</span>   <span class="keyword">set</span> UDP destination port max.</span><br><span class="line"> pgset <span class="keyword">stop</span>    	          aborts injection. Also, ^C aborts generator.</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<h3 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h3><p>A collection of small tutorial scripts for pktgen is in expamples dir.</p>
+<ul>
+<li>pktgen.conf-1-1 # 1 CPU 1 dev</li>
+<li>pktgen.conf-1-2 # 1 CPU 2 dev</li>
+<li>pktgen.conf-2-1 # 2 CPU’s 1 dev</li>
+<li>pktgen.conf-2-2 # 2 CPU’s 2 dev</li>
+<li>pktgen.conf-1-1-rdos # 1 CPU 1 dev w. route DoS</li>
+<li>pktgen.conf-1-1-ip6 # 1 CPU 1 dev ipv6</li>
+<li>pktgen.conf-1-1-ip6-rdos # 1 CPU 1 dev ipv6 w. route DoS</li>
+<li>pktgen.conf-1-1-flows # 1 CPU 1 dev multiple flows.<br>Run in shell: <code>./pktgen.conf-X-Y</code> It does all the setup including sending.</li>
+</ul>
+<h4 id="Interrupt-affinity"><a href="#Interrupt-affinity" class="headerlink" title="Interrupt affinity"></a>Interrupt affinity</h4><p>Note when adding devices to a specific CPU there good idea to also assign <code>/proc/irq/XX/smp_affinity</code> so the TX-interrupts gets bound to the same CPU. as this reduces cache bouncing when freeing skb’s.</p>
+<h3 id="Commands"><a href="#Commands" class="headerlink" title="Commands"></a>Commands</h3><p>Pgcontrol commands:</p>
+<ul>
+<li>start</li>
+<li>stop<br>Thread commands:</li>
+<li>add_device</li>
+<li>rem_device_all</li>
+<li>max_before_softirq<br>Device commands:</li>
+<li>count</li>
+<li>clone_skb</li>
+<li>debug</li>
+<li>frags</li>
+<li>delay</li>
+<li>src_mac_count</li>
+<li>dst_mac_count</li>
+<li>pkt_size</li>
+<li>min_pkt_size</li>
+<li>max_pkt_size</li>
+<li>udp_src_min</li>
+<li>udp_src_max</li>
+<li>udp_dst_min</li>
+<li>udp_dst_max</li>
+<li>flag<ul>
+<li>IPSRC_RND</li>
+<li>TXSIZE_RND</li>
+<li>IPDST_RND</li>
+<li>UDPSRC_RND</li>
+<li>UDPDST_RND</li>
+<li>MACSRC_RND</li>
+<li>MACDST_RND</li>
+</ul>
+</li>
+<li>dst_min</li>
+<li>dst_max</li>
+<li>src_min</li>
+<li>src_max</li>
+<li>dst_mac</li>
+<li>src_mac</li>
+<li>clear_counters</li>
+<li>dst6</li>
+<li>src6</li>
+<li>flows</li>
+<li>flowlen</li>
+</ul>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/网络测试/" rel="tag"># 网络测试</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201603/tools/hexo.html" rel="next" title="hexo 搭站备忘">
+                <i class="fa fa-chevron-left"></i> hexo 搭站备忘
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201603/networks/openswitch-build.html" rel="prev" title="openswitch 编译记录">
+                openswitch 编译记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-pktgen"><span class="nav-number">1.</span> <span class="nav-text">什么是 pktgen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使能-pktgen"><span class="nav-number">2.</span> <span class="nav-text">使能 pktgen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-pktgen-发包"><span class="nav-number">3.</span> <span class="nav-text">使用 pktgen 发包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发包样例"><span class="nav-number">4.</span> <span class="nav-text">发包样例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完整说明"><span class="nav-number">5.</span> <span class="nav-text">完整说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Setup"><span class="nav-number">5.1.</span> <span class="nav-text">Setup</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Confguring"><span class="nav-number">5.1.1.</span> <span class="nav-text">Confguring</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Examples"><span class="nav-number">5.2.</span> <span class="nav-text">Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Interrupt-affinity"><span class="nav-number">5.2.1.</span> <span class="nav-text">Interrupt affinity</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Commands"><span class="nav-number">5.3.</span> <span class="nav-text">Commands</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201603/networks/pktgen.html";
+    this.page.identifier = "201603/networks/pktgen.html";
+    this.page.title = 'pktgen';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

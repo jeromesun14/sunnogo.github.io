@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+<meta name="keywords" content="ubuntu,python,交叉编译,mips,mips64,arm,ppc,2.7,cross compile,sqlite3,ncurses,readline,ssl,环境变量,PYTHONHOME,PYTHONPATH,not found,裁剪">
+<meta property="og:type" content="article">
+<meta property="og:title" content="交叉编译 python">
+<meta property="og:url" content="http://sunyongfeng.com/201605/programmer/python/cross_compile.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="交叉编译 python">
+<meta name="twitter:description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+  <link rel="canonical" href="http://sunyongfeng.com/201605/programmer/python/cross_compile">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>交叉编译 python | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201605/programmer/python/cross_compile.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">交叉编译 python
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-05-17 12:13:24" itemprop="dateCreated datePublished" datetime="2016-05-17T12:13:24+08:00">2016-05-17</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201605/programmer/python/cross_compile.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201605/programmer/python/cross_compile.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">ubuntu 16.04 下交叉编译 mips64 python 2.7.11</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="下载、解压-python-源代码"><a href="#下载、解压-python-源代码" class="headerlink" title="下载、解压 python 源代码"></a>下载、解压 python 源代码</h2><p>从 python.org 下载。</p>
+<h2 id="导入交叉编译-patch"><a href="#导入交叉编译-patch" class="headerlink" title="导入交叉编译 patch"></a>导入交叉编译 patch</h2><p>参考自 <a href="http://code.openhub.net/file?fid=gbEPeGEYo_iBj7isfd9QeVX7N8A&amp;cid=r3Ocm3qAuhY&amp;s=python&amp;fp=520151&amp;mp=&amp;projSelected=true#L0" target="_blank" rel="noopener">python-2.7-001-support-for-build.patch</a>，2.7.11 的修改地方有稍微变化，详见如下 patch。</p>
+<p>Python 虽然使用 <code>autoconf</code>，但是事实上代码中已经包含 <code>configure</code> 文件，因此下文代码给出的是修改 <code>configure.ac</code> 并执行 <code>autoconf</code> 后生成的 <code>configure</code> 文件。</p>
+<p>patch 的使用方法，在 python 源代码根目录下执行：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">patch</span> -p1 &lt; ../<span class="number">0001</span>-<span class="built_in">cross</span>-compile.<span class="keyword">patch</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>python 2.7.11 交叉编译 patch：</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/Makefile.pre.<span class="keyword">in</span> b/Makefile.pre.<span class="keyword">in</span></span><br><span class="line">index ee73edd.<span class="number">.730</span>db7e <span class="number">100644</span></span><br><span class="line">--- a/Makefile.pre.<span class="keyword">in</span></span><br><span class="line">+++ b/Makefile.pre.<span class="keyword">in</span></span><br><span class="line">@@ <span class="number">-237</span>,<span class="number">7</span> +<span class="number">237</span>,<span class="number">8</span> @@ LIBFFI_INCLUDEDIR=	@LIBFFI_INCLUDEDIR@</span><br><span class="line"> </span><br><span class="line"> ##########################################################################</span><br><span class="line"> # Parser</span><br><span class="line">-PGEN=		Parser/pgen$(EXE)</span><br><span class="line">+BUILDPGEN=		Parser/pgen$(EXE)</span><br><span class="line">+PGEN_FOR_BUILD=	@PGEN_FOR_BUILD@</span><br><span class="line"> </span><br><span class="line"> PSRCS=		\</span><br><span class="line"> 		Parser/acceler.c \</span><br><span class="line">@@ <span class="number">-635</span>,<span class="number">14</span> +<span class="number">636</span>,<span class="number">14</span> @@ Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule</span><br><span class="line"> </span><br><span class="line"> $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)</span><br><span class="line"> 		@$(MKDIR_P) Include</span><br><span class="line">-		$(MAKE) $(PGEN)</span><br><span class="line">-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)</span><br><span class="line">+		$(MAKE) $(BUILDPGEN)</span><br><span class="line">+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)</span><br><span class="line"> $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)</span><br><span class="line"> 		$(MAKE) $(GRAMMAR_H)</span><br><span class="line"> 		touch $(GRAMMAR_C)</span><br><span class="line"> </span><br><span class="line">-$(PGEN):	$(PGENOBJS)</span><br><span class="line">-		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)</span><br><span class="line">+$(BUILDPGEN):	$(PGENOBJS)</span><br><span class="line">+		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(BUILDPGEN)</span><br><span class="line"> </span><br><span class="line"> Parser/grammar.o:	$(srcdir)/Parser/grammar.c \</span><br><span class="line"> 				$(srcdir)/Include/token.h \</span><br><span class="line">diff --git a/configure b/configure</span><br><span class="line">index <span class="number">7</span>dab897..bf16c0e <span class="number">100755</span></span><br><span class="line">--- a/configure</span><br><span class="line">+++ b/configure</span><br><span class="line">@@ <span class="number">-734</span>,<span class="number">6</span> +<span class="number">734</span>,<span class="number">7</span> @@ UNIVERSALSDK</span><br><span class="line"> CONFIG_ARGS</span><br><span class="line"> SOVERSION</span><br><span class="line"> VERSION</span><br><span class="line">+PGEN_FOR_BUILD</span><br><span class="line"> PYTHON_FOR_BUILD</span><br><span class="line"> host_os</span><br><span class="line"> host_vendor</span><br><span class="line">@@ <span class="number">-2911</span>,<span class="number">6</span> +<span class="number">2912</span>,<span class="number">13</span> @@ else</span><br><span class="line"> fi</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">+<span class="keyword">if</span> test <span class="string">"$cross_compiling"</span> = yes; then</span><br><span class="line">+    PGEN_FOR_BUILD=<span class="string">"$&#123;PGEN_FOR_BUILD&#125;"</span></span><br><span class="line">+else</span><br><span class="line">+    PGEN_FOR_BUILD=<span class="string">'$(BUILDPGEN)'</span></span><br><span class="line">+fi</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">if</span> test <span class="string">"$prefix"</span> != <span class="string">"/"</span>; then</span><br><span class="line">     prefix=`echo <span class="string">"$prefix"</span> | sed -e <span class="string">'s/\/$//g'</span>`</span><br><span class="line">@@ <span class="number">-6334</span>,<span class="number">6</span> +<span class="number">6342</span>,<span class="number">12</span> @@ fi</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> # Enable PGO flags.</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line"> # Extract the first word <span class="keyword">of</span> <span class="string">"llvm-profdata"</span>, so it can be a program name <span class="keyword">with</span> args.</span><br><span class="line"> set dummy llvm-profdata; ac_word=$<span class="number">2</span></span><br><span class="line"> &#123; $as_echo <span class="string">"$as_me:$&#123;as_lineno-$LINENO&#125;: checking for $ac_word"</span> &gt;&amp;<span class="number">5</span></span><br><span class="line">-- </span><br><span class="line"><span class="number">1.9</span><span class="number">.1</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建-build-目录"><a href="#创建-build-目录" class="headerlink" title="创建 build 目录"></a>创建 build 目录</h2><p>在 python 源代码下创建 <code>build-pc</code> 和 <code>build-mips</code> 目录，分别用于编译 PC pgen（交叉编译时用到）与交叉编译 mips python。该目录做 configure、make、make install，编译时用于保存临时生成的文件，保证 python 源代码干净。</p>
+<h2 id="编译本地-Python-与-pgen"><a href="#编译本地-Python-与-pgen" class="headerlink" title="编译本地 Python 与 pgen"></a>编译本地 Python 与 pgen</h2><p>用于生成 grammar 所需要文件用。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd build-pc</span><br><span class="line"></span><br><span class="line"><span class="built_in">..</span>/configure <span class="attribute">CC</span>=gcc <span class="attribute">CXX</span>=g++ <span class="attribute">AR</span>=ar <span class="attribute">RANLIB</span>=ranlib <span class="attribute">LDFLAGS</span>=<span class="string">"-L/usr/lib -L/usr/lib64 -L/usr/local/lib -L/usr/local/lib64"</span> <span class="attribute">CFLAGS</span>=<span class="string">"-I/usr/include -I/usr/local/include"</span></span><br><span class="line"> </span><br><span class="line">make python Parser/pgen</span><br></pre></td></tr></table></figure>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="配置交叉编译环境变量"><a href="#配置交叉编译环境变量" class="headerlink" title="配置交叉编译环境变量"></a>配置交叉编译环境变量</h3><p>比如 CC、CFLAGS、LDFLAGS 等。</p>
+<h3 id="configure-配置"><a href="#configure-配置" class="headerlink" title="configure 配置"></a>configure 配置</h3><p>配置命令如下：<br>configure 的 prefix 只支持绝对路径。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd build-mips</span><br><span class="line"></span><br><span class="line"><span class="built_in">..</span>/configure <span class="attribute">--host</span>=mips64-octeon-linux-gnu <span class="attribute">--build</span>=x86_64-linux-gnu <span class="attribute">--prefix</span>=/home/sunyongfeng/python-install --disable-ipv6 <span class="attribute">ac_cv_file__dev_ptmx</span>=<span class="literal">no</span> <span class="attribute">ac_cv_file__dev_ptc</span>=<span class="literal">no</span> <span class="attribute">ac_cv_have_long_long_format</span>=<span class="literal">yes</span> <span class="attribute">PGEN_FOR_BUILD</span>=../build-pc/Parse/pgen</span><br></pre></td></tr></table></figure>
+<p>问题：</p>
+<ul>
+<li><code>--enable-FEATURE</code>，不清楚有哪些 features ，怎么配置；</li>
+<li><code>--enable-PACKAGE</code>，不清楚有哪些 package，怎么配置。</li>
+</ul>
+<p>配置完了之后，在 Modules 目录会生成 Setup 文件。x86 的默认编译会编译到必须的模块，而 mips64 的交叉编译很多模块没有编译下，如 socket 等。修改 <code>Modules/Setup</code> 文件，定制想编译的内置模块。以下是基础模块，目前还不清楚如果不想内置的话要如何编译。<br>定制内置模块，参见这篇博文 《<a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a>》，讲述各个内置模块的功能。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Modules that should always be present (non UNIX dependent):                                       </span></span><br><span class="line">                                                                                                    </span><br><span class="line">array arraymodule.c # array objects                                                                 </span><br><span class="line">cmath cmathmodule.c _math.c # -lm # complex math library functions                                  </span><br><span class="line">math mathmodule.c _math.c # -lm # math library functions, e.g. sin()                                </span><br><span class="line">_struct _struct.c   # binary structure packing/unpacking                                            </span><br><span class="line">time timemodule.c # -lm # time operations <span class="keyword">and</span> variables                                             </span><br><span class="line">operator operator.c # operator.<span class="builtin-name">add</span>() <span class="keyword">and</span> similar goodies                                            </span><br><span class="line">_testcapi _testcapimodule.c    # Python C API test module                                           </span><br><span class="line">_random _randommodule.c # Random number generator                                                   </span><br><span class="line">_collections _collectionsmodule.c # Container types                                                 </span><br><span class="line">_heapq _heapqmodule.c       # Heapq<span class="built_in"> type </span>                                                           </span><br><span class="line">itertools itertoolsmodule.c # Functions creating iterators <span class="keyword">for</span> efficient looping                    </span><br><span class="line">strop stropmodule.c     # String manipulations                                                      </span><br><span class="line">_functools _functoolsmodule.c   # Tools <span class="keyword">for</span> working with functions <span class="keyword">and</span> callable objects             </span><br><span class="line">_elementtree -I$(srcdir)/Modules/expat -DHAVE_EXPAT_CONFIG_H -DUSE_PYEXPAT_CAPI _elementtree.c  # elementtree accelerator</span><br><span class="line"><span class="comment">#_pickle _pickle.c  # pickle accelerator                                                            </span></span><br><span class="line">datetime datetimemodule.c   # date/time<span class="built_in"> type </span>                                                       </span><br><span class="line">_bisect _bisectmodule.c # Bisection algorithms                                                      </span><br><span class="line">                                                                                                    </span><br><span class="line">unicodedata unicodedata.c    # static Unicode character database</span><br></pre></td></tr></table></figure>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>简单的 <code>make</code> 命令即可。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>命令 <code>make install -i</code>，安装 <code>bin</code>、<code>lib</code>、<code>share</code>、<code>man</code> 等目录至 <code>./configure</code> 中配置的 <code>prefix</code> 目录。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@R04220:~/python-install$ ls</span><br><span class="line">bin  include  lib  share</span><br><span class="line">sunyongfeng@R04220:~/python-install$ ls -al *</span><br><span class="line">bin:</span><br><span class="line">总用量 9612</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>sunyongfeng sunyongfeng   <span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 .</span><br><span class="line">drwxr-xr-x<span class="number"> 6 </span>sunyongfeng sunyongfeng   <span class="number"> 4096 </span> 5月<span class="number"> 15 </span>10:58 ..</span><br><span class="line">-rwxrwxr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng    <span class="number"> 123 </span> 5月<span class="number"> 13 </span>16:38 2to3</span><br><span class="line">-rwxrwxr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng    <span class="number"> 121 </span> 5月<span class="number"> 13 </span>16:38 idle</span><br><span class="line">-rwxrwxr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng    <span class="number"> 106 </span> 5月<span class="number"> 13 </span>16:38 pydoc</span><br><span class="line">lrwxrwxrwx<span class="number"> 1 </span>sunyongfeng sunyongfeng      <span class="number"> 7 </span> 5月<span class="number"> 13 </span>16:51 python -&gt; python2</span><br><span class="line">lrwxrwxrwx<span class="number"> 1 </span>sunyongfeng sunyongfeng      <span class="number"> 9 </span> 5月<span class="number"> 13 </span>16:51 python2 -&gt; python2.7</span><br><span class="line">-rwxr-xr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng<span class="number"> 9793952 </span> 5月<span class="number"> 13 </span>16:51 python2.7</span><br><span class="line">-rwxr-xr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng   <span class="number"> 1709 </span> 5月<span class="number"> 13 </span>16:51 python2.7-config</span><br><span class="line">lrwxrwxrwx<span class="number"> 1 </span>sunyongfeng sunyongfeng     <span class="number"> 16 </span> 5月<span class="number"> 13 </span>16:51 python2-config -&gt; python2.7-config</span><br><span class="line">lrwxrwxrwx<span class="number"> 1 </span>sunyongfeng sunyongfeng     <span class="number"> 14 </span> 5月<span class="number"> 13 </span>16:51 python-config -&gt; python2-config</span><br><span class="line">-rwxrwxr-x<span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 18569 </span> 5月<span class="number"> 13 </span>16:38 smtpd.py</span><br><span class="line"></span><br><span class="line">include:</span><br><span class="line">总用量 12</span><br><span class="line">drwxr-xr-x<span class="number"> 3 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 .</span><br><span class="line">drwxr-xr-x<span class="number"> 6 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 15 </span>10:58 ..</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 python2.7</span><br><span class="line"></span><br><span class="line">lib:</span><br><span class="line">总用量 16312</span><br><span class="line">drwxr-xr-x <span class="number"> 4 </span>sunyongfeng sunyongfeng    <span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 .</span><br><span class="line">drwxr-xr-x <span class="number"> 6 </span>sunyongfeng sunyongfeng    <span class="number"> 4096 </span> 5月<span class="number"> 15 </span>10:58 ..</span><br><span class="line">-r-xr-xr-x <span class="number"> 1 </span>sunyongfeng sunyongfeng<span class="number"> 16670684 </span> 5月<span class="number"> 13 </span>16:51 libpython2.7.a</span><br><span class="line">drwxr-xr-x <span class="number"> 2 </span>sunyongfeng sunyongfeng    <span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 pkgconfig</span><br><span class="line">drwxr-xr-x<span class="number"> 28 </span>sunyongfeng sunyongfeng   <span class="number"> 20480 </span> 5月<span class="number"> 13 </span>16:51 python2.7</span><br><span class="line"></span><br><span class="line">share:</span><br><span class="line">总用量 12</span><br><span class="line">drwxr-xr-x<span class="number"> 3 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 .</span><br><span class="line">drwxr-xr-x<span class="number"> 6 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 15 </span>10:58 ..</span><br><span class="line">drwxr-xr-x<span class="number"> 3 </span>sunyongfeng sunyongfeng<span class="number"> 4096 </span> 5月<span class="number"> 13 </span>16:51 man</span><br><span class="line">sunyongfeng@R04220:~/python-install$</span><br></pre></td></tr></table></figure>
+<p>打包放到目标机上，配置目标机的 PATH，加上 python 的 bin 目录。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><h3 id="编译依赖"><a href="#编译依赖" class="headerlink" title="编译依赖"></a>编译依赖</h3><p>交叉编译的时候，如果没有配置好 CFLAGS、LDFLAGS 之类的变量，可能找不到 python 编译所依赖的头文件或库文件。最终体现在编译的结果（此处可能因不同的变量配置而不同）：</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Python build finished, but the necessary bits <span class="keyword">to</span> build these modules were <span class="built_in">not</span> found:</span><br><span class="line"><span class="variable">_bsddb</span>             <span class="variable">_curses</span>            <span class="variable">_curses_panel</span>   </span><br><span class="line"><span class="variable">_sqlite3</span>           <span class="variable">_ssl</span>               <span class="variable">_tkinter</span>        </span><br><span class="line">bsddb185           bz2                dbm             </span><br><span class="line">dl                 gdbm               imageop         </span><br><span class="line">linuxaudiodev      ossaudiodev        readline        </span><br><span class="line">sunaudiodev        zlib                               </span><br><span class="line"><span class="keyword">To</span> <span class="built_in">find</span> the necessary bits, look <span class="built_in">in</span> setup.py <span class="built_in">in</span> detect_modules() <span class="keyword">for</span> the module<span class="string">'s name.</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>sqlite3 依赖配置<br>修改 python 源码根目录下的 setup.py 文件，在 <code>detect_modules</code> 函数下，找到 sqlite3 的头文件配置，添加上交叉编译下的 sqlite3 头文件目录。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sqlite_inc_paths = [ <span class="string">'/usr/include'</span>,                                                        </span><br><span class="line">                     <span class="string">'/usr/include/sqlite'</span>,                                                 </span><br><span class="line">                     <span class="string">'/usr/include/sqlite3'</span>,                                                </span><br><span class="line">                     <span class="string">'/usr/local/include'</span>,                                                  </span><br><span class="line">                     <span class="string">'/usr/local/include/sqlite'</span>,                                           </span><br><span class="line">                     <span class="string">'/usr/local/include/sqlite3'</span>,                                          </span><br><span class="line">                   ]                                                                        </span><br><span class="line"><span class="keyword">if</span> <span class="string">cross_compiling:</span>                                                                         </span><br><span class="line">    sqlite_inc_paths = [ <span class="string">'/home/sunyongfeng/workshop/prj/images/header/'</span>,</span><br><span class="line">                         <span class="string">'/home/sunyongfeng/workshop/prj/images/header/sqlite'</span>,</span><br><span class="line">                         <span class="string">'/home/sunyongfeng/workshop/prj/images/header/sqlite3'</span>,</span><br><span class="line">                       ]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ssl 依赖配置<br>类似 sqlite3，在 setup.py 文件的 <code>detect_modules</code> 函数下，找到 ssl 相关的头文件与库文件配置，添加上交叉编译下的 ssl 头文件与库文件目录。</p>
+</li>
+</ul>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># Detect SSL support <span class="keyword">for</span> the socket <span class="keyword">module</span> (via _ssl)                                       </span><br><span class="line">search_for_ssl_incs_in = [                                                                  </span><br><span class="line">                      <span class="string">'/usr/local/ssl/include'</span>,                                             </span><br><span class="line">                      <span class="string">'/usr/contrib/ssl/include/'</span>,                                          </span><br><span class="line">                      <span class="string">'/home/sunyongfeng/workshop/prj/images/header/'</span>,</span><br><span class="line">                     ]                                                                      </span><br><span class="line">ssl_incs = find_file(<span class="string">'openssl/ssl.h'</span>, inc_dirs,                                             </span><br><span class="line">                     search_for_ssl_incs_in                                                 </span><br><span class="line">                     )                                                                      </span><br><span class="line"><span class="keyword">if</span> ssl_incs <span class="keyword">is</span> <span class="keyword">not</span> None:                                                                    </span><br><span class="line">    krb5_h = find_file(<span class="string">'krb5.h'</span>, inc_dirs,                                                  </span><br><span class="line">                       [<span class="string">'/usr/kerberos/include'</span>])                                           </span><br><span class="line">    <span class="keyword">if</span> krb5_h:                                                                              </span><br><span class="line">        ssl_incs += krb5_h                                                                  </span><br><span class="line">ssl_libs = find_library_file(<span class="keyword">self</span>.compiler, <span class="string">'ssl'</span>,lib_dirs,                                 </span><br><span class="line">                             [<span class="string">'/usr/local/ssl/lib'</span>,                                         </span><br><span class="line">                              <span class="string">'/usr/contrib/ssl/lib/'</span>,                                      </span><br><span class="line">                              <span class="string">'/home/sunyongfeng/workshop/prj/images/rootfs/lib64'</span></span><br><span class="line">                             ] )</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>ncurses</p>
+<blockquote>
+<p><a href="https://zh.wikipedia.org/wiki/Ncurses" target="_blank" rel="noopener">维基百科</a> ncurses（new curses）是一个程序库，它提供了API，可以允许程序员编写独立于终端的基于文本的用户界面。它是一个虚拟终端中的“类GUI”应用软件工具箱。它还优化了屏幕刷新方法，以减少使用远程shell时遇到的延迟。</p>
+</blockquote>
+</li>
+<li><p>readline<br>如果 readline 模块编译失败，会导致退格键、方向键等不可用。下面错误中”^”位置是退格键。<br>交叉编译 python 前需要先编译好 libreadline ，并将头文件和库文件放到默认可索引到的路径。</p>
+</li>
+</ul>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">print</span> <span class="string">"abc"</span></span><br><span class="line">  <span class="keyword">File</span> <span class="string">"&lt;stdin&gt;"</span>, <span class="keyword">line</span> 1</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"abc"</span></span><br><span class="line">               ^</span><br><span class="line">SyntaxError: invalid <span class="keyword">syntax</span></span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>目前还不清楚为何 export $PATH 后，运行 python 命令找不到 python lib 库，而且找不到 site 模块。而使用绝对路径访问 python 没有问题。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/tmp/bin # python</span><br><span class="line">Could <span class="keyword">not</span> <span class="builtin-name">find</span> platform independent libraries &lt;prefix&gt;</span><br><span class="line">Could <span class="keyword">not</span> <span class="builtin-name">find</span> platform dependent libraries &lt;exec_prefix&gt;</span><br><span class="line">Consider setting <span class="variable">$PYTHONHOME</span> <span class="keyword">to</span> &lt;prefix&gt;[:&lt;exec_prefix&gt;]</span><br><span class="line">ImportError: <span class="literal">No</span> module named site</span><br><span class="line"></span><br><span class="line">/tmp/bin # /tmp/bin/python</span><br><span class="line">Python 2.7.11 (default, May 16 2016, 17:11:59) </span><br><span class="line">[GCC 4.3.3] on linux2</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> <span class="keyword">or</span> <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>通过配置环境变量解决：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">PYTHONHOME</span>=/usr/lib/python2.7</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">PYTHONPATH</span>=.:$PYTHONHOME:$PYTHONHOME/site-packages</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$PATH</span>:$PYTHONHOME:$PYTHONPATH</span><br></pre></td></tr></table></figure></p>
+<h2 id="裁剪考虑"><a href="#裁剪考虑" class="headerlink" title="裁剪考虑"></a>裁剪考虑</h2><ul>
+<li>lib/libpython2.7.a, 16M</li>
+<li>lib/test, 30M</li>
+</ul>
+<h2 id="附一：Python-内建模块功能说明"><a href="#附一：Python-内建模块功能说明" class="headerlink" title="附一：Python 内建模块功能说明"></a>附一：Python 内建模块功能说明</h2><p>直接引自 <a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a>，内容可能已过时，不过有参考价值。</p>
+<ol>
+<li>array (Modules/arraymodule.c) (<a href="http://docs.python.org/library/array.html" target="_blank" rel="noopener">http://docs.python.org/library/array.html</a>) 一个可以存放基本类型的高效数组, 提供了和序列类似的操作. 使用放法类似于 a = array.array(‘b’, [10, 20, 30]), 不常使用, 可以考虑去除. </li>
+<li>_ast (Python/Python-ast.c) (<a href="http://docs.python.org/library/ast.html" target="_blank" rel="noopener">http://docs.python.org/library/ast.html</a>) 抽象语法树, 供 Python 程序解析处理 Python 语法相关的库, 这个模块的源代码是由脚本自动生成的. 由于 Python-ast.c 本身还会被解释器的其它地方引用, 不能删除, 所以, 如果是为了压缩解释器大小, 保留这个库也没关系. 如果是为了定制 python 的功能, 也可以屏蔽这个库, 但是源代码需要保留, 不能从工程中删掉. </li>
+<li>audioop (Modules/audioop.c) (<a href="http://docs.python.org/library/audioop.html" target="_blank" rel="noopener">http://docs.python.org/library/audioop.html</a>) 一个音频处理的库, 仅 Win32 平台有效.</li>
+<li>binascii (Modules/binascii.c) (<a href="http://docs.python.org/library/binascii.html" target="_blank" rel="noopener">http://docs.python.org/library/binascii.html</a>) 提供二进制和 ASCII 码的转换, 会被 uu, base64, binhex 这些库引用. 建议保留.</li>
+<li>cmath (Modules/cmathmodule.c) (<a href="http://docs.python.org/library/cmath.html" target="_blank" rel="noopener">http://docs.python.org/library/cmath.html</a>) 提供复数操作的函数</li>
+<li>errno (Modules/errnomodule.c) (<a href="http://docs.python.org/library/errno.html" target="_blank" rel="noopener">http://docs.python.org/library/errno.html</a>) 提供标准的错误码定义, 在很多地方中都会使用, 需要保留.</li>
+<li>future_builtins (Modules/future_builtins.c) (<a href="http://docs.python.org/library/future_builtins.html" target="_blank" rel="noopener">http://docs.python.org/library/future_builtins.html</a>) 对那些在 Python2.x 和 Python3 中都有但是意义不一样的函数提供的包装. 使用这里面的函数可以保证调用了正确的版本的函数.</li>
+<li>gc (Modules/gcmodule.c) (<a href="http://docs.python.org/library/gc.html" target="_blank" rel="noopener">http://docs.python.org/library/gc.html</a>) Python 的垃圾收集接口. 当然保留.</li>
+<li>imageop (Modules/imageop.c) (<a href="http://docs.python.org/library/imageop.html" target="_blank" rel="noopener">http://docs.python.org/library/imageop.html</a>) 一些图像处理的函数.</li>
+<li>math (Modules/mathmodule.c) (<a href="http://docs.python.org/library/math.html" target="_blank" rel="noopener">http://docs.python.org/library/math.html</a>) 提供了 C 标准库中的那些数学函数.</li>
+<li>_md5 (Modules/md5module.c) 提供了 MD5 算法.</li>
+<li>nt (Modules/posixmodule.c) 一些操作系统习惯的函数, 比如打开文件等等.</li>
+<li>operator (Modules/operator.c) (<a href="http://docs.python.org/library/operator.html" target="_blank" rel="noopener">http://docs.python.org/library/operator.html</a>) 提供了操作符的等价函数</li>
+<li>signal (Modules/signalmodule.c) (<a href="http://docs.python.org/library/signal.html" target="_blank" rel="noopener">http://docs.python.org/library/signal.html</a>) 信号机制, 提供异步事件的回调.</li>
+<li>_sha, _sha256, _sha512 三种 SHA 的加密算法模块.</li>
+<li>strop (Modules/stropmodule.c) 提供了一些优化的字符串操作.<br>17.time (Modules/timemodule.c) (<a href="http://docs.python.org/library/time.html" target="_blank" rel="noopener">http://docs.python.org/library/time.html</a>) 时间操作库.</li>
+<li>thread (Modules/threadmodule.c) Python 线程的底层模块, threading 会使用 thread 库.</li>
+<li>cStringIO (Modules/cStringIO.c) (<a href="http://docs.python.org/library/stringio.html" target="_blank" rel="noopener">http://docs.python.org/library/stringio.html</a>) StringIO 的高效版本.</li>
+<li>cPickle (Modules/cPickle.c) (<a href="http://docs.python.org/library/pickle.html" target="_blank" rel="noopener">http://docs.python.org/library/pickle.html</a>) Python 的序列化模块.</li>
+<li>msvcrt (PC/msvcrtmodule.c) (<a href="http://docs.python.org/library/msvcrt.html" target="_blank" rel="noopener">http://docs.python.org/library/msvcrt.html</a>) VC 运行时库的包装, 包括一些文件和屏幕操作函数.</li>
+<li>_locale (Modules/_localemodule.c) 提供本地化支持的模块.</li>
+<li>_subprocess (PC/_subprocess.c) (<a href="http://docs.python.org/library/subprocess.html" target="_blank" rel="noopener">http://docs.python.org/library/subprocess.html</a>) 操作子进程的库, 平台相关的.</li>
+<li>_codecs (Modules/_codecsmodule.c)  (<a href="http://docs.python.org/library/codecs.html" target="_blank" rel="noopener">http://docs.python.org/library/codecs.html</a>) 定义了 Python 的编码器相关接口.</li>
+<li>_weakref (Modules/_weakref.c) (<a href="http://docs.python.org/library/weakref.html" target="_blank" rel="noopener">http://docs.python.org/library/weakref.html</a>) 创建对象的弱引用.</li>
+<li>_hotshot (Modules/_hotshot.c) (<a href="http://docs.python.org/library/hotshot.html" target="_blank" rel="noopener">http://docs.python.org/library/hotshot.html</a>) 类似于 Profiler 模块, 而且将来可能被移除, 现在把它去掉也不错.</li>
+<li>_random (Modules/_randommodule.c) 随机数模块.</li>
+<li>_bisect (Modules/_bisectmodule.c) (<a href="http://docs.python.org/library/bisect.html" target="_blank" rel="noopener">http://docs.python.org/library/bisect.html</a>)  一个基于二分算法, 可以让插入一个数据岛排序的序列后序列仍然有序的库.</li>
+<li>_heapq (Modules/_heapqmodule.c) (<a href="http://docs.python.org/library/heapq.html" target="_blank" rel="noopener">http://docs.python.org/library/heapq.html</a>) 实现堆栈数据结构算法的库.</li>
+<li>_lsprof (Modules/_lsprof.c) (<a href="http://docs.python.org/library/profile.html" target="_blank" rel="noopener">http://docs.python.org/library/profile.html</a>) Profiler 模块, 统计程序执行的性能.</li>
+<li>itertools (Modules/itertoolsmodule.c) (<a href="http://docs.python.org/library/itertools.html" target="_blank" rel="noopener">http://docs.python.org/library/itertools.html</a>) 一些迭代器操作的模块.</li>
+<li>_collections (Modules/_collectionsmodule.c) (<a href="http://docs.python.org/library/collections.html" target="_blank" rel="noopener">http://docs.python.org/library/collections.html</a>) 提供了几个高级的容器类.</li>
+<li>_symtable (Modules/symtablemodule.c) (<a href="http://docs.python.org/library/symtable.html" target="_blank" rel="noopener">http://docs.python.org/library/symtable.html</a>) 符号表管理模块.</li>
+<li>mmap (Modules/mmapmodule.c) (<a href="http://docs.python.org/library/mmap.html" target="_blank" rel="noopener">http://docs.python.org/library/mmap.html</a>) 文件内存映射支持模块.</li>
+<li>_csv (Modules/_csv.c) (<a href="http://docs.python.org/library/csv.html" target="_blank" rel="noopener">http://docs.python.org/library/csv.html</a>) 为 CSV 模块的内部支持. CSV 模块提供了读写 CSV 文件的功能.</li>
+<li>_sre (Modules/_sre.c)  正则表达式的匹配引擎.</li>
+<li>parser (Modules/parsermodule.c) (<a href="http://docs.python.org/library/parser.html" target="_blank" rel="noopener">http://docs.python.org/library/parser.html</a>) 操作 Python 语法树的模块.</li>
+<li>_winreg (PC/_winreg.c) Windows 注册表操作模块.</li>
+<li>_struct (Modules/_struct.c) 提供在 Python 和 C 之间转换数据类型的功能.</li>
+<li>datetime (Modules/datetimemodule.c) (<a href="http://docs.python.org/library/datetime.html" target="_blank" rel="noopener">http://docs.python.org/library/datetime.html</a>) 日期时间操作函数.</li>
+<li>_functools (Modules/_functoolsmodule.c) (<a href="http://docs.python.org/library/functools.html" target="_blank" rel="noopener">http://docs.python.org/library/functools.html</a>) 函数相关操作模块.</li>
+<li>_json (Modules/_json.c) (<a href="http://docs.python.org/library/json.html" target="_blank" rel="noopener">http://docs.python.org/library/json.html</a>) JSON 数据格式操作模块.</li>
+<li>xxsubtype (Modules/xxsubtype.c)  这是一个测试相关的模块. 运行 test_descr.py 时会用到.</li>
+<li>zipimport (Modules/zipimport.c) 这个模块主要用于从 zip 文件中导入 Python 的模块.</li>
+<li>zlib (Modules/zlibmodule.c) 这个模块提供了 zip 压缩和解压功能, 基于 GNU zip 实现.</li>
+<li>_multibytecodec, _codecs_cn, _codecs_hk, _codecs_iso2022, _codecs_jp, _codecs_kr, _codecs_tw (Modules/cjkcodecs/*) 这些模块提供了 CJK(中日韩统一表意文字) 的编码和解码. 去掉这部分可以减小 python 解释器 600 多 K.</li>
+<li>marshal (Python/marshal.c) (<a href="http://docs.python.org/library/marshal.html" target="_blank" rel="noopener">http://docs.python.org/library/marshal.html</a>) 为 Python 对象提供序列化的模块.</li>
+<li>imp (Python/import.c) (<a href="http://docs.python.org/library/imp.html" target="_blank" rel="noopener">http://docs.python.org/library/imp.html</a>) 这个模块提供了 Python 里的 import 语句的实现.</li>
+<li><strong>main</strong>, <strong>builtin</strong>, sys, exceptions, _warnings 这部分模块在 config.c 设置里只是一个名字占位符.</li>
+<li>_io (Modules/_iomodule.c) (<a href="http://docs.python.org/library/io.html" target="_blank" rel="noopener">http://docs.python.org/library/io.html</a>) 新版本的 Python 输入输出模块, 在 Python 3 中为默认的输入输出处理方法.</li>
+</ol>
+<h2 id="附二：Python-最佳编译依赖"><a href="#附二：Python-最佳编译依赖" class="headerlink" title="附二：Python 最佳编译依赖"></a>附二：Python 最佳编译依赖</h2><p>直接译自 <a href="https://gist.github.com/reorx/4067217" target="_blank" rel="noopener">Python Deployment</a>。</p>
+<p>键入如下命令自动安装一些依赖：<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="meta">get</span> <span class="keyword">build-dep </span>python2.<span class="number">7</span></span><br></pre></td></tr></table></figure></p>
+<p>确认安装如下列下的其他 -dev 包。</p>
+<ul>
+<li>python-dev</li>
+<li>libncurses5-dev</li>
+<li>libsqlite3-dev</li>
+<li>libbz2-dev</li>
+<li>libreadline-dev</li>
+<li>libdb4.8-dev</li>
+<li>tcl8.5-dev,tk8.5-dev</li>
+</ul>
+<p>下面这个包在 ubuntu 早期版本（如 10.04）并没有自动安装，需确认一下。</p>
+<ul>
+<li>libssl-dev</li>
+<li>libexpat1-dev</li>
+<li>libreadline6-dev</li>
+<li>libgtk2.0-dev</li>
+</ul>
+<p>如果想支持 xml 相关：</p>
+<ul>
+<li>libxml2-dev</li>
+<li>libxslt1-dev</li>
+</ul>
+<p>如果想支持 MySQLdb （在 pypi 中实际命令为 MySQL-python）：</p>
+<ul>
+<li>libmysqlclient-dev</li>
+</ul>
+<p>最终的 make 结果（编译结果）如能如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Python build finished, but <span class="keyword">the</span> necessary bits <span class="built_in">to</span> build these modules were <span class="keyword">not</span> found:</span><br><span class="line"><span class="title">_tkinter</span>           bsddb185           dl</span><br><span class="line">gdbm               imageop            sunaudiodev</span><br><span class="line">To find <span class="keyword">the</span> necessary bits, look <span class="keyword">in</span> setup.py <span class="keyword">in</span> detect_modules() <span class="keyword">for</span> <span class="keyword">the</span> module<span class="string">'s name.</span></span><br></pre></td></tr></table></figure>
+<p>这个编译 log 提示哪些模块没有被编译到，注意其中有一些并不是必需的或过时的：</p>
+<ul>
+<li>bsddb185: Older version of Oracle Berkeley DB. Undocumented. Install version 4.8 instead.</li>
+<li>dl: For 32-bit machines. Deprecated. Use ctypes instead.</li>
+<li>imageop: For 32-bit machines. Deprecated. Use PIL instead.</li>
+<li>sunaudiodev: For Sun hardware. Deprecated.</li>
+<li>_tkinter: For tkinter graphy library, unnecessary if you don’t develop tkinter programs.</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a></li>
+<li><a href="http://jyhshin.pixnet.net/blog/post/45780376-build-python-2.7.11-for-mips" target="_blank" rel="noopener">build python 2.7.11 for mips</a></li>
+<li><a href="https://gist.github.com/reorx/4067217" target="_blank" rel="noopener">Python Deployment</a></li>
+<li><a href="http://python-mips.blogspot.sg/" target="_blank" rel="noopener">How to cross compile python for MIPS</a></li>
+<li><a href="http://code.openhub.net/file?fid=gbEPeGEYo_iBj7isfd9QeVX7N8A&amp;cid=r3Ocm3qAuhY&amp;s=python&amp;fp=520151&amp;mp=&amp;projSelected=true#L0" target="_blank" rel="noopener">python-2.7-001-support-for-build.patch</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/交叉编译/" rel="tag"># 交叉编译</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201605/life/talk_about_research.html" rel="next" title="关于研究">
+                <i class="fa fa-chevron-left"></i> 关于研究
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201605/linux/wine_rtx.html" rel="prev" title="Linux 下使用 RTX">
+                Linux 下使用 RTX <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载、解压-python-源代码"><span class="nav-number">1.</span> <span class="nav-text">下载、解压 python 源代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入交叉编译-patch"><span class="nav-number">2.</span> <span class="nav-text">导入交叉编译 patch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-build-目录"><span class="nav-number">3.</span> <span class="nav-text">创建 build 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译本地-Python-与-pgen"><span class="nav-number">4.</span> <span class="nav-text">编译本地 Python 与 pgen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">5.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置交叉编译环境变量"><span class="nav-number">5.1.</span> <span class="nav-text">配置交叉编译环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#configure-配置"><span class="nav-number">5.2.</span> <span class="nav-text">configure 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">6.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">7.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">8.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译依赖"><span class="nav-number">8.1.</span> <span class="nav-text">编译依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境变量"><span class="nav-number">8.2.</span> <span class="nav-text">环境变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#裁剪考虑"><span class="nav-number">9.</span> <span class="nav-text">裁剪考虑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附一：Python-内建模块功能说明"><span class="nav-number">10.</span> <span class="nav-text">附一：Python 内建模块功能说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附二：Python-最佳编译依赖"><span class="nav-number">11.</span> <span class="nav-text">附二：Python 最佳编译依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">12.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201605/programmer/python/cross_compile.html";
+    this.page.identifier = "201605/programmer/python/cross_compile.html";
+    this.page.title = '交叉编译 python';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

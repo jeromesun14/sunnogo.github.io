@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Kconfig-frontends - “官方” standalone kconfig 工具，使用简介。">
+<meta name="keywords" content="kconfig,standalone,conf,menuconfig,defconfig,alldefconfig,configuration">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kconfig-frontends 简介">
+<meta property="og:url" content="http://sunyongfeng.com/201811/programmer/tools/kconfig-frontends.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Kconfig-frontends - “官方” standalone kconfig 工具，使用简介。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.085Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kconfig-frontends 简介">
+<meta name="twitter:description" content="Kconfig-frontends - “官方” standalone kconfig 工具，使用简介。">
+  <link rel="canonical" href="http://sunyongfeng.com/201811/programmer/tools/kconfig-frontends">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>kconfig-frontends 简介 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201811/programmer/tools/kconfig-frontends.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">kconfig-frontends 简介
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-01 09:14:22" itemprop="dateCreated datePublished" datetime="2018-11-01T09:14:22+08:00">2018-11-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201811/programmer/tools/kconfig-frontends.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201811/programmer/tools/kconfig-frontends.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Kconfig-frontends - “官方” standalone kconfig 工具，使用简介。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Kconfig + Kbuild 为内核编译的配置和编译框架。其中 Kconfig 作为一个典型的配置框架，被很多开发人员单独使用，典型的项目有 BuildRoot、uboot。</p>
+<p>也有一些人将 Kconfig 的源码从内核中剥出，作为一个独立的组件。比如:</p>
+<ul>
+<li><a href="https://github.com/ulfalizer/Kconfiglib" target="_blank" rel="noopener">Kconfiglib</a>, A flexible Python 2/3 Kconfig implementation and library</li>
+<li><a href="https://github.com/guillon/kconfig" target="_blank" rel="noopener">guillon/kconfig</a>, 通过 kconfig/config.sh 脚本，实现 kconfig 编译和目标运行</li>
+<li><a href="http://ymorin.is-a-geek.org/projects/kconfig-frontends" target="_blank" rel="noopener">kconfig-frontends</a>，与内核一起发布，有点官方 standalone kconfig 的意思。需要编译、安装，之后通过 kconfig-conf 等命令运行。</li>
+</ul>
+<p>这里介绍 Kconfig-frontend 从零到使用的过程。</p>
+<h2 id="下载编译"><a href="#下载编译" class="headerlink" title="下载编译"></a>下载编译</h2><ol>
+<li>wget <a href="http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.19.0.0.tar.xz" target="_blank" rel="noopener">http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.19.0.0.tar.xz</a></li>
+<li>tar xvf kconfig-frontends-3.19.0.0.tar.xz </li>
+<li>sudo apt-get install gperf</li>
+<li>./configure –enable-conf –enable-mconf –disable-shared –enable-static</li>
+<li>make</li>
+<li>make install</li>
+</ol>
+<h2 id="使用记录"><a href="#使用记录" class="headerlink" title="使用记录"></a>使用记录</h2><h3 id="类-make-alldefconfig"><a href="#类-make-alldefconfig" class="headerlink" title="类 make alldefconfig"></a>类 make alldefconfig</h3><ul>
+<li><code>kconfig-conf --alldefconfig Kconfig</code>，其中文件 Kconfig 为配置入口。</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">jeromesun<span class="variable">@kmcb0220</span><span class="symbol">:~/workshop/hello</span><span class="variable">$ </span>kconfig-conf --alldefconfig Kconfig </span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># configuration written to .config</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">jeromesun<span class="variable">@kmcb0220</span><span class="symbol">:~/workshop/hello</span><span class="variable">$ </span>ls</span><br><span class="line">configs  hello.c  hello.d  hello.o  Kconfig  lib  Makefile</span><br><span class="line">jeromesun<span class="variable">@kmcb0220</span><span class="symbol">:~/workshop/hello</span><span class="variable">$ </span>vi .config </span><br><span class="line">  <span class="number">1</span> <span class="comment">#</span></span><br><span class="line">  <span class="number">2</span> <span class="comment"># Automatically generated file; DO NOT EDIT.</span></span><br><span class="line">  <span class="number">3</span> <span class="comment"># MYAPP Configuration</span></span><br><span class="line">  <span class="number">4</span> <span class="comment">#</span></span><br><span class="line">  <span class="number">5</span> CONFIG_CROSS_COMPILE=<span class="string">""</span></span><br><span class="line">  <span class="number">6</span> CONFIG_ENABLE_LOGGING=y</span><br><span class="line">  <span class="number">7</span> CONFIG_DEFAULT_LOGLEVEL=<span class="number">3</span></span><br><span class="line">  <span class="number">8</span> CONFIG_LOGGING_TIME=y</span><br><span class="line">  <span class="number">9</span> <span class="comment"># CONFIG_DEBUG_LIST is not set</span></span><br><span class="line"> <span class="number">10</span> <span class="comment"># CONFIG_FOO is not set</span></span><br></pre></td></tr></table></figure>
+<h3 id="类-make-menuconfig"><a href="#类-make-menuconfig" class="headerlink" title="类 make menuconfig"></a>类 make menuconfig</h3><ul>
+<li><code>kconfig-mconf Kconfig</code></li>
+</ul>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@kmcb0220:~/workshop/hello$ kconfig-mconf Kconfig</span><br><span class="line"> .config - MYAPP Configuration</span><br><span class="line"> ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">  ┌───────────────────────────────────────────── MYAPP Configuration ─────────────────────────────────────────────┐</span><br><span class="line">  │  Arrow keys navigate the menu.  <span class="variable">&lt;Enter&gt;</span> selects submenus ---&gt; (or empty submenus ----).  Highlighted letters  │  </span><br><span class="line">  │  are hotkeys.  Pressing <span class="variable">&lt;Y&gt;</span> includes, <span class="variable">&lt;N&gt;</span> excludes, <span class="variable">&lt;M&gt;</span> modularizes features.  Press <span class="variable">&lt;Esc&gt;</span><span class="variable">&lt;Esc&gt;</span> <span class="keyword">to</span> exit, <span class="variable">&lt;?&gt;</span>  │  </span><br><span class="line">  │  <span class="keyword">for</span> Help, &lt;/&gt; <span class="keyword">for</span> Search.  Legend: [*] built-in  [ ] excluded  <span class="variable">&lt;M&gt;</span> module  <span class="variable">&lt; &gt;</span> module capable                │  </span><br><span class="line">  │                                                                                                               │  </span><br><span class="line">  │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │  </span><br><span class="line">  │ │                  ()  Cross-compiler tool prefix                                                           │ │  </span><br><span class="line">  │ │                  [*] Enable <span class="keyword">log</span> functions                                                                 │ │  </span><br><span class="line">  │ │                  (<span class="number">3</span>)   Default message <span class="keyword">log</span> level (<span class="number">1</span>-<span class="number">4</span>)                                                    │ │  </span><br><span class="line">  │ │                  [*]   Show timing information <span class="keyword">on</span> <span class="keyword">log</span> functions                                           │ │  </span><br><span class="line">  │ │                  [ ] Debug linked list manipulation                                                       │ │  </span><br><span class="line">  │ │                  [ ] Foo                                                                                  │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ │                                                                                                           │ │  </span><br><span class="line">  │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │  </span><br><span class="line">  ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤  </span><br><span class="line">  │                           <span class="variable">&lt;Select&gt;</span>    <span class="variable">&lt; Exit &gt;</span>    <span class="variable">&lt; Help &gt;</span>    <span class="variable">&lt; Save &gt;</span>    <span class="variable">&lt; Load &gt;</span>                            │  </span><br><span class="line">  └───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  </span><br><span class="line">                                                                                                                     </span><br><span class="line">configuration written <span class="keyword">to</span> .config</span><br><span class="line"></span><br><span class="line">*** End of the configuration.</span><br><span class="line">*** Execute 'make' <span class="keyword">to</span> start the build or try 'make help'.</span><br><span class="line"></span><br><span class="line">jeromesun@kmcb0220:~/workshop/hello$ cat .config</span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Automatically generated file; DO NOT EDIT.</span></span><br><span class="line"><span class="comment"># MYAPP Configuration</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">CONFIG_CROSS_COMPILE=<span class="string">""</span></span><br><span class="line">CONFIG_ENABLE_LOGGING=y</span><br><span class="line">CONFIG_DEFAULT_LOGLEVEL=<span class="number">3</span></span><br><span class="line">CONFIG_LOGGING_TIME=y</span><br><span class="line"><span class="comment"># CONFIG_DEBUG_LIST is not set</span></span><br><span class="line">CONFIG_FOO=y</span><br><span class="line">CONFIG_BAR=y</span><br></pre></td></tr></table></figure>
+<h2 id="编译-log"><a href="#编译-log" class="headerlink" title="编译 log"></a>编译 log</h2><h3 id="下载、解压"><a href="#下载、解压" class="headerlink" title="下载、解压"></a>下载、解压</h3><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">jeromesun@km:</span>~/workshop$ wget http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz</span><br><span class="line">--<span class="number">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">23</span>:<span class="number">21</span>:<span class="number">48</span>--  http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz</span><br><span class="line">Resolving ymorin.is-a-geek.org (ymorin.is-a-geek.org)... <span class="number">90.76</span><span class="meta">.108</span><span class="meta">.19</span></span><br><span class="line">Connecting to ymorin.is-a-geek.org (ymorin.is-a-geek.org)|<span class="number">90.76</span><span class="meta">.108</span><span class="meta">.19</span>|:<span class="number">80</span>... connected.</span><br><span class="line">HTTP request sent, awaiting response... <span class="number">200</span> OK</span><br><span class="line"><span class="symbol">Length:</span> <span class="number">370660</span> (362K) [application/octet-stream]</span><br><span class="line">Saving to: ‘kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz’</span><br><span class="line"></span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz  <span class="number">100</span>%[===============================================================&gt;] <span class="number">361.</span>97K  <span class="number">14.</span>2KB/s    <span class="keyword">in</span> 17s     </span><br><span class="line"></span><br><span class="line"><span class="number">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">23</span>:<span class="number">22</span>:<span class="number">06</span> (<span class="number">21.5</span> KB/s) - ‘kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz’ saved [<span class="number">370660</span>/<span class="number">370660</span>]</span><br><span class="line"></span><br><span class="line"><span class="symbol">jeromesun@km:</span>~/workshop$ </span><br><span class="line"><span class="symbol">jeromesun@km:</span>~/workshop$ tar xvf kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>.tar.xz </span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/qconf.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/qconf.cc.patch</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/qconf.cc</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/qconf/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/conf/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/conf/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/conf/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/conf/conf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/gconf.glade</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/gconf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/gconf.c.patch</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/gconf/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/mconf/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/mconf/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/mconf/mconf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/mconf/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/nconf.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/nconf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/frontends/nconf/nconf.gui.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/INSTALL</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/tweak.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/merge</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/gettext.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/diff</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/utils/tweak.in.patch</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/README</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/aclocal.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/COPYING</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/AUTHORS</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/images/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/images/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/images/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/images/images.c_orig</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/util.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/checklist.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/yesno.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/menubox.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/dialog.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/textbox.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/lxdialog/inputbox.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/util.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/yconf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/yconf.y.patch</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/lkc_proto.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/confdata.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/symbol.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/lkc.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/yconf.y</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/list.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/expr.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/menu.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/expr.h</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/hconf.gperf</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/lconf.l</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/libs/parser/lconf.c</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/version.sh</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/ksync.list</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/ksync.sh</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/missing</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/depcomp</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/config.sub</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/ar-lib</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/ltmain.sh</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/compile</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/config.guess</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/ylwrap</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/scripts/install-sh</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/lt~obsolete.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/ltoptions.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/libtool.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/ltversion.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/m4/ltsugar.m4</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/scripts/.autostuff/config.h.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/bootstrap</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/.version</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/Makefile.am</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/configure</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/configure.ac</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/docs/</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/docs/kconfig-language.txt</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/docs/kconfig.txt</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/docs/Makefile.in</span><br><span class="line">kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/docs/Makefile.am</span><br><span class="line"><span class="symbol">jeromesun@km:</span>~/workshop$ cd kconfig-frontends-<span class="number">3.19</span><span class="meta">.0</span><span class="meta">.0</span>/</span><br></pre></td></tr></table></figure>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>如果没安装 gperf 会提示 <code>configure: error: can not find gperf</code>。</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop/kconfig-frontends-<span class="number">3.19</span>.<span class="number">0.0</span>$ ./configure <span class="comment">--help</span></span><br><span class="line">`configure' configures kconfig-frontends <span class="number">3.19</span>.<span class="number">0.0</span> <span class="keyword">to</span> adapt <span class="keyword">to</span> many kinds <span class="keyword">of</span> systems.</span><br><span class="line"></span><br><span class="line">Usage: ./configure [OPTION]... [VAR=VALUE]...</span><br><span class="line"></span><br><span class="line"><span class="keyword">To</span> assign environment variables (e.g., CC, CFLAGS...), specify them as</span><br><span class="line">VAR=VALUE.  See below <span class="keyword">for</span> descriptions <span class="keyword">of</span> some <span class="keyword">of</span> the useful variables.</span><br><span class="line"></span><br><span class="line">Defaults <span class="keyword">for</span> the options are specified <span class="keyword">in</span> brackets.</span><br><span class="line"></span><br><span class="line"><span class="keyword">Configuration</span>:</span><br><span class="line">  -h, <span class="comment">--help              display this help and exit</span></span><br><span class="line">      <span class="comment">--help=short        display options specific to this package</span></span><br><span class="line">      <span class="comment">--help=recursive    display the short help of all the included packages</span></span><br><span class="line">  -V, <span class="comment">--version           display version information and exit</span></span><br><span class="line">  -q, <span class="comment">--quiet, --silent   do not print `checking ...' messages</span></span><br><span class="line">      <span class="comment">--cache-file=FILE   cache test results in FILE [disabled]</span></span><br><span class="line">  -C, <span class="comment">--config-cache      alias for `--cache-file=config.cache'</span></span><br><span class="line">  -n, <span class="comment">--no-create         do not create output files</span></span><br><span class="line">      <span class="comment">--srcdir=DIR        find the sources in DIR [configure dir or `..']</span></span><br><span class="line"></span><br><span class="line">Installation directories:</span><br><span class="line">  <span class="comment">--prefix=PREFIX         install architecture-independent files in PREFIX</span></span><br><span class="line">                          [/usr/local]</span><br><span class="line">  <span class="comment">--exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX</span></span><br><span class="line">                          [PREFIX]</span><br><span class="line"></span><br><span class="line">By <span class="keyword">default</span>, `make install' will install <span class="keyword">all</span> the files <span class="keyword">in</span></span><br><span class="line">`/usr/local/bin', `/usr/local/lib' etc.  You can specify</span><br><span class="line">an installation prefix other than `/usr/local' using `<span class="comment">--prefix',</span></span><br><span class="line"><span class="keyword">for</span> instance `<span class="comment">--prefix=$HOME'.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">For</span> better control, <span class="keyword">use</span> the options below.</span><br><span class="line"></span><br><span class="line">Fine tuning <span class="keyword">of</span> the installation directories:</span><br><span class="line">  <span class="comment">--bindir=DIR            user executables [EPREFIX/bin]</span></span><br><span class="line">  <span class="comment">--sbindir=DIR           system admin executables [EPREFIX/sbin]</span></span><br><span class="line">  <span class="comment">--libexecdir=DIR        program executables [EPREFIX/libexec]</span></span><br><span class="line">  <span class="comment">--sysconfdir=DIR        read-only single-machine data [PREFIX/etc]</span></span><br><span class="line">  <span class="comment">--sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]</span></span><br><span class="line">  <span class="comment">--localstatedir=DIR     modifiable single-machine data [PREFIX/var]</span></span><br><span class="line">  <span class="comment">--runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]</span></span><br><span class="line">  <span class="comment">--libdir=DIR            object code libraries [EPREFIX/lib]</span></span><br><span class="line">  <span class="comment">--includedir=DIR        C header files [PREFIX/include]</span></span><br><span class="line">  <span class="comment">--oldincludedir=DIR     C header files for non-gcc [/usr/include]</span></span><br><span class="line">  <span class="comment">--datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]</span></span><br><span class="line">  <span class="comment">--datadir=DIR           read-only architecture-independent data [DATAROOTDIR]</span></span><br><span class="line">  <span class="comment">--infodir=DIR           info documentation [DATAROOTDIR/info]</span></span><br><span class="line">  <span class="comment">--localedir=DIR         locale-dependent data [DATAROOTDIR/locale]</span></span><br><span class="line">  <span class="comment">--mandir=DIR            man documentation [DATAROOTDIR/man]</span></span><br><span class="line">  <span class="comment">--docdir=DIR            documentation root</span></span><br><span class="line">                          [DATAROOTDIR/doc/kconfig-frontends]</span><br><span class="line">  <span class="comment">--htmldir=DIR           html documentation [DOCDIR]</span></span><br><span class="line">  <span class="comment">--dvidir=DIR            dvi documentation [DOCDIR]</span></span><br><span class="line">  <span class="comment">--pdfdir=DIR            pdf documentation [DOCDIR]</span></span><br><span class="line">  <span class="comment">--psdir=DIR             ps documentation [DOCDIR]</span></span><br><span class="line"></span><br><span class="line">Program names:</span><br><span class="line">  <span class="comment">--program-prefix=PREFIX            prepend PREFIX to installed program names</span></span><br><span class="line">  <span class="comment">--program-suffix=SUFFIX            append SUFFIX to installed program names</span></span><br><span class="line">  <span class="comment">--program-transform-name=PROGRAM   run sed PROGRAM on installed program names</span></span><br><span class="line"></span><br><span class="line">System types:</span><br><span class="line">  <span class="comment">--build=BUILD     configure for building on BUILD [guessed]</span></span><br><span class="line">  <span class="comment">--host=HOST       cross-compile to build programs to run on HOST [BUILD]</span></span><br><span class="line"></span><br><span class="line">Optional Features:</span><br><span class="line">  <span class="comment">--disable-option-checking  ignore unrecognized --enable/--with options</span></span><br><span class="line">  <span class="comment">--disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)</span></span><br><span class="line">  <span class="comment">--enable-FEATURE[=ARG]  include FEATURE [ARG=yes]</span></span><br><span class="line">  <span class="comment">--enable-silent-rules   less verbose build output (undo: "make V=1")</span></span><br><span class="line">  <span class="comment">--disable-silent-rules  verbose build output (undo: "make V=0")</span></span><br><span class="line">  <span class="comment">--enable-dependency-tracking</span></span><br><span class="line">                          do <span class="keyword">not</span> <span class="keyword">reject</span> slow dependency extractors</span><br><span class="line">  <span class="comment">--disable-dependency-tracking</span></span><br><span class="line">                          speeds up one-<span class="built_in">time</span> build</span><br><span class="line">  <span class="comment">--enable-static[=PKGS]  build static libraries [default=no]</span></span><br><span class="line">  <span class="comment">--enable-shared[=PKGS]  build shared libraries [default=yes]</span></span><br><span class="line">  <span class="comment">--enable-fast-install[=PKGS]</span></span><br><span class="line">                          optimize <span class="keyword">for</span> fast installation [<span class="keyword">default</span>=yes]</span><br><span class="line">  <span class="comment">--disable-libtool-lock  avoid locking (might break parallel builds)</span></span><br><span class="line">  <span class="comment">--disable-wall          build with -Wall (default=yes)</span></span><br><span class="line">  <span class="comment">--enable-werror         build with -Werror (default=no)</span></span><br><span class="line">  <span class="comment">--enable-root-menu-prompt=PROMPT</span></span><br><span class="line">                          set the root-menu prompt (<span class="keyword">default</span>=<span class="keyword">Configuration</span>)</span><br><span class="line">  <span class="comment">--enable-config-prefix=PREFIX</span></span><br><span class="line">                          the prefix <span class="keyword">to</span> the config option (<span class="keyword">default</span>=CONFIG_)</span><br><span class="line">  <span class="comment">--disable-utils         install utilities to manage .config files</span></span><br><span class="line">                          (<span class="keyword">default</span>=yes)</span><br><span class="line">  <span class="comment">--disable-L10n          enable localisation (L10n) (default=auto)</span></span><br><span class="line">  <span class="comment">--disable-conf          conf, the stdin-based frontend (default=auto)</span></span><br><span class="line">  <span class="comment">--disable-mconf         mconf, the traditional ncurses-based frontend</span></span><br><span class="line">                          (<span class="keyword">default</span>=auto)</span><br><span class="line">  <span class="comment">--disable-nconf         nconf, the modern ncurses-based frontend</span></span><br><span class="line">                          (<span class="keyword">default</span>=auto)</span><br><span class="line">  <span class="comment">--disable-gconf         gconf, the GTK-based frontend (default=auto)</span></span><br><span class="line">  <span class="comment">--disable-qconf         qconf, the QT-based frontend (default=auto)</span></span><br><span class="line">  <span class="comment">--enable-frontends=list enables only the set of frontends in comma-separated</span></span><br><span class="line">                          <span class="symbol">'list</span>' (<span class="keyword">default</span>: auto selection), takes precedence</span><br><span class="line">                          over <span class="keyword">all</span> <span class="comment">--enable-*conf, above</span></span><br><span class="line"></span><br><span class="line">Optional Packages:</span><br><span class="line">  <span class="comment">--with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]</span></span><br><span class="line">  <span class="comment">--without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)</span></span><br><span class="line">  <span class="comment">--with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use</span></span><br><span class="line">                          both]</span><br><span class="line">  <span class="comment">--with-aix-soname=aix|svr4|both</span></span><br><span class="line">                          <span class="keyword">shared</span> <span class="keyword">library</span> versioning (aka <span class="string">"SONAME"</span>) variant <span class="keyword">to</span></span><br><span class="line">                          provide <span class="keyword">on</span> AIX, [<span class="keyword">default</span>=aix].</span><br><span class="line">  <span class="comment">--with-gnu-ld           assume the C compiler uses GNU ld [default=no]</span></span><br><span class="line">  <span class="comment">--with-sysroot[=DIR]    Search for dependent libraries within DIR (or the</span></span><br><span class="line">                          compiler<span class="symbol">'s</span> sysroot <span class="keyword">if</span> <span class="keyword">not</span> specified).</span><br><span class="line"></span><br><span class="line">Some influential environment variables:</span><br><span class="line">  CC          C compiler command</span><br><span class="line">  CFLAGS      C compiler flags</span><br><span class="line">  LDFLAGS     linker flags, e.g. -L&lt;lib dir&gt; <span class="keyword">if</span> you have libraries <span class="keyword">in</span> a</span><br><span class="line">              nonstandard directory &lt;lib dir&gt;</span><br><span class="line">  LIBS        libraries <span class="keyword">to</span> pass <span class="keyword">to</span> the linker, e.g. -l&lt;<span class="keyword">library</span>&gt;</span><br><span class="line">  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I&lt;include dir&gt; <span class="keyword">if</span></span><br><span class="line">              you have headers <span class="keyword">in</span> a nonstandard directory &lt;include dir&gt;</span><br><span class="line">  LT_SYS_LIBRARY_PATH</span><br><span class="line">              User-defined run-<span class="built_in">time</span> <span class="keyword">library</span> search path.</span><br><span class="line">  CPP         C preprocessor</span><br><span class="line">  CXX         C++ compiler command</span><br><span class="line">  CXXFLAGS    C++ compiler flags</span><br><span class="line">  CXXCPP      C++ preprocessor</span><br><span class="line">  PKG_CONFIG  path <span class="keyword">to</span> pkg-config utility</span><br><span class="line">  PKG_CONFIG_PATH</span><br><span class="line">              directories <span class="keyword">to</span> add <span class="keyword">to</span> pkg-config<span class="symbol">'s</span> search path</span><br><span class="line">  PKG_CONFIG_LIBDIR</span><br><span class="line">              path overriding pkg-config<span class="symbol">'s</span> built-<span class="keyword">in</span> search path</span><br><span class="line">  YACC        The `Yet Another Compiler Compiler' implementation <span class="keyword">to</span> <span class="keyword">use</span>.</span><br><span class="line">              Defaults <span class="keyword">to</span> the first program found <span class="keyword">out</span> <span class="keyword">of</span>: `bison -y', `byacc',</span><br><span class="line">              `yacc'.</span><br><span class="line">  YFLAGS      The list <span class="keyword">of</span> arguments that will be passed by <span class="keyword">default</span> <span class="keyword">to</span> $YACC.</span><br><span class="line">              This script will <span class="keyword">default</span> YFLAGS <span class="keyword">to</span> the empty <span class="built_in">string</span> <span class="keyword">to</span> avoid a</span><br><span class="line">              <span class="keyword">default</span> value <span class="keyword">of</span> `-d' given by some make applications.</span><br><span class="line">  gtk_CFLAGS  C compiler flags <span class="keyword">for</span> gtk, overriding pkg-config</span><br><span class="line">  gtk_LIBS    linker flags <span class="keyword">for</span> gtk, overriding pkg-config</span><br><span class="line">  qt4_CFLAGS  C compiler flags <span class="keyword">for</span> qt4, overriding pkg-config</span><br><span class="line">  qt4_LIBS    linker flags <span class="keyword">for</span> qt4, overriding pkg-config</span><br><span class="line">  MOC         Qt meta object compiler (moc) command</span><br><span class="line">  conf_EXTRA_LIBS</span><br><span class="line">              Extra libraries <span class="keyword">to</span> build the conf frontend</span><br><span class="line">  gconf_EXTRA_LIBS</span><br><span class="line">              Extra libraries <span class="keyword">to</span> build the gconf frontend</span><br><span class="line">  mconf_EXTRA_LIBS</span><br><span class="line">              Extra libraries <span class="keyword">to</span> build the mconf frontend</span><br><span class="line">  nconf_EXTRA_LIBS</span><br><span class="line">              Extra libraries <span class="keyword">to</span> build the nconf frontend</span><br><span class="line">  qconf_EXTRA_LIBS</span><br><span class="line">              Extra libraries <span class="keyword">to</span> build the qconf frontend</span><br><span class="line"></span><br><span class="line"><span class="keyword">Use</span> these variables <span class="keyword">to</span> override the choices made by `configure' <span class="keyword">or</span> <span class="keyword">to</span> help</span><br><span class="line">it <span class="keyword">to</span> find libraries <span class="keyword">and</span> programs <span class="keyword">with</span> nonstandard names/locations.</span><br><span class="line"></span><br><span class="line"><span class="keyword">Report</span> bugs <span class="keyword">to</span> &lt;yann.morin.<span class="number">1998</span>@free.fr&gt;.</span><br><span class="line">jeromesun@km:~/workshop/kconfig-frontends-<span class="number">3.19</span>.<span class="number">0.0</span>$ ./configure <span class="comment">--enable-conf --enable-mconf --disable-shared --enable-static</span></span><br><span class="line">checking <span class="keyword">for</span> a BSD-compatible install... /usr/bin/install -c</span><br><span class="line">checking whether build environment <span class="keyword">is</span> sane... yes</span><br><span class="line">checking <span class="keyword">for</span> a thread-safe mkdir -p... /bin/mkdir -p</span><br><span class="line">checking <span class="keyword">for</span> gawk... no</span><br><span class="line">checking <span class="keyword">for</span> mawk... mawk</span><br><span class="line">checking whether make sets $(MAKE)... yes</span><br><span class="line">checking whether make supports nested variables... yes</span><br><span class="line">checking whether make supports nested variables... (cached) yes</span><br><span class="line">checking <span class="keyword">for</span> style <span class="keyword">of</span> include used by make... GNU</span><br><span class="line">checking <span class="keyword">for</span> gcc... gcc</span><br><span class="line">checking whether the C compiler works... yes</span><br><span class="line">checking <span class="keyword">for</span> C compiler <span class="keyword">default</span> output <span class="keyword">file</span> name... a.<span class="keyword">out</span></span><br><span class="line">checking <span class="keyword">for</span> suffix <span class="keyword">of</span> executables... </span><br><span class="line">checking whether we are cross compiling... no</span><br><span class="line">checking <span class="keyword">for</span> suffix <span class="keyword">of</span> object files... o</span><br><span class="line">checking whether we are using the GNU C compiler... yes</span><br><span class="line">checking whether gcc accepts -g... yes</span><br><span class="line">checking <span class="keyword">for</span> gcc option <span class="keyword">to</span> accept ISO C89... none needed</span><br><span class="line">checking whether gcc understands -c <span class="keyword">and</span> -o together... yes</span><br><span class="line">checking dependency style <span class="keyword">of</span> gcc... gcc3</span><br><span class="line">checking <span class="keyword">for</span> ar... ar</span><br><span class="line">checking the archiver (ar) interface... ar</span><br><span class="line">checking build system <span class="keyword">type</span>... x86_64-pc-linux-gnu</span><br><span class="line">checking host system <span class="keyword">type</span>... x86_64-pc-linux-gnu</span><br><span class="line">checking how <span class="keyword">to</span> print strings... printf</span><br><span class="line">checking <span class="keyword">for</span> a sed that does <span class="keyword">not</span> truncate output... /bin/sed</span><br><span class="line">checking <span class="keyword">for</span> grep that handles long lines <span class="keyword">and</span> -e... /bin/grep</span><br><span class="line">checking <span class="keyword">for</span> egrep... /bin/grep -E</span><br><span class="line">checking <span class="keyword">for</span> fgrep... /bin/grep -F</span><br><span class="line">checking <span class="keyword">for</span> ld used by gcc... /usr/bin/ld</span><br><span class="line">checking <span class="keyword">if</span> the linker (/usr/bin/ld) <span class="keyword">is</span> GNU ld... yes</span><br><span class="line">checking <span class="keyword">for</span> BSD- <span class="keyword">or</span> MS-compatible name lister (nm)... /usr/bin/nm -B</span><br><span class="line">checking the name lister (/usr/bin/nm -B) interface... BSD nm</span><br><span class="line">checking whether ln -s works... yes</span><br><span class="line">checking the maximum length <span class="keyword">of</span> command <span class="literal">line</span> arguments... <span class="number">1572864</span></span><br><span class="line">checking how <span class="keyword">to</span> convert x86_64-pc-linux-gnu <span class="keyword">file</span> names <span class="keyword">to</span> x86_64-pc-linux-gnu format... func_convert_file_noop</span><br><span class="line">checking how <span class="keyword">to</span> convert x86_64-pc-linux-gnu <span class="keyword">file</span> names <span class="keyword">to</span> toolchain format... func_convert_file_noop</span><br><span class="line">checking <span class="keyword">for</span> /usr/bin/ld option <span class="keyword">to</span> reload object files... -r</span><br><span class="line">checking <span class="keyword">for</span> objdump... objdump</span><br><span class="line">checking how <span class="keyword">to</span> recognize dependent libraries... pass_all</span><br><span class="line">checking <span class="keyword">for</span> dlltool... no</span><br><span class="line">checking how <span class="keyword">to</span> associate runtime <span class="keyword">and</span> link libraries... printf %s\n</span><br><span class="line">checking <span class="keyword">for</span> archiver @<span class="keyword">FILE</span> support... @</span><br><span class="line">checking <span class="keyword">for</span> strip... strip</span><br><span class="line">checking <span class="keyword">for</span> ranlib... ranlib</span><br><span class="line">checking command <span class="keyword">to</span> parse /usr/bin/nm -B output from gcc object... ok</span><br><span class="line">checking <span class="keyword">for</span> sysroot... no</span><br><span class="line">checking <span class="keyword">for</span> a working dd... /bin/dd</span><br><span class="line">checking how <span class="keyword">to</span> truncate binary pipes... /bin/dd bs=<span class="number">4096</span> count=<span class="number">1</span></span><br><span class="line">checking <span class="keyword">for</span> mt... mt</span><br><span class="line">checking <span class="keyword">if</span> mt <span class="keyword">is</span> a manifest tool... no</span><br><span class="line">checking how <span class="keyword">to</span> run the C preprocessor... gcc -E</span><br><span class="line">checking <span class="keyword">for</span> ANSI C header files... yes</span><br><span class="line">checking <span class="keyword">for</span> sys/types.h... yes</span><br><span class="line">checking <span class="keyword">for</span> sys/stat.h... yes</span><br><span class="line">checking <span class="keyword">for</span> stdlib.h... yes</span><br><span class="line">checking <span class="keyword">for</span> <span class="built_in">string</span>.h... yes</span><br><span class="line">checking <span class="keyword">for</span> memory.h... yes</span><br><span class="line">checking <span class="keyword">for</span> strings.h... yes</span><br><span class="line">checking <span class="keyword">for</span> inttypes.h... yes</span><br><span class="line">checking <span class="keyword">for</span> stdint.h... yes</span><br><span class="line">checking <span class="keyword">for</span> unistd.h... yes</span><br><span class="line">checking <span class="keyword">for</span> dlfcn.h... yes</span><br><span class="line">checking <span class="keyword">for</span> objdir... .libs</span><br><span class="line">checking <span class="keyword">if</span> gcc supports -fno-rtti -fno-exceptions... no</span><br><span class="line">checking <span class="keyword">for</span> gcc option <span class="keyword">to</span> produce PIC... -fPIC -DPIC</span><br><span class="line">checking <span class="keyword">if</span> gcc PIC flag -fPIC -DPIC works... yes</span><br><span class="line">checking <span class="keyword">if</span> gcc static flag -static works... yes</span><br><span class="line">checking <span class="keyword">if</span> gcc supports -c -o <span class="keyword">file</span>.o... yes</span><br><span class="line">checking <span class="keyword">if</span> gcc supports -c -o <span class="keyword">file</span>.o... (cached) yes</span><br><span class="line">checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports <span class="keyword">shared</span> libraries... yes</span><br><span class="line">checking dynamic linker characteristics... GNU/Linux ld.so</span><br><span class="line">checking how <span class="keyword">to</span> hardcode <span class="keyword">library</span> paths into programs... immediate</span><br><span class="line">checking whether stripping libraries <span class="keyword">is</span> possible... yes</span><br><span class="line">checking <span class="keyword">if</span> libtool supports <span class="keyword">shared</span> libraries... yes</span><br><span class="line">checking whether <span class="keyword">to</span> build <span class="keyword">shared</span> libraries... no</span><br><span class="line">checking whether <span class="keyword">to</span> build static libraries... yes</span><br><span class="line">checking <span class="keyword">for</span> gcc... (cached) gcc</span><br><span class="line">checking whether we are using the GNU C compiler... (cached) yes</span><br><span class="line">checking whether gcc accepts -g... (cached) yes</span><br><span class="line">checking <span class="keyword">for</span> gcc option <span class="keyword">to</span> accept ISO C89... (cached) none needed</span><br><span class="line">checking whether gcc understands -c <span class="keyword">and</span> -o together... (cached) yes</span><br><span class="line">checking dependency style <span class="keyword">of</span> gcc... (cached) gcc3</span><br><span class="line">checking <span class="keyword">for</span> g++... g++</span><br><span class="line">checking whether we are using the GNU C++ compiler... yes</span><br><span class="line">checking whether g++ accepts -g... yes</span><br><span class="line">checking dependency style <span class="keyword">of</span> g++... gcc3</span><br><span class="line">checking how <span class="keyword">to</span> run the C++ preprocessor... g++ -E</span><br><span class="line">checking <span class="keyword">for</span> ld used by g++... /usr/bin/ld -m elf_x86_64</span><br><span class="line">checking <span class="keyword">if</span> the linker (/usr/bin/ld -m elf_x86_64) <span class="keyword">is</span> GNU ld... yes</span><br><span class="line">checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports <span class="keyword">shared</span> libraries... yes</span><br><span class="line">checking <span class="keyword">for</span> g++ option <span class="keyword">to</span> produce PIC... -fPIC -DPIC</span><br><span class="line">checking <span class="keyword">if</span> g++ PIC flag -fPIC -DPIC works... yes</span><br><span class="line">checking <span class="keyword">if</span> g++ static flag -static works... yes</span><br><span class="line">checking <span class="keyword">if</span> g++ supports -c -o <span class="keyword">file</span>.o... yes</span><br><span class="line">checking <span class="keyword">if</span> g++ supports -c -o <span class="keyword">file</span>.o... (cached) yes</span><br><span class="line">checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports <span class="keyword">shared</span> libraries... yes</span><br><span class="line">checking dynamic linker characteristics... (cached) GNU/Linux ld.so</span><br><span class="line">checking how <span class="keyword">to</span> hardcode <span class="keyword">library</span> paths into programs... immediate</span><br><span class="line">checking <span class="keyword">for</span> inline... inline</span><br><span class="line">checking whether make sets $(MAKE)... (cached) yes</span><br><span class="line">checking <span class="keyword">for</span> gperf... gperf</span><br><span class="line">checking <span class="keyword">for</span> pkg-config... /usr/bin/pkg-config</span><br><span class="line">checking pkg-config <span class="keyword">is</span> at least version <span class="number">0.9</span>.<span class="number">0</span>... yes</span><br><span class="line">checking <span class="keyword">for</span> flex... flex</span><br><span class="line">checking lex output <span class="keyword">file</span> root... lex.yy</span><br><span class="line">checking lex <span class="keyword">library</span>... -lfl</span><br><span class="line">checking whether yytext <span class="keyword">is</span> a pointer... yes</span><br><span class="line">checking <span class="keyword">for</span> bison... bison -y</span><br><span class="line">checking libintl.h usability... yes</span><br><span class="line">checking libintl.h presence... yes</span><br><span class="line">checking <span class="keyword">for</span> libintl.h... yes</span><br><span class="line">checking whether gettext <span class="keyword">is</span> declared... yes</span><br><span class="line">checking <span class="keyword">for</span> <span class="keyword">library</span> containing gettext... none required</span><br><span class="line">checking ncursesw/curses.h usability... yes</span><br><span class="line">checking ncursesw/curses.h presence... yes</span><br><span class="line">checking <span class="keyword">for</span> ncursesw/curses.h... yes</span><br><span class="line">checking <span class="keyword">for</span> <span class="keyword">library</span> containing setupterm... -ltinfo</span><br><span class="line">checking <span class="keyword">for</span> <span class="keyword">library</span> containing initscr... -lncursesw</span><br><span class="line">checking <span class="keyword">for</span> <span class="keyword">library</span> containing new_panel... -lpanelw</span><br><span class="line">checking <span class="keyword">for</span> <span class="keyword">library</span> containing menu_init... -lmenuw</span><br><span class="line">checking <span class="keyword">for</span> gtk... no</span><br><span class="line">checking <span class="keyword">for</span> qt4... no</span><br><span class="line">checking that generated files are newer than configure... done</span><br><span class="line">configure: creating ./config.status</span><br><span class="line">config.status: creating Makefile</span><br><span class="line">config.status: creating docs/Makefile</span><br><span class="line">config.status: creating libs/Makefile</span><br><span class="line">config.status: creating libs/images/Makefile</span><br><span class="line">config.status: creating libs/lxdialog/Makefile</span><br><span class="line">config.status: creating libs/parser/Makefile</span><br><span class="line">config.status: creating frontends/Makefile</span><br><span class="line">config.status: creating frontends/conf/Makefile</span><br><span class="line">config.status: creating frontends/mconf/Makefile</span><br><span class="line">config.status: creating frontends/nconf/Makefile</span><br><span class="line">config.status: creating frontends/gconf/Makefile</span><br><span class="line">config.status: creating frontends/qconf/Makefile</span><br><span class="line">config.status: creating utils/Makefile</span><br><span class="line">config.status: creating scripts/Makefile</span><br><span class="line">config.status: creating scripts/.autostuff/config.h</span><br><span class="line">config.status: executing depfiles commands</span><br><span class="line">config.status: executing libtool commands</span><br><span class="line">configure: </span><br><span class="line">configure: Configured <span class="keyword">with</span>:</span><br><span class="line">configure: - parser <span class="keyword">library</span>     : static</span><br><span class="line">configure:   - root-menu prompt : <span class="keyword">Configuration</span></span><br><span class="line">configure:   - config prefix    : CONFIG_</span><br><span class="line">configure: - frontends          : conf mconf nconf</span><br><span class="line">configure:   - transform name   : s&amp;^&amp;kconfig-&amp;</span><br><span class="line">configure:   - localised        : yes</span><br><span class="line">configure: - install utilities  : yes</span><br><span class="line">configure: - CFLAGS CXXFLAGS    : -Wall</span><br></pre></td></tr></table></figure>
+<h3 id="编译、安装"><a href="#编译、安装" class="headerlink" title="编译、安装"></a>编译、安装</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop/kconfig-frontends-3.19.0.0$ make</span><br><span class="line">Making all in docs</span><br><span class="line">Making all in libs</span><br><span class="line">Making all in parser</span><br><span class="line">  GPERF  hconf.c</span><br><span class="line">  CC       libkconfig_parser_la-yconf.lo</span><br><span class="line">  CCLD     libkconfig-parser.la</span><br><span class="line">ar: `u' modifier ignored since `D' is the default (see `U')</span><br><span class="line">Making all in lxdialog</span><br><span class="line">  CC       libkconfig_lxdialog_a-checklist.o</span><br><span class="line">  CC       libkconfig_lxdialog_a-inputbox.o</span><br><span class="line">  CC       libkconfig_lxdialog_a-menubox.o</span><br><span class="line">  CC       libkconfig_lxdialog_a-textbox.o</span><br><span class="line">  CC       libkconfig_lxdialog_a-util.o</span><br><span class="line">  CC       libkconfig_lxdialog_a-yesno.o</span><br><span class="line">  AR       libkconfig-lxdialog.a</span><br><span class="line">ar: `u' modifier ignored since `D' is the default (see `U')</span><br><span class="line">Making all in frontends</span><br><span class="line">Making all in conf</span><br><span class="line">  CC       conf-conf.o</span><br><span class="line">  CCLD     conf</span><br><span class="line">Making all in mconf</span><br><span class="line">  CC       mconf-mconf.o</span><br><span class="line">  CCLD     mconf</span><br><span class="line">Making all in nconf</span><br><span class="line">  CC       nconf-nconf.o</span><br><span class="line">  CC       nconf-nconf.gui.o</span><br><span class="line">  CCLD     nconf</span><br><span class="line">Making all in scripts</span><br><span class="line">Making all in utils</span><br><span class="line">  CC       gettext-gettext.o</span><br><span class="line">  CCLD     gettext</span><br><span class="line">  GEN      tweak</span><br><span class="line">jeromesun@km:~/workshop/kconfig-frontends-3.19.0.0$ sudo make <span class="keyword">install</span></span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> docs</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/share/doc/kconfig-frontends'</span></span><br><span class="line"> /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c -m <span class="number">644</span> kconfig-language.txt kconfig.txt <span class="string">'/usr/local/share/doc/kconfig-frontends'</span></span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> libs</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> parser</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/lib'</span></span><br><span class="line"> /<span class="keyword">bin</span>/bash ../../libtool   <span class="comment">--mode=install /usr/bin/install -c   libkconfig-parser.la '/usr/local/lib'</span></span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c .libs/libkconfig-parser.lai /usr/<span class="keyword">local</span>/lib/libkconfig-parser.la</span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c .libs/libkconfig-parser.a /usr/<span class="keyword">local</span>/lib/libkconfig-parser.a</span><br><span class="line">libtool: <span class="keyword">install</span>: chmod <span class="number">644</span> /usr/<span class="keyword">local</span>/lib/libkconfig-parser.a</span><br><span class="line">libtool: <span class="keyword">install</span>: ranlib /usr/<span class="keyword">local</span>/lib/libkconfig-parser.a</span><br><span class="line">libtool: <span class="keyword">finish</span>: <span class="keyword">PATH</span>=<span class="string">"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/sbin"</span> ldconfig -n /usr/<span class="keyword">local</span>/lib</span><br><span class="line"><span class="comment">----------------------------------------------------------------------</span></span><br><span class="line">Libraries have been installed <span class="keyword">in</span>:</span><br><span class="line">   /usr/<span class="keyword">local</span>/lib</span><br><span class="line"></span><br><span class="line"><span class="keyword">If</span> you ever happen <span class="keyword">to</span> want <span class="keyword">to</span> <span class="keyword">link</span> against installed libraries</span><br><span class="line"><span class="keyword">in</span> a given <span class="keyword">directory</span>, LIBDIR, you must either <span class="keyword">use</span> libtool, <span class="keyword">and</span></span><br><span class="line">specify the <span class="keyword">full</span> pathname <span class="keyword">of</span> the <span class="keyword">library</span>, <span class="keyword">or</span> <span class="keyword">use</span> the <span class="string">'-LLIBDIR'</span></span><br><span class="line">flag during linking <span class="keyword">and</span> <span class="keyword">do</span> <span class="keyword">at</span> <span class="keyword">least</span> one <span class="keyword">of</span> the <span class="keyword">following</span>:</span><br><span class="line">   - <span class="keyword">add</span> LIBDIR <span class="keyword">to</span> the <span class="string">'LD_LIBRARY_PATH'</span> environment <span class="keyword">variable</span></span><br><span class="line">     during execution</span><br><span class="line">   - <span class="keyword">add</span> LIBDIR <span class="keyword">to</span> the <span class="string">'LD_RUN_PATH'</span> environment <span class="keyword">variable</span></span><br><span class="line">     during linking</span><br><span class="line">   - <span class="keyword">use</span> the <span class="string">'-Wl,-rpath -Wl,LIBDIR'</span> linker flag</span><br><span class="line">   - have your <span class="keyword">system</span> administrator <span class="keyword">add</span> LIBDIR <span class="keyword">to</span> <span class="string">'/etc/ld.so.conf'</span></span><br><span class="line"></span><br><span class="line">See <span class="keyword">any</span> operating <span class="keyword">system</span> documentation about <span class="keyword">shared</span> libraries <span class="keyword">for</span></span><br><span class="line">more information, such <span class="keyword">as</span> the ld(<span class="number">1</span>) <span class="keyword">and</span> ld.so(<span class="number">8</span>) <span class="keyword">manual</span> pages.</span><br><span class="line"><span class="comment">----------------------------------------------------------------------</span></span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/include/kconfig'</span></span><br><span class="line"> /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c -m <span class="number">644</span> list.h lkc.h expr.h lkc_proto.h <span class="string">'/usr/local/include/kconfig'</span></span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> lxdialog</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> frontends</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> conf</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line">  /<span class="keyword">bin</span>/bash ../../libtool   <span class="comment">--mode=install /usr/bin/install -c conf '/usr/local/bin/./kconfig-conf'</span></span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c conf /usr/<span class="keyword">local</span>/<span class="keyword">bin</span>/./kconfig-conf</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> mconf</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line">  /<span class="keyword">bin</span>/bash ../../libtool   <span class="comment">--mode=install /usr/bin/install -c mconf '/usr/local/bin/./kconfig-mconf'</span></span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c mconf /usr/<span class="keyword">local</span>/<span class="keyword">bin</span>/./kconfig-mconf</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> nconf</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line">  /<span class="keyword">bin</span>/bash ../../libtool   <span class="comment">--mode=install /usr/bin/install -c nconf '/usr/local/bin/./kconfig-nconf'</span></span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c nconf /usr/<span class="keyword">local</span>/<span class="keyword">bin</span>/./kconfig-nconf</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> scripts</span><br><span class="line">Making <span class="keyword">install</span> <span class="keyword">in</span> utils</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line">  /<span class="keyword">bin</span>/bash ../libtool   <span class="comment">--mode=install /usr/bin/install -c gettext '/usr/local/bin/./kconfig-gettext'</span></span><br><span class="line">libtool: <span class="keyword">install</span>: /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c gettext /usr/<span class="keyword">local</span>/<span class="keyword">bin</span>/./kconfig-gettext</span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line"> /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c tweak <span class="string">'/usr/local/bin/./kconfig-tweak'</span></span><br><span class="line"> /<span class="keyword">bin</span>/mkdir -p <span class="string">'/usr/local/bin'</span></span><br><span class="line"> /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c diff <span class="string">'/usr/local/bin/./kconfig-diff'</span></span><br><span class="line"> /usr/<span class="keyword">bin</span>/<span class="keyword">install</span> -c <span class="keyword">merge</span> <span class="string">'/usr/local/bin/./kconfig-merge'</span></span><br><span class="line">jeromesun@km:~/workshop/kconfig-frontends<span class="number">-3.19</span><span class="number">.0</span><span class="number">.0</span>$</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/kconfig/" rel="tag"># kconfig</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201811/programmer/tools/scrt_note.html" rel="next" title="SecureCRT 使用记录">
+                <i class="fa fa-chevron-left"></i> SecureCRT 使用记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201901/networks/rpc.rpc_poll.rpc_streaming.html" rel="prev" title="图解 rpc rpc_poll 和 rpc_streaming 的差异">
+                图解 rpc rpc_poll 和 rpc_streaming 的差异 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载编译"><span class="nav-number">1.</span> <span class="nav-text">下载编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用记录"><span class="nav-number">2.</span> <span class="nav-text">使用记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类-make-alldefconfig"><span class="nav-number">2.1.</span> <span class="nav-text">类 make alldefconfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类-make-menuconfig"><span class="nav-number">2.2.</span> <span class="nav-text">类 make menuconfig</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译-log"><span class="nav-number">3.</span> <span class="nav-text">编译 log</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载、解压"><span class="nav-number">3.1.</span> <span class="nav-text">下载、解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">3.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译、安装"><span class="nav-number">3.3.</span> <span class="nav-text">编译、安装</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201811/programmer/tools/kconfig-frontends.html";
+    this.page.identifier = "201811/programmer/tools/kconfig-frontends.html";
+    this.page.title = 'kconfig-frontends 简介';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

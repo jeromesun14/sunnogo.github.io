@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Linux 内核源码如何处理 ICMP packet too big 和 don&apos;t fragment。">
+<meta name="keywords" content="Linux,kernel,don&#39;t fragment,DF,分片">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux内核源码处理ICMP packet too big与DF">
+<meta property="og:url" content="http://sunyongfeng.com/201712/networks/kernel_handle_rfc1191.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Linux 内核源码如何处理 ICMP packet too big 和 don&apos;t fragment。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.069Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux内核源码处理ICMP packet too big与DF">
+<meta name="twitter:description" content="Linux 内核源码如何处理 ICMP packet too big 和 don&apos;t fragment。">
+  <link rel="canonical" href="http://sunyongfeng.com/201712/networks/kernel_handle_rfc1191">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux内核源码处理ICMP packet too big与DF | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201712/networks/kernel_handle_rfc1191.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux内核源码处理ICMP packet too big与DF
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-12-19 09:52:24" itemprop="dateCreated datePublished" datetime="2017-12-19T09:52:24+08:00">2017-12-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201712/networks/kernel_handle_rfc1191.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201712/networks/kernel_handle_rfc1191.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Linux 内核源码如何处理 ICMP packet too big 和 don't fragment。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>RFC 1191</li>
+<li>man 7 ip</li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><ul>
+<li>ICMP packet too big<br>对ICMP packet too big的处理，TCP/UDP最终都对对应路由条目进行MTU更新。而TCP的MTU、MSS、窗口大小和最终段大小的关系比较复杂，目前没有看明白。</li>
+<li>Don’t fragment<br>DF位的默认配置，受系统配置控制，Ubuntu 14.04默认开启MTU发现功能。推断结果：UDP大报文默认未置上，而TCP大报文默认置上。</li>
+</ul>
+<h2 id="Linux内核如何处理ICMP-Packet-too-big"><a href="#Linux内核如何处理ICMP-Packet-too-big" class="headerlink" title="Linux内核如何处理ICMP Packet too big"></a>Linux内核如何处理ICMP Packet too big</h2><h3 id="ICMP流程"><a href="#ICMP流程" class="headerlink" title="ICMP流程"></a>ICMP流程</h3><p>报文类型：<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">23 </span>#define ICMP_DEST_UNREACH       <span class="number">3</span>       /* Destination Unreachable      */</span><br><span class="line"><span class="symbol">43 </span>#define ICMP_FRAG_NEEDED        <span class="number">4</span>       /* Fragmentation Needed/DF set  */</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L848" target="_blank" rel="noopener">icmp_rcv(struct sk_buff *skb)</a>，根据ICMP类型处理skb：<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">icmp_pointers</span>[icmph-&gt;<span class="keyword">type</span>].handler(skb);</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L965" target="_blank" rel="noopener">icmp_pointers</a>的定义显示，ICMP_DEST_UNRAECH的handler为<a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L663" target="_blank" rel="noopener">icmp_unreach</a>，后者获取出ICMP头部的mtu后，投递给<a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L638" target="_blank" rel="noopener">icmp_socket_deliver(skb, mtu)</a>。<br><code>icmp_socket_deliver</code>最终将skb和mtu值投递给<code>ipprot-&gt;err_handler(skb, info);</code></p>
+<h3 id="TCP流程"><a href="#TCP流程" class="headerlink" title="TCP流程"></a>TCP流程</h3><p><a href="http://lxr.free-electrons.com/source/net/ipv4/tcp_ipv4.c?v=3.10#L326" target="_blank" rel="noopener">tcp_v4_err(skb, info)</a>，<br>调用<a href="http://lxr.free-electrons.com/source/net/ipv4/tcp_ipv4.c?v=3.10#L271" target="_blank" rel="noopener">tcp_v4_mtu_reduced(struct sock *sk)</a></p>
+<p>更新路由的MTU，<a href="http://lxr.free-electrons.com/source/net/ipv4/inet_connection_sock.c?v=3.10#L929" target="_blank" rel="noopener">inet_csk_update_pmtu(struct sock *sk, u32 mtu)</a><br>找到路由<code>inet_csk_rebuild_route(sk, &amp;inet-&gt;cork.fl);</code><br>更新路由MTU<code>dst-&gt;ops-&gt;update_pmtu(dst, sk, NULL, mtu);</code></p>
+<p><code>tcp_v4_err</code>，如果MTU变小，且可分片，则会<a href="http://lxr.free-electrons.com/source/net/ipv4/tcp_output.c?v=3.10#L1296" target="_blank" rel="noopener">tcp_sync_mss(struct sock *sk, u32 pmtu)</a>。关于TCP的MSS与MTU相关的内容很多：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1274 </span>/* This function synchronize snd mss <span class="keyword">to</span> current pmtu/exthdr set.</span><br><span class="line"><span class="symbol">1275 </span></span><br><span class="line"><span class="symbol">1276 </span>   tp-&gt;rx_opt.user_mss is mss set by user by TCP_MAXSEG. It does <span class="keyword">NOT</span> counts</span><br><span class="line"><span class="symbol">1277 </span>   <span class="keyword">for</span> TCP options, but includes only bare TCP header.</span><br><span class="line"><span class="symbol">1278 </span></span><br><span class="line"><span class="symbol">1279 </span>   tp-&gt;rx_opt.mss_clamp is mss negotiated at connection setup.</span><br><span class="line"><span class="symbol">1280 </span>   It is minimum of user_mss <span class="keyword">and</span> mss received with SYN.</span><br><span class="line"><span class="symbol">1281 </span>   It also does <span class="keyword">not</span> include TCP options.</span><br><span class="line"><span class="symbol">1282 </span></span><br><span class="line"><span class="symbol">1283 </span>   inet_csk(sk)-&gt;icsk_pmtu_cookie is last pmtu, seen by this function.</span><br><span class="line"><span class="symbol">1284 </span></span><br><span class="line"><span class="symbol">1285 </span>   tp-&gt;mss_cache is current effective sending mss, including</span><br><span class="line"><span class="symbol">1286 </span>   all tcp options except <span class="keyword">for</span> SACKs. It is evaluated,</span><br><span class="line"><span class="symbol">1287 </span>   taking into account current pmtu, but never exceeds</span><br><span class="line"><span class="symbol">1288 </span>   tp-&gt;rx_opt.mss_clamp.</span><br><span class="line"><span class="symbol">1289 </span></span><br><span class="line"><span class="symbol">1290 </span>   NOTE1. rfc1122 clearly states that advertised MSS</span><br><span class="line"><span class="symbol">1291 </span>   DOES <span class="keyword">NOT</span> include either tcp <span class="keyword">or</span> ip options.</span><br><span class="line"><span class="symbol">1292 </span></span><br><span class="line"><span class="symbol">1293 </span>   NOTE2. inet_csk(sk)-&gt;icsk_pmtu_cookie <span class="keyword">and</span> tp-&gt;mss_cache</span><br><span class="line"><span class="symbol">1294 </span>   are <span class="keyword">READ</span> ONLY outside this function.         --ANK (<span class="number">980731</span>)</span><br><span class="line"><span class="symbol">1295 </span> */</span><br></pre></td></tr></table></figure>
+<h3 id="处理TCP-MSS"><a href="#处理TCP-MSS" class="headerlink" title="处理TCP MSS"></a>处理TCP MSS</h3><p>未看懂。</p>
+<h3 id="UDP流程"><a href="#UDP流程" class="headerlink" title="UDP流程"></a>UDP流程</h3><p><a href="http://lxr.free-electrons.com/source/net/ipv4/udp.c?v=3.10#L608" target="_blank" rel="noopener">__udp4_lib_err(struct sk_buff <em>skb, u32 info, struct udp_table </em>udptable)</a><br><a href="http://lxr.free-electrons.com/source/net/ipv4/route.c?v=3.10#L983" target="_blank" rel="noopener">ipv4_sk_update_pmtu(struct sk_buff <em>skb, struct sock </em>sk, u32 mtu)</a>，也是基于路由更新MTU。<br><a href="http://lxr.free-electrons.com/source/net/ipv4/route.c?v=3.10#L911" target="_blank" rel="noopener">__ip_rt_update_pmtu</a></p>
+<p>ping报文的处理也是类似，见<a href="http://lxr.free-electrons.com/source/net/ipv4/ping.c?v=3.10#L369" target="_blank" rel="noopener">ping_err</a>。</p>
+<h2 id="Linux内核对DF的默认处理"><a href="#Linux内核对DF的默认处理" class="headerlink" title="Linux内核对DF的默认处理"></a>Linux内核对DF的默认处理</h2><p>经阅读代码，发现控制DF标志的地方主要有两处：</p>
+<ol>
+<li>inet_sock.pmtudisc</li>
+<li>sk_buff.local_df</li>
+</ol>
+<p>以关键字pmtudisc和local_df做全局字符串搜索，发现对pmtudisc和local_df有赋值的地方很少。如下各小节分析。</p>
+<p>另附：<a href="http://lxr.free-electrons.com/source/include/uapi/linux/in.h?v=3.10#L91" target="_blank" rel="noopener">IP MTU DISCOVER相关宏</a><br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">90 </span>/* IP_MTU_DISCOVER values */</span><br><span class="line"><span class="symbol">91 </span>#define IP_PMTUDISC_DONT                <span class="number">0</span>       /* Never send DF frames */</span><br><span class="line"><span class="symbol">92 </span>#define IP_PMTUDISC_WANT                <span class="number">1</span>       /* Use per route hints  */</span><br><span class="line"><span class="symbol">93 </span>#define IP_PMTUDISC_DO                  <span class="number">2</span>       /* Always DF            */</span><br><span class="line"><span class="symbol">94 </span>#define IP_PMTUDISC_PROBE               <span class="number">3</span>       /* Ignore dst pmtu      */</span><br></pre></td></tr></table></figure></p>
+<h3 id="IP报文发送出口"><a href="#IP报文发送出口" class="headerlink" title="IP报文发送出口"></a>IP报文发送出口</h3><p>源代码：<a href="http://lxr.free-electrons.com/source/net/ipv4/ip_output.c?v=3.10#L326" target="_blank" rel="noopener">ip_queue_xmit</a>和<a href="http://lxr.free-electrons.com/source/net/ipv4/ip_output.c?v=3.10#L1314" target="_blank" rel="noopener">__ip_make_skb</a>，后者用于UDP。</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">382 </span>        <span class="keyword">if</span> (ip_dont_fragment(sk, &amp;rt-&gt;dst) &amp;&amp; !skb-&gt;local_df)</span><br><span class="line"><span class="symbol">383 </span>                iph-&gt;frag_off = htons(IP_DF);</span><br><span class="line"><span class="symbol">384 </span>        <span class="keyword">else</span></span><br><span class="line"><span class="symbol">385 </span>                iph-&gt;frag_off = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="symbol">248 </span><span class="keyword">int</span> ip_dont_fragment(struct sock *sk, struct dst_entry *dst)</span><br><span class="line"><span class="symbol">249 </span>&#123;</span><br><span class="line"><span class="symbol">250 </span>        <span class="keyword">return</span>  inet_sk(sk)-&gt;pmtudisc == IP_PMTUDISC_DO ||</span><br><span class="line"><span class="symbol">251 </span>                (inet_sk(sk)-&gt;pmtudisc == IP_PMTUDISC_WANT &amp;&amp;</span><br><span class="line"><span class="symbol">252 </span>                 !(dst_metric_locked(dst, RTAX_MTU)));</span><br><span class="line"><span class="symbol">253 </span>&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="AF-INET协议族"><a href="#AF-INET协议族" class="headerlink" title="AF_INET协议族"></a>AF_INET协议族</h3><p><a href="http://lxr.free-electrons.com/source/net/ipv4/af_inet.c?v=3.10#L375" target="_blank" rel="noopener">inet_create</a>，依赖<code>ipv4_config</code>配置。该配置体现在<code>/proc/sys/net/ipv4/ip_no_pmtu_disc</code>，目前Ubuntu 14.04上默认<code>ip_no_pmtu_disc=0</code>，即由每个路由确定。</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">374 </span>        <span class="keyword">if</span> (ipv4_config.no_pmtu_disc)</span><br><span class="line"><span class="symbol">375 </span>                inet-&gt;pmtudisc = IP_PMTUDISC_DONT;</span><br><span class="line"><span class="symbol">376 </span>        <span class="keyword">else</span></span><br><span class="line"><span class="symbol">377 </span>                inet-&gt;pmtudisc = IP_PMTUDISC_WANT;</span><br></pre></td></tr></table></figure>
+<h3 id="系统配置"><a href="#系统配置" class="headerlink" title="系统配置"></a>系统配置</h3><p>可用<code>sysctl</code>命令配置，或通过<code>/etc/sysctl.conf</code>配置文件配置<code>ip_no_pmtu_disc</code>值，最终体现在<code>/proc/sys/net/ipv4/ip_no_pmtu_disc</code>。<a href="http://lxr.free-electrons.com/source/net/ipv4/sysctl_net_ipv4.c?v=3.10#L316" target="_blank" rel="noopener">源码链接</a>。</p>
+<h3 id="ICMP报文"><a href="#ICMP报文" class="headerlink" title="ICMP报文"></a>ICMP报文</h3><p>默认创建ICMP sk时，不发送DF报文。<a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L1074" target="_blank" rel="noopener">icmp_sk_init(struct net *net)</a>。</p>
+<p>PS：ICMP报文不超过576字节的限制在<a href="http://lxr.free-electrons.com/source/net/ipv4/icmp.c?v=3.10#L481" target="_blank" rel="noopener">icmp_send</a>接口中有体现。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/packet/" rel="tag"># packet</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201712/administrator/gitlab.html" rel="next" title="搭建 gitlab 服务器">
+                <i class="fa fa-chevron-left"></i> 搭建 gitlab 服务器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201712/networks/path_mtu.html" rel="prev" title="Path MTU 概述">
+                Path MTU 概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">1.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux内核如何处理ICMP-Packet-too-big"><span class="nav-number">2.</span> <span class="nav-text">Linux内核如何处理ICMP Packet too big</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP流程"><span class="nav-number">2.1.</span> <span class="nav-text">ICMP流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP流程"><span class="nav-number">2.2.</span> <span class="nav-text">TCP流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理TCP-MSS"><span class="nav-number">2.3.</span> <span class="nav-text">处理TCP MSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UDP流程"><span class="nav-number">2.4.</span> <span class="nav-text">UDP流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux内核对DF的默认处理"><span class="nav-number">3.</span> <span class="nav-text">Linux内核对DF的默认处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IP报文发送出口"><span class="nav-number">3.1.</span> <span class="nav-text">IP报文发送出口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AF-INET协议族"><span class="nav-number">3.2.</span> <span class="nav-text">AF_INET协议族</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统配置"><span class="nav-number">3.3.</span> <span class="nav-text">系统配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP报文"><span class="nav-number">3.4.</span> <span class="nav-text">ICMP报文</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201712/networks/kernel_handle_rfc1191.html";
+    this.page.identifier = "201712/networks/kernel_handle_rfc1191.html";
+    this.page.title = 'Linux内核源码处理ICMP packet too big与DF';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

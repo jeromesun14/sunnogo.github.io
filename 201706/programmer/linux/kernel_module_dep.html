@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+<meta name="keywords" content="Linux,kernel,module,dependency,依赖,关系,内核,模块">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux kernel module 依赖相关">
+<meta property="og:url" content="http://sunyongfeng.com/201706/programmer/linux/kernel_module_dep.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.080Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux kernel module 依赖相关">
+<meta name="twitter:description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+  <link rel="canonical" href="http://sunyongfeng.com/201706/programmer/linux/kernel_module_dep">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>linux kernel module 依赖相关 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201706/programmer/linux/kernel_module_dep.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">linux kernel module 依赖相关
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-06-22 16:58:00" itemprop="dateCreated datePublished" datetime="2017-06-22T16:58:00+08:00">2017-06-22</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201706/programmer/linux/kernel_module_dep.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201706/programmer/linux/kernel_module_dep.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="查看依赖关系"><a href="#查看依赖关系" class="headerlink" title="查看依赖关系"></a>查看依赖关系</h2><p>问题背景：从专有系统移植某个特定功能的内核模块到 Linux 发行版，确认该模块的依赖关系。包含“我依赖谁”、“谁依赖我”两种情况。<br>详见<a href="http://xmodulo.com/how-to-check-kernel-module-dependencies-on-linux.html" target="_blank" rel="noopener">How to check kernel module dependencies on Linux</a></p>
+<ul>
+<li>lsmod</li>
+</ul>
+<p>如下，vboxdrv.ko 依赖 vboxnetadp.ko、vboxnetflt.ko、vboxpci.ko。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ lsmod</span><br><span class="line">Module                  Size  Used by</span><br><span class="line">tipc                 <span class="number"> 127285 </span> 0</span><br><span class="line">pci_stub              <span class="number"> 12622 </span> 1</span><br><span class="line">vboxpci               <span class="number"> 23116 </span> 0</span><br><span class="line">vboxnetadp            <span class="number"> 25813 </span> 0</span><br><span class="line">vboxnetflt            <span class="number"> 27947 </span> 0</span><br><span class="line">vboxdrv              <span class="number"> 455053 </span><span class="number"> 3 </span>vboxnetadp,vboxnetflt,vboxpci</span><br><span class="line">xt_CHECKSUM           <span class="number"> 12549 </span> 1</span><br><span class="line">iptable_mangle        <span class="number"> 12734 </span> 1</span><br><span class="line">ipt_REJECT            <span class="number"> 12541 </span> 2</span><br><span class="line">nf_reject_ipv4        <span class="number"> 13183 </span><span class="number"> 1 </span>ipt_REJECT</span><br><span class="line">ebtable_filter        <span class="number"> 12827 </span> 0</span><br><span class="line">ebtables              <span class="number"> 35359 </span><span class="number"> 1 </span>ebtable_filter</span><br><span class="line">ip6table_filter       <span class="number"> 12815 </span> 0</span><br><span class="line">ip6_tables            <span class="number"> 27504 </span><span class="number"> 1 </span>ip6table_filter</span><br><span class="line">kvm_intel            <span class="number"> 154139 </span> 0</span><br><span class="line">binfmt_misc           <span class="number"> 18163 </span> 1</span><br><span class="line">cfg80211             <span class="number"> 551242 </span> 0</span><br><span class="line">sch_netem             <span class="number"> 17419 </span> 0</span><br><span class="line">vxlan                 <span class="number"> 41123 </span> 0</span><br><span class="line">ip6_udp_tunnel        <span class="number"> 12755 </span><span class="number"> 1 </span>vxlan</span><br><span class="line">udp_tunnel            <span class="number"> 13187 </span><span class="number"> 1 </span>vxlan</span><br><span class="line">sch_htb               <span class="number"> 22429 </span> 0</span><br><span class="line">xt_nat                <span class="number"> 12726 </span> 0</span><br><span class="line">xt_tcpudp             <span class="number"> 12924 </span> 6</span><br><span class="line">btrfs                <span class="number"> 968059 </span> 0</span><br><span class="line">xor                   <span class="number"> 21411 </span><span class="number"> 1 </span>btrfs</span><br><span class="line">raid6_pq              <span class="number"> 97812 </span><span class="number"> 1 </span>btrfs</span><br><span class="line">ufs                   <span class="number"> 75315 </span> 0</span><br><span class="line">qnx4                  <span class="number"> 13394 </span> 0</span><br><span class="line">hfsplus              <span class="number"> 103788 </span> 0</span><br><span class="line">hfs                   <span class="number"> 54819 </span> 0</span><br><span class="line">minix                 <span class="number"> 36454 </span> 0</span><br><span class="line">ntfs                 <span class="number"> 101958 </span> 0</span><br><span class="line">msdos                 <span class="number"> 17332 </span> 0</span><br><span class="line">jfs                  <span class="number"> 186807 </span> 0</span><br><span class="line">xfs                  <span class="number"> 937845 </span> 0</span><br><span class="line">veth                  <span class="number"> 13376 </span> 0</span><br><span class="line">ipt_MASQUERADE        <span class="number"> 12678 </span> 4</span><br><span class="line">nf_nat_masquerade_ipv4   <span class="number"> 13412 </span><span class="number"> 1 </span>ipt_MASQUERADE</span><br><span class="line">xfrm_user             <span class="number"> 36115 </span> 1</span><br><span class="line">xfrm_algo             <span class="number"> 15394 </span><span class="number"> 1 </span>xfrm_user</span><br><span class="line">iptable_nat           <span class="number"> 12875 </span> 1</span><br><span class="line">nf_conntrack_ipv4     <span class="number"> 18953 </span> 3</span><br><span class="line">nf_defrag_ipv4        <span class="number"> 12758 </span><span class="number"> 1 </span>nf_conntrack_ipv4</span><br><span class="line">nf_nat_ipv4           <span class="number"> 14267 </span><span class="number"> 1 </span>iptable_nat</span><br><span class="line">xt_addrtype           <span class="number"> 12713 </span> 2</span><br><span class="line">iptable_filter        <span class="number"> 12810 </span> 1</span><br><span class="line">ip_tables             <span class="number"> 27718 </span><span class="number"> 3 </span>iptable_filter,iptable_mangle,iptable_nat</span><br><span class="line">xt_conntrack          <span class="number"> 12760 </span> 2</span><br><span class="line">x_tables              <span class="number"> 34103 </span><span class="number"> 13 </span>ip6table_filter,xt_CHECKSUM,ip_tables,xt_tcpudp,ipt_MASQUERADE,xt_conntrack,xt_nat,iptable_filter,ebtables,ipt_REJECT,iptable_mangle,ip6_tables,xt_addrtype</span><br><span class="line">nf_nat                <span class="number"> 26308 </span><span class="number"> 3 </span>nf_nat_ipv4,xt_nat,nf_nat_masquerade_ipv4</span><br><span class="line">nf_conntrack         <span class="number"> 105683 </span><span class="number"> 5 </span>nf_nat,nf_nat_ipv4,xt_conntrack,nf_nat_masquerade_ipv4,nf_conntrack_ipv4</span><br><span class="line">br_netfilter          <span class="number"> 18017 </span> 0</span><br><span class="line">bridge               <span class="number"> 114479 </span><span class="number"> 1 </span>br_netfilter</span><br><span class="line">stp                   <span class="number"> 12976 </span><span class="number"> 1 </span>bridge</span><br><span class="line">llc                   <span class="number"> 14441 </span><span class="number"> 2 </span>stp,bridge</span><br><span class="line">overlay               <span class="number"> 42380 </span> 0</span><br><span class="line">openvswitch           <span class="number"> 85378 </span> 0</span><br><span class="line">libcrc32c             <span class="number"> 12644 </span><span class="number"> 2 </span>xfs,openvswitch</span><br><span class="line">snd_hda_codec_realtek   <span class="number"> 80584 </span> 1</span><br><span class="line">snd_hda_codec_generic   <span class="number"> 70069 </span><span class="number"> 1 </span>snd_hda_codec_realtek</span><br><span class="line">snd_hda_intel         <span class="number"> 30775 </span> 6</span><br><span class="line">dell_wmi              <span class="number"> 13132 </span> 0</span><br><span class="line">snd_hda_controller    <span class="number"> 35493 </span><span class="number"> 1 </span>snd_hda_intel</span><br><span class="line">sparse_keymap         <span class="number"> 13890 </span><span class="number"> 1 </span>dell_wmi</span><br><span class="line">gpio_ich              <span class="number"> 13636 </span> 0</span><br><span class="line">snd_hda_codec        <span class="number"> 144641 </span><span class="number"> 4 </span>snd_hda_codec_realtek,snd_hda_codec_generic,snd_hda_intel,snd_hda_controller</span><br><span class="line">snd_hwdep             <span class="number"> 17709 </span><span class="number"> 1 </span>snd_hda_codec</span><br><span class="line">coretemp              <span class="number"> 13638 </span> 0</span><br><span class="line">snd_pcm              <span class="number"> 106401 </span><span class="number"> 3 </span>snd_hda_codec,snd_hda_intel,snd_hda_controller</span><br><span class="line">snd_seq_midi          <span class="number"> 13564 </span> 0</span><br><span class="line">snd_seq_midi_event    <span class="number"> 14899 </span><span class="number"> 1 </span>snd_seq_midi</span><br><span class="line">kvm                  <span class="number"> 480880 </span><span class="number"> 1 </span>kvm_intel</span><br><span class="line">snd_rawmidi           <span class="number"> 31148 </span><span class="number"> 1 </span>snd_seq_midi</span><br><span class="line">snd_seq               <span class="number"> 63540 </span><span class="number"> 2 </span>snd_seq_midi_event,snd_seq_midi</span><br><span class="line">snd_seq_device        <span class="number"> 14875 </span><span class="number"> 3 </span>snd_seq,snd_rawmidi,snd_seq_midi</span><br><span class="line">snd_timer             <span class="number"> 30069 </span><span class="number"> 2 </span>snd_pcm,snd_seq</span><br><span class="line">dcdbas                <span class="number"> 15017 </span> 0</span><br><span class="line">lpc_ich               <span class="number"> 21176 </span> 0</span><br><span class="line">snd                   <span class="number"> 83976 </span><span class="number"> 22 </span>snd_hda_codec_realtek,snd_hwdep,snd_timer,snd_pcm,snd_seq,snd_rawmidi,snd_hda_codec_generic,snd_hda_codec,snd_hda_intel,snd_seq_device</span><br><span class="line">serio_raw             <span class="number"> 13434 </span> 0</span><br><span class="line">soundcore             <span class="number"> 15091 </span><span class="number"> 2 </span>snd,snd_hda_codec</span><br><span class="line">8250_fintek           <span class="number"> 12924 </span> 0</span><br><span class="line">shpchp                <span class="number"> 37216 </span> 0</span><br><span class="line">mac_hid               <span class="number"> 13275 </span> 0</span><br><span class="line">parport_pc            <span class="number"> 32909 </span> 1</span><br><span class="line">ppdev                 <span class="number"> 17711 </span> 0</span><br><span class="line">lp                    <span class="number"> 17799 </span> 0</span><br><span class="line">parport               <span class="number"> 42432 </span><span class="number"> 3 </span>lp,ppdev,parport_pc</span><br><span class="line">autofs4               <span class="number"> 39306 </span> 2</span><br><span class="line">hid_generic           <span class="number"> 12559 </span> 0</span><br><span class="line">psmouse              <span class="number"> 118539 </span> 0</span><br><span class="line">broadcom              <span class="number"> 17339 </span> 0</span><br><span class="line">i915                <span class="number"> 1087204 </span> 3</span><br><span class="line">pata_acpi             <span class="number"> 13053 </span> 0</span><br><span class="line">usbhid                <span class="number"> 53106 </span> 0</span><br><span class="line">hid                  <span class="number"> 110883 </span><span class="number"> 2 </span>hid_generic,usbhid</span><br><span class="line">wmi                   <span class="number"> 19379 </span><span class="number"> 1 </span>dell_wmi</span><br><span class="line">video                 <span class="number"> 24803 </span><span class="number"> 1 </span>i915</span><br><span class="line">i2c_algo_bit          <span class="number"> 13564 </span><span class="number"> 1 </span>i915</span><br><span class="line">drm_kms_helper       <span class="number"> 123797 </span><span class="number"> 1 </span>i915</span><br><span class="line">tg3                  <span class="number"> 179117 </span> 0</span><br><span class="line">ptp                   <span class="number"> 19534 </span><span class="number"> 1 </span>tg3</span><br><span class="line">pps_core              <span class="number"> 19332 </span><span class="number"> 1 </span>ptp</span><br><span class="line">drm                  <span class="number"> 341489 </span><span class="number"> 5 </span>i915,drm_kms_helper</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cat modules.dep，几乎与 lsmod 一样，但是包含未加载的内核模块依赖关系，ubuntu 默认有很多很多！</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ cat /lib/modules/`uname -r`/modules.dep</span><br><span class="line">kernel/arch/x86/kernel/cpu/mcheck/mce-inject<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/kernel/msr<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/kernel/cpuid<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/kernel/iosf_mbi<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/crypto/glue_helper<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/crypto/aes-x86_64<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/crypto/des3_ede-x86_64<span class="selector-class">.ko</span>: kernel/crypto/des_generic.ko</span><br><span class="line">kernel/arch/x86/crypto/camellia-x86_64<span class="selector-class">.ko</span>: kernel/crypto/xts<span class="selector-class">.ko</span> kernel/crypto/lrw<span class="selector-class">.ko</span> kernel/crypto/gf128mul<span class="selector-class">.ko</span> kernel/arch/x86/crypto/glue_helper.ko</span><br><span class="line">kernel/arch/x86/crypto/blowfish-x86_64<span class="selector-class">.ko</span>: kernel/crypto/blowfish_common.ko</span><br><span class="line">kernel/arch/x86/crypto/twofish-x86_64<span class="selector-class">.ko</span>: kernel/crypto/twofish_common.ko</span><br><span class="line">kernel/arch/x86/crypto/twofish-x86_64-<span class="number">3</span>way<span class="selector-class">.ko</span>: kernel/arch/x86/crypto/twofish-x86_64<span class="selector-class">.ko</span> kernel/crypto/twofish_common<span class="selector-class">.ko</span> kernel/crypto/xts<span class="selector-class">.ko</span> kernel/crypto/lrw<span class="selector-class">.ko</span> kernel/crypto/gf128mul<span class="selector-class">.ko</span> kernel/arch/x86/crypto/glue_helper.ko</span><br><span class="line">kernel/arch/x86/crypto/salsa20-x86_64<span class="selector-class">.ko</span>:</span><br><span class="line">kernel/arch/x86/crypto/serpent-sse2-x86_64<span class="selector-class">.ko</span>: kernel/crypto/xts<span class="selector-class">.ko</span> kernel/crypto/serpent_generic<span class="selector-class">.ko</span> kernel/crypto/lrw<span class="selector-class">.ko</span> kernel/crypto/gf128mul<span class="selector-class">.ko</span> kernel/arch/x86/crypto/glue_helper<span class="selector-class">.ko</span> kernel/crypto/ablk_helper<span class="selector-class">.ko</span> kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/aesni-intel<span class="selector-class">.ko</span>: kernel/arch/x86/crypto/aes-x86_64<span class="selector-class">.ko</span> kernel/crypto/lrw<span class="selector-class">.ko</span> kernel/crypto/gf128mul<span class="selector-class">.ko</span> kernel/arch/x86/crypto/glue_helper<span class="selector-class">.ko</span> kernel/crypto/ablk_helper<span class="selector-class">.ko</span> kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/ghash-clmulni-intel<span class="selector-class">.ko</span>: kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/sha1-ssse3<span class="selector-class">.ko</span>:</span><br><span class="line">... 此处省略几千行</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>modprobe --show-dependency xxx.ko</code>，以 lsmod 不同的是，该命令显示谁依赖 xxx.ko。</li>
+</ul>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@<span class="symbol">ubuntu:</span>~$ modprobe --show-depends -n iptable_filter</span><br><span class="line">insmod /<span class="class"><span class="keyword">lib</span>/<span class="title">modules</span>/3.19.8-031908-<span class="title">generic</span>/<span class="title">kernel</span>/<span class="title">net</span>/<span class="title">netfilter</span>/<span class="title">x_tables</span>.<span class="title">ko</span> </span></span><br><span class="line">insmod /<span class="class"><span class="keyword">lib</span>/<span class="title">modules</span>/3.19.8-031908-<span class="title">generic</span>/<span class="title">kernel</span>/<span class="title">net</span>/<span class="title">ipv4</span>/<span class="title">netfilter</span>/<span class="title">ip_tables</span>.<span class="title">ko</span> </span></span><br><span class="line">insmod /<span class="class"><span class="keyword">lib</span>/<span class="title">modules</span>/3.19.8-031908-<span class="title">generic</span>/<span class="title">kernel</span>/<span class="title">net</span>/<span class="title">ipv4</span>/<span class="title">netfilter</span>/<span class="title">iptable_filter</span>.<span class="title">ko</span></span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>depmod，生成 modules.dep 和 map 文件</li>
+</ul>
+<h2 id="依赖相关的问题"><a href="#依赖相关的问题" class="headerlink" title="依赖相关的问题"></a>依赖相关的问题</h2><h3 id="提示-“modprobe-ERROR-libkmod-libkmod-c-5”"><a href="#提示-“modprobe-ERROR-libkmod-libkmod-c-5”" class="headerlink" title="提示 “modprobe: ERROR: ../libkmod/libkmod.c:5”"></a>提示 “modprobe: ERROR: ../libkmod/libkmod.c:5”</h3><p>可能出现的原因:</p>
+<ul>
+<li>内核版本不一致</li>
+<li>modules.dep.bin 受损</li>
+</ul>
+<p>参考:</p>
+<ul>
+<li><a href="https://askubuntu.com/questions/459296/could-not-open-moddep-file-lib-modules-3-xx-generic-modules-dep-bin-when-mo" target="_blank" rel="noopener">“Could not open moddep file ‘/lib/modules/3.XX-generic/modules.dep.bin’” when mounting using a loop</a> </li>
+<li><a href="https://www.helplib.com/ubuntu/article_159091" target="_blank" rel="noopener">使用循环进行挂载时的modprobe”无法打开moddep文件’/lib/modules/3.XX generic/modules.dep.bin’”</a></li>
+</ul>
+<p>解决:（思路，重新生成 modules.dep.bin，或干脆重新替换内核）</p>
+<ul>
+<li><code>depmod</code></li>
+<li>uname -r, <code>apt-get install --reinstall linux-image-&#39;uname -r 的结果&#39;</code></li>
+</ul>
+<p>一个样例，发现 docker 服务起不来，通过 systemd 的 log 查看（<code>sudo journalctl -u systemd-modules-load.service -b</code>）是 modprobe 其他模块失败，导致 docker 服务退出。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Nov 09 11:07:18 hostnamexxx systemd[1]: Starting Docker Application Container Engine<span class="built_in">..</span>.</span><br><span class="line">Nov 09 11:07:18 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:18.725826063+08:00"</span> <span class="attribute">level</span>=info <span class="attribute">msg</span>=<span class="string">"New containerd process, pid: 1024\n"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.800079405+08:00"</span> <span class="attribute">level</span>=info <span class="attribute">msg</span>=<span class="string">"Graph migration to content-addressability took 0.00 seconds"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.801535791+08:00"</span> <span class="attribute">level</span>=warning <span class="attribute">msg</span>=<span class="string">"Running modprobe bridge br_netfilter failed with message: modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file '/lib/modules/3.16.0-5-amd64/modules.dep.bin'\nmodprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file '/lib/modules/3.16.0-5-amd64/modules.dep.bin'\n, error: exit status 1"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.802736912+08:00"</span> <span class="attribute">level</span>=warning <span class="attribute">msg</span>=<span class="string">"Running modprobe nf_nat failed with message: `modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file '/lib/modules/3.16.0-5-amd64/modules.dep.bin'`, error: exit status 1"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.803828391+08:00"</span> <span class="attribute">level</span>=warning <span class="attribute">msg</span>=<span class="string">"Running modprobe xt_conntrack failed with message: `modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file '/lib/modules/3.16.0-5-amd64/modules.dep.bin'`, error: exit status 1"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.805611702+08:00"</span> <span class="attribute">level</span>=info <span class="attribute">msg</span>=<span class="string">"Firewalld running: false"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19.904012372+08:00"</span> <span class="attribute">level</span>=fatal <span class="attribute">msg</span>=<span class="string">"Error starting daemon: Error initializing network controller: Error creating default \"bridge\" network: package not installed"</span></span><br><span class="line">Nov 09 11:07:19 hostnamexxx systemd[1]: docker.service: main process exited, <span class="attribute">code</span>=exited, <span class="attribute">status</span>=1/FAILURE</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: <span class="attribute">time</span>=<span class="string">"2018-11-09T11:07:19+08:00"</span> <span class="attribute">level</span>=info <span class="attribute">msg</span>=<span class="string">"stopping containerd after receiving terminated"</span></span><br><span class="line">Nov 09 11:07:20 hostnamexxx systemd[1]: Failed <span class="keyword">to</span> start Docker Application Container Engine.</span><br><span class="line">Nov 09 11:07:20 hostnamexxx systemd[1]: Unit docker.service entered failed state.</span><br></pre></td></tr></table></figure>
+<p>运行一下 <code>sudo depmod</code>，pass。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/kernel/" rel="tag"># kernel</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201706/networks/switch/three_panel.html" rel="next" title="交换机的三个平面简介——管理平面、控制平面、数据平面">
+                <i class="fa fa-chevron-left"></i> 交换机的三个平面简介——管理平面、控制平面、数据平面
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201706/linux/deb_dependency.html" rel="prev" title="包管理工具依赖关系管理">
+                包管理工具依赖关系管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看依赖关系"><span class="nav-number">1.</span> <span class="nav-text">查看依赖关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖相关的问题"><span class="nav-number">2.</span> <span class="nav-text">依赖相关的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#提示-“modprobe-ERROR-libkmod-libkmod-c-5”"><span class="nav-number">2.1.</span> <span class="nav-text">提示 “modprobe: ERROR: ../libkmod/libkmod.c:5”</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201706/programmer/linux/kernel_module_dep.html";
+    this.page.identifier = "201706/programmer/linux/kernel_module_dep.html";
+    this.page.title = 'linux kernel module 依赖相关';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

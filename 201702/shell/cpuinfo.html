@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Linux命令行查看 CPU 信息。">
+<meta name="keywords" content="linux,cpu,cpuinfo,frequency,频率,核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 查看 CPU 信息">
+<meta property="og:url" content="http://sunyongfeng.com/201702/shell/cpuinfo.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Linux命令行查看 CPU 信息。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.089Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux 查看 CPU 信息">
+<meta name="twitter:description" content="Linux命令行查看 CPU 信息。">
+  <link rel="canonical" href="http://sunyongfeng.com/201702/shell/cpuinfo">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux 查看 CPU 信息 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201702/shell/cpuinfo.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux 查看 CPU 信息
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-02-09 12:01:18" itemprop="dateCreated datePublished" datetime="2017-02-09T12:01:18+08:00">2017-02-09</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/shell/" itemprop="url" rel="index"><span itemprop="name">shell</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201702/shell/cpuinfo.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201702/shell/cpuinfo.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Linux命令行查看 CPU 信息。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文记录 Linux 操作系统中查看 CPU 信息的方法。查看的内容包含但不局限于：</p>
+<ul>
+<li>CPU 型号</li>
+<li>CPU 核数</li>
+<li>CPU 主频</li>
+<li>Cache 容量</li>
+<li>CPU 指令集</li>
+<li>CPU 特性</li>
+</ul>
+<h2 id="cat-proc-cpuinfo"><a href="#cat-proc-cpuinfo" class="headerlink" title="cat /proc/cpuinfo"></a><code>cat /proc/cpuinfo</code></h2><figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex<span class="number">-380</span>:~$ cat /<span class="keyword">proc</span>/cpuinfo </span><br><span class="line">processor       : 0</span><br><span class="line">vendor_id       :<span class="title"> GenuineIntel</span></span><br><span class="line"><span class="title">cpu</span> family      : 6</span><br><span class="line">model           : 23</span><br><span class="line">model<span class="title"> name</span>      :<span class="title"> Intel(R)</span> Core(TM)2<span class="title"> Duo</span> CPU<span class="title">     E7500</span>  @ 2.93GHz</span><br><span class="line">stepping        : 10</span><br><span class="line">microcode       : 0xa07</span><br><span class="line">cpu<span class="title"> MHz</span>         : 1600.000</span><br><span class="line">cache<span class="title"> size</span>      : 3072<span class="title"> KB</span></span><br><span class="line"><span class="title">physical</span> id     : 0</span><br><span class="line">siblings        : 2</span><br><span class="line">core<span class="title"> id</span>         : 0</span><br><span class="line">cpu<span class="title"> cores</span>       : 2</span><br><span class="line">apicid          : 0</span><br><span class="line">initial<span class="title"> apicid</span>  : 0</span><br><span class="line">fpu             :<span class="title"> yes</span></span><br><span class="line"><span class="title">fpu_exception</span>   :<span class="title"> yes</span></span><br><span class="line"><span class="title">cpuid</span> level     : 13</span><br><span class="line">wp              :<span class="title"> yes</span></span><br><span class="line"><span class="title">flags</span>           :<span class="title"> fpu</span> vme<span class="title"> de</span> pse<span class="title"> tsc</span> msr<span class="title"> pae</span> mce<span class="title"> cx8</span> apic<span class="title"> sep</span> mtrr<span class="title"> pge</span> mca<span class="title"> cmov</span> pat<span class="title"> pse36</span> clflush<span class="title"> dts</span> acpi<span class="title"> mmx</span> fxsr<span class="title"> sse</span> sse2<span class="title"> ss</span> ht<span class="title"> tm</span> pbe<span class="title"> syscall</span> nx<span class="title"> lm</span> constant_tsc<span class="title"> arch_perfmon</span> pebs<span class="title"> bts</span> rep_good<span class="title"> nopl</span> aperfmperf<span class="title"> pni</span> dtes64<span class="title"> monitor</span> ds_cpl<span class="title"> vmx</span> est<span class="title"> tm2</span> ssse3<span class="title"> cx16</span> xtpr<span class="title"> pdcm</span> sse4_1<span class="title"> xsave</span> lahf_lm<span class="title"> tpr_shadow</span> vnmi<span class="title"> flexpriority</span> dtherm</span><br><span class="line">bugs            :</span><br><span class="line">bogomips        : 5851.77</span><br><span class="line">clflush<span class="title"> size</span>    : 64</span><br><span class="line">cache_alignment : 64</span><br><span class="line">address<span class="title"> sizes</span>   : 36<span class="title"> bits</span> physical, 48<span class="title"> bits</span> virtual</span><br><span class="line">power<span class="title"> management:</span></span><br><span class="line"><span class="title"></span></span><br><span class="line"><span class="title">processor</span>       : 1</span><br><span class="line">vendor_id       :<span class="title"> GenuineIntel</span></span><br><span class="line"><span class="title">cpu</span> family      : 6</span><br><span class="line">model           : 23</span><br><span class="line">model<span class="title"> name</span>      :<span class="title"> Intel(R)</span> Core(TM)2<span class="title"> Duo</span> CPU<span class="title">     E7500</span>  @ 2.93GHz</span><br><span class="line">stepping        : 10</span><br><span class="line">microcode       : 0xa07</span><br><span class="line">cpu<span class="title"> MHz</span>         : 1600.000</span><br><span class="line">cache<span class="title"> size</span>      : 3072<span class="title"> KB</span></span><br><span class="line"><span class="title">physical</span> id     : 0</span><br><span class="line">siblings        : 2</span><br><span class="line">core<span class="title"> id</span>         : 1</span><br><span class="line">cpu<span class="title"> cores</span>       : 2</span><br><span class="line">apicid          : 1</span><br><span class="line">initial<span class="title"> apicid</span>  : 1</span><br><span class="line">fpu             :<span class="title"> yes</span></span><br><span class="line"><span class="title">fpu_exception</span>   :<span class="title"> yes</span></span><br><span class="line"><span class="title">cpuid</span> level     : 13</span><br><span class="line">wp              :<span class="title"> yes</span></span><br><span class="line"><span class="title">flags</span>           :<span class="title"> fpu</span> vme<span class="title"> de</span> pse<span class="title"> tsc</span> msr<span class="title"> pae</span> mce<span class="title"> cx8</span> apic<span class="title"> sep</span> mtrr<span class="title"> pge</span> mca<span class="title"> cmov</span> pat<span class="title"> pse36</span> clflush<span class="title"> dts</span> acpi<span class="title"> mmx</span> fxsr<span class="title"> sse</span> sse2<span class="title"> ss</span> ht<span class="title"> tm</span> pbe<span class="title"> syscall</span> nx<span class="title"> lm</span> constant_tsc<span class="title"> arch_perfmon</span> pebs<span class="title"> bts</span> rep_good<span class="title"> nopl</span> aperfmperf<span class="title"> pni</span> dtes64<span class="title"> monitor</span> ds_cpl<span class="title"> vmx</span> est<span class="title"> tm2</span> ssse3<span class="title"> cx16</span> xtpr<span class="title"> pdcm</span> sse4_1<span class="title"> xsave</span> lahf_lm<span class="title"> tpr_shadow</span> vnmi<span class="title"> flexpriority</span> dtherm</span><br><span class="line">bugs            :</span><br><span class="line">bogomips        : 5851.77</span><br><span class="line">clflush<span class="title"> size</span>    : 64</span><br><span class="line">cache_alignment : 64</span><br><span class="line">address<span class="title"> sizes</span>   : 36<span class="title"> bits</span> physical, 48<span class="title"> bits</span> virtual</span><br><span class="line">power<span class="title"> management:</span></span><br></pre></td></tr></table></figure>
+<h2 id="dmesg-grep-Hz"><a href="#dmesg-grep-Hz" class="headerlink" title="dmesg | grep Hz"></a><code>dmesg | grep Hz</code></h2><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@openswitch</span>-OptiPlex<span class="number">-380</span>:~$ dmesg | grep Hz</span><br><span class="line">[    <span class="number">0.000000</span>] <span class="string">tsc:</span> Detected <span class="number">2925.887</span> MHz processor</span><br><span class="line">[    <span class="number">0.104000</span>] <span class="string">smpboot:</span> <span class="string">CPU0:</span> Intel(R) Core(TM)<span class="number">2</span> Duo CPU     E7500  @ <span class="number">2.93</span>GHz (<span class="string">family:</span> <span class="number">0x6</span>, <span class="string">model:</span> <span class="number">0x17</span>, <span class="string">stepping:</span> <span class="number">0xa</span>)</span><br><span class="line">[    <span class="number">0.280044</span>] <span class="string">hpet0:</span> <span class="number">3</span> comparators, <span class="number">64</span>-bit <span class="number">14.318180</span> MHz counter</span><br><span class="line">[    <span class="number">1.840016</span>] <span class="string">tsc:</span> Refined TSC clocksource <span class="string">calibration:</span> <span class="number">2925.999</span> MHz</span><br></pre></td></tr></table></figure>
+<h2 id="lscpu"><a href="#lscpu" class="headerlink" title="lscpu"></a><code>lscpu</code></h2><figure class="highlight ldif"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">sunyongfeng@openswitch-OptiPlex-380:~$ lscpu</span></span><br><span class="line"><span class="attribute">Architecture</span>:          x86_64</span><br><span class="line"><span class="attribute">CPU op-mode(s)</span>:        32-bit, 64-bit</span><br><span class="line"><span class="attribute">Byte Order</span>:            Little Endian</span><br><span class="line"><span class="attribute">CPU(s)</span>:                2</span><br><span class="line"><span class="attribute">On-line CPU(s) list</span>:   0,1</span><br><span class="line"><span class="attribute">Thread(s) per core</span>:    1</span><br><span class="line"><span class="attribute">Core(s) per socket</span>:    2</span><br><span class="line"><span class="attribute">Socket(s)</span>:             1</span><br><span class="line"><span class="attribute">NUMA node(s)</span>:          1</span><br><span class="line"><span class="attribute">Vendor ID</span>:             GenuineIntel</span><br><span class="line"><span class="attribute">CPU family</span>:            6</span><br><span class="line"><span class="attribute">Model</span>:                 23</span><br><span class="line"><span class="attribute">Model name</span>:            Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz</span><br><span class="line"><span class="attribute">Stepping</span>:              10</span><br><span class="line"><span class="attribute">CPU MHz</span>:               1600.000</span><br><span class="line"><span class="attribute">CPU max MHz</span>:           2933.0000</span><br><span class="line"><span class="attribute">CPU min MHz</span>:           1600.0000</span><br><span class="line"><span class="attribute">BogoMIPS</span>:              5851.77</span><br><span class="line"><span class="attribute">Virtualization</span>:        VT-x</span><br><span class="line"><span class="attribute">L1d cache</span>:             32K</span><br><span class="line"><span class="attribute">L1i cache</span>:             32K</span><br><span class="line"><span class="attribute">L2 cache</span>:              3072K</span><br><span class="line"><span class="attribute">NUMA node0 CPU(s)</span>:     0,1</span><br><span class="line"><span class="attribute">Flags</span>:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm tpr_shadow vnmi flexpriority dtherm</span><br><span class="line"><span class="attribute">sunyongfeng@openswitch-OptiPlex-380:~$</span></span><br></pre></td></tr></table></figure>
+<h2 id="lshw-c-cpu"><a href="#lshw-c-cpu" class="headerlink" title="lshw -c cpu"></a>lshw -c cpu</h2><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-<span class="number">380</span>:~$ sudo lshw -c <span class="meta">cpu</span></span><br><span class="line">[sudo] password for sunyongfeng: </span><br><span class="line">  *-<span class="meta">cpu</span>                   </span><br><span class="line"><span class="symbol">       product:</span> Intel(R) Core(TM)<span class="number">2</span> Duo <span class="meta">CPU</span>     E7500  @ <span class="number">2.</span>93GHz</span><br><span class="line"><span class="symbol">       vendor:</span> Intel Corp.</span><br><span class="line">       physical id: <span class="number">1</span></span><br><span class="line">       bus info: <span class="meta">cpu</span>@<span class="number">0</span></span><br><span class="line"><span class="symbol">       size:</span> 1600MHz</span><br><span class="line"><span class="symbol">       capacity:</span> 2933MHz</span><br><span class="line"><span class="symbol">       width:</span> <span class="number">64</span> <span class="meta">bits</span></span><br><span class="line"><span class="symbol">       capabilities:</span> fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 <span class="keyword">clflush</span> dts acpi mmx fxsr sse sse2 <span class="built_in">ss</span> ht tm pbe <span class="keyword">syscall</span> nx x86-<span class="number">64</span> constant_tsc arch_perfmon pebs <span class="keyword">bts</span> rep_good nopl aperfmperf pni dtes64 <span class="keyword">monitor</span> ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 <span class="keyword">xsave</span> lahf_lm tpr_shadow vnmi flexpriority dtherm cpufreq</span><br></pre></td></tr></table></figure>
+<h2 id="sudo-dmidecode-t-processor"><a href="#sudo-dmidecode-t-processor" class="headerlink" title="sudo dmidecode -t processor"></a><code>sudo dmidecode -t processor</code></h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ sudo dmidecode -t processor</span><br><span class="line"><span class="comment"># dmidecode 3.0</span></span><br><span class="line">Getting SMBIOS data <span class="keyword">from</span> sysfs.</span><br><span class="line">SMBIOS 2.5 present.</span><br><span class="line"></span><br><span class="line">Handle 0x0400, DMI<span class="built_in"> type </span>4, 40 bytes</span><br><span class="line">Processor Information</span><br><span class="line">        Socket Designation: CPU</span><br><span class="line">        Type: Central Processor</span><br><span class="line">        Family: Core 2 Duo</span><br><span class="line">        Manufacturer: Intel</span><br><span class="line">        ID: 7A 06 01 00 FF FB EB BF</span><br><span class="line">        Signature:<span class="built_in"> Type </span>0, Family 6, Model 23, Stepping 10</span><br><span class="line">        Flags:</span><br><span class="line">                FPU (Floating-point unit on-chip)</span><br><span class="line">                VME (Virtual mode extension)</span><br><span class="line">                DE (Debugging extension)</span><br><span class="line">                PSE (Page size extension)</span><br><span class="line">                TSC (Time stamp counter)</span><br><span class="line">                MSR (Model specific registers)</span><br><span class="line">                PAE (Physical<span class="built_in"> address </span>extension)</span><br><span class="line">                MCE (Machine check exception)</span><br><span class="line">                CX8 (CMPXCHG8 instruction supported)</span><br><span class="line">                APIC (On-chip APIC<span class="built_in"> hardware </span>supported)</span><br><span class="line">                SEP (Fast<span class="built_in"> system </span>call)</span><br><span class="line">                MTRR (Memory<span class="built_in"> type </span>range registers)</span><br><span class="line">                PGE (Page global enable)</span><br><span class="line">                MCA (Machine check architecture)</span><br><span class="line">                CMOV (Conditional move instruction supported)</span><br><span class="line">                PAT (Page attribute table)</span><br><span class="line">                PSE-36 (36-bit<span class="built_in"> page </span>size extension)</span><br><span class="line">                CLFSH (CLFLUSH instruction supported)</span><br><span class="line">                DS (<span class="builtin-name">Debug</span> store)</span><br><span class="line">                ACPI (ACPI supported)</span><br><span class="line">                MMX (MMX technology supported)</span><br><span class="line">                FXSR (FXSAVE <span class="keyword">and</span> FXSTOR instructions supported)</span><br><span class="line">                SSE (Streaming SIMD extensions)</span><br><span class="line">                SSE2 (Streaming SIMD extensions 2)</span><br><span class="line">                SS (Self-snoop)</span><br><span class="line">                HTT (Multi-threading)</span><br><span class="line">                TM (Thermal monitor supported)</span><br><span class="line">                PBE (Pending break enabled)</span><br><span class="line">        Version: <span class="keyword">Not</span> Specified</span><br><span class="line">        Voltage: 1.2 V</span><br><span class="line">        External Clock: 1066 MHz</span><br><span class="line">        Max Speed: 5200 MHz</span><br><span class="line">        Current Speed: 2933 MHz</span><br><span class="line">        Status: Populated, Enabled</span><br><span class="line">        Upgrade: Socket LGA775</span><br><span class="line">        L1 Cache Handle: 0x0700</span><br><span class="line">        L2 Cache Handle: 0x0701</span><br><span class="line">        L3 Cache Handle: <span class="keyword">Not</span> Provided</span><br><span class="line">        Serial Number: <span class="keyword">Not</span> Specified</span><br><span class="line">        Asset Tag: <span class="keyword">Not</span> Specified</span><br><span class="line">        Part Number: <span class="keyword">Not</span> Specified</span><br><span class="line">        Core Count: 2</span><br><span class="line">        Core Enabled: 2</span><br><span class="line">        Thread Count: 2</span><br><span class="line">        Characteristics:</span><br><span class="line">                64-bit capable</span><br></pre></td></tr></table></figure>
+<h2 id="sudo-watch-n-1-cat-sys-devices-system-cpu-cpu-cpufreq-cpuinfo-cur-freq"><a href="#sudo-watch-n-1-cat-sys-devices-system-cpu-cpu-cpufreq-cpuinfo-cur-freq" class="headerlink" title="sudo watch -n 1  cat /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq"></a><code>sudo watch -n 1  cat /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq</code></h2><p>监控 CPU 频率变化。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng<span class="meta">@openswitch</span>-OptiPlex<span class="number">-380</span>:~$ sudo watch -n <span class="number">1</span>  cat <span class="regexp">/sys/</span>devices<span class="regexp">/system/</span>cpu<span class="regexp">/cpu*/</span>cpufreq/cpuinfo_cur_freq</span><br><span class="line">Every <span class="number">1.0</span><span class="string">s:</span> cat <span class="regexp">/sys/</span>devices<span class="regexp">/system/</span>cpu<span class="regexp">/cpu0/</span>cpufreq/cpuinfo_cu...  Thu Feb  <span class="number">9</span> <span class="number">12</span>:<span class="number">50</span>:<span class="number">54</span> <span class="number">2017</span></span><br><span class="line"></span><br><span class="line"><span class="number">1600000</span></span><br><span class="line"><span class="number">1600000</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/CPU/" rel="tag"># CPU</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201701/tools/git_encode.html" rel="next" title="git中文编码问题">
+                <i class="fa fa-chevron-left"></i> git中文编码问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201702/networks/wireshark_capture_less_64B.html" rel="prev" title="为什么 wireshark 可以抓到小于 64 字节的报文？">
+                为什么 wireshark 可以抓到小于 64 字节的报文？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cat-proc-cpuinfo"><span class="nav-number">1.</span> <span class="nav-text">cat /proc/cpuinfo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dmesg-grep-Hz"><span class="nav-number">2.</span> <span class="nav-text">dmesg | grep Hz</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lscpu"><span class="nav-number">3.</span> <span class="nav-text">lscpu</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lshw-c-cpu"><span class="nav-number">4.</span> <span class="nav-text">lshw -c cpu</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sudo-dmidecode-t-processor"><span class="nav-number">5.</span> <span class="nav-text">sudo dmidecode -t processor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sudo-watch-n-1-cat-sys-devices-system-cpu-cpu-cpufreq-cpuinfo-cur-freq"><span class="nav-number">6.</span> <span class="nav-text">sudo watch -n 1  cat /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201702/shell/cpuinfo.html";
+    this.page.identifier = "201702/shell/cpuinfo.html";
+    this.page.title = 'Linux 查看 CPU 信息';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

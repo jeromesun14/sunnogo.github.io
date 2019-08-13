@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="python 学习笔记">
+<meta name="keywords" content="python,list,dict,string to int,foreach">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 学习笔记">
+<meta property="og:url" content="http://sunyongfeng.com/201806/programmer/python/note.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="python 学习笔记">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python 学习笔记">
+<meta name="twitter:description" content="python 学习笔记">
+  <link rel="canonical" href="http://sunyongfeng.com/201806/programmer/python/note">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python 学习笔记 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201806/programmer/python/note.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">python 学习笔记
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-06-13 09:02:24" itemprop="dateCreated datePublished" datetime="2018-06-13T09:02:24+08:00">2018-06-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201806/programmer/python/note.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201806/programmer/python/note.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">python 学习笔记</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><p>详见 <a href="http://www.runoob.com/python/python-operators.html" target="_blank" rel="noopener">菜鸟教程 python 运算符</a></p>
+<p>这里只列出与 C 语言有差异的地方。</p>
+<ul>
+<li>算术运算符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>**</td>
+<td>幂 - 返回x的y次幂</td>
+<td>a**b 为10的20次方， 输出结果 100000000000000000000</td>
+</tr>
+<tr>
+<td>//</td>
+<td>取整除 - 返回商的整数部分</td>
+<td>9//2 输出结果 4 , 9.0//2.0 输出结果 4.0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>比较运算符，没有 <code>|| &amp;&amp;</code>，换为 <code>and / or / not</code> </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt;&gt;</td>
+<td>不等于 - 比较两个对象是否不相等</td>
+<td>(a &lt;&gt; b) 返回 true。这个运算符类似 != 。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>赋值运算符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+=</td>
+<td>加法赋值运算符</td>
+<td>c += a 等效于 c = c + a</td>
+</tr>
+<tr>
+<td>-=</td>
+<td>减法赋值运算符</td>
+<td>c -= a 等效于 c = c - a</td>
+</tr>
+<tr>
+<td>*=</td>
+<td>乘法赋值运算符</td>
+<td>c <em>= a 等效于 c = c </em> a</td>
+</tr>
+<tr>
+<td>/=</td>
+<td>除法赋值运算符</td>
+<td>c /= a 等效于 c = c / a</td>
+</tr>
+<tr>
+<td>%=</td>
+<td>取模赋值运算符</td>
+<td>c %= a 等效于 c = c % a</td>
+</tr>
+<tr>
+<td>**=</td>
+<td>幂赋值运算符</td>
+<td>c <strong>= a 等效于 c = c </strong> a</td>
+</tr>
+<tr>
+<td>//=</td>
+<td>取整除赋值运算符</td>
+<td>c //= a 等效于 c = c // a</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>位运算符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>^</td>
+<td>按位异或运算符：当两对应的二进位相异时，结果为1</td>
+<td>(a ^ b) 输出结果 49 ，二进制解释： 0011 0001</td>
+</tr>
+<tr>
+<td>~</td>
+<td>按位取反运算符：对数据的每个二进制位取反,即把1变为0,把0变为1 。~x 类似于 -x-1</td>
+<td>(~a ) 输出结果 -61 ，二进制解释： 1100 0011，在一个有符号二进制数的补码形式。</td>
+</tr>
+<tr>
+<td>&lt;&lt;</td>
+<td>左移动运算符：运算数的各二进位全部左移若干位，由 &lt;&lt; 右边的数字指定了移动的位数，高位丢弃，低位补0。</td>
+<td>a &lt;&lt; 2 输出结果 240 ，二进制解释： 1111 0000</td>
+</tr>
+<tr>
+<td>&gt;&gt;</td>
+<td>右移动运算符：把”&gt;&gt;”左边的运算数的各二进位全部右移若干位，&gt;&gt; 右边的数字指定了移动的位数</td>
+<td>a &gt;&gt; 2 输出结果 15 ，二进制解释：</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>逻辑运算符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>逻辑表达式</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>and</td>
+<td>x and y</td>
+<td>布尔”与” - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。</td>
+<td>(a and b) 返回 20。</td>
+</tr>
+<tr>
+<td>or</td>
+<td>x or y</td>
+<td>布尔”或”    - 如果 x 是非 0，它返回 x 的值，否则它返回 y 的计算值。</td>
+<td>(a or b) 返回 10。</td>
+</tr>
+<tr>
+<td>not</td>
+<td>not x</td>
+<td>布尔”非” - 如果 x 为 True，返回 False 。如果 x 为 False，它返回 True。</td>
+<td>not(a and b) 返回 False</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>成员运算符</li>
+</ul>
+<p>除了以上的一些运算符之外，Python还支持成员运算符，测试实例中包含了一系列的成员，包括字符串，列表或元组。</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>in</td>
+<td>如果在指定的序列中找到值返回 True，否则返回 False。</td>
+<td>x 在 y 序列中 , 如果 x 在 y 序列中返回 True。</td>
+</tr>
+<tr>
+<td>not in</td>
+<td>如果在指定的序列中没有找到值返回 True，否则返回 False。</td>
+<td>x 不在 y 序列中 , 如果 x 不在 y 序列中返回 True</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>身份运算符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>is</td>
+<td>is 是判断两个标识符是不是引用自一个对象</td>
+<td><strong>x is y</strong>, 类似 <strong>id(x) == id(y)</strong> , 如果引用的是同一个对象则返回 True，否则返回 False</td>
+</tr>
+<tr>
+<td>is not</td>
+<td>is not 是判断两个标识符是不是引用自不同对象</td>
+<td><strong>x is not y</strong> ， 类似 <strong>id(a) != id(b)</strong>。如果引用的不是同一个对象则返回结果 True，否则返回 False。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="string">condition:</span></span><br><span class="line">   statement</span><br><span class="line">elif <span class="string">condition:</span></span><br><span class="line">   statement</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">   statement</span><br></pre></td></tr></table></figure>
+<h3 id="全局变量-global"><a href="#全局变量-global" class="headerlink" title="全局变量 global"></a>全局变量 global</h3><p>全局变量一般不建议使用，但是写小脚本的时候可能用到。<br>全局变量定义只需要在最外层定义即可，在函数内使用时，用 global 指定变量为外层定义的全局变量。</p>
+<p><a href="https://www.programiz.com/python-programming/global-keyword" target="_blank" rel="noopener">样例</a>：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">c</span> = <span class="number">0</span> # <span class="keyword">global</span> variable</span><br><span class="line"></span><br><span class="line">def <span class="keyword">add</span>():</span><br><span class="line">    <span class="keyword">global</span> <span class="keyword">c</span></span><br><span class="line">    <span class="keyword">c</span> = <span class="keyword">c</span> + <span class="number">2</span> # increment by <span class="number">2</span></span><br><span class="line">    print(<span class="string">"Inside add():"</span>, <span class="keyword">c</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add</span>()</span><br><span class="line">print(<span class="string">"In main:"</span>, <span class="keyword">c</span>)</span><br></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Inside <span class="builtin-name">add</span>(): 2</span><br><span class="line"><span class="keyword">In</span> main: 2</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><h4 id="遍历列表"><a href="#遍历列表" class="headerlink" title="遍历列表"></a>遍历列表</h4><p>见 <a href="https://www.cnblogs.com/pizitai/p/6398276.html" target="_blank" rel="noopener">Python 列表(List) 的三种遍历(序号和值)方法</a>，这里贴一下原作者 <strong>痞子泰</strong> 的代码备忘，</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">if</span> __name_<span class="number">_</span> == <span class="string">'__main__'</span>:</span><br><span class="line">    list = [<span class="string">'html'</span>, <span class="string">'js'</span>, <span class="string">'css'</span>, <span class="string">'python'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法1</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'遍历列表方法1：'</span></span><br><span class="line">    <span class="keyword">for</span> i in list:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"序号：%s   值：%s"</span> % (list.index(i) + <span class="number">1</span>, i))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'\n遍历列表方法2：'</span></span><br><span class="line">    <span class="comment"># 方法2</span></span><br><span class="line">    <span class="keyword">for</span> i in range(len(list)):</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"序号：%s   值：%s"</span> % (i + <span class="number">1</span>, list[i]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法3</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'\n遍历列表方法3：'</span></span><br><span class="line">    <span class="keyword">for</span> i, val in enumerate(list):</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"序号：%s   值：%s"</span> % (i + <span class="number">1</span>, val))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法3</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'\n遍历列表方法3 （设置遍历开始初始位置，只改变了起始序号）：'</span></span><br><span class="line">    <span class="keyword">for</span> i, val in enumerate(list, <span class="number">2</span>):</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"序号：%s   值：%s"</span> % (i + <span class="number">1</span>, val))</span><br></pre></td></tr></table></figure>
+<h4 id="列表比较"><a href="#列表比较" class="headerlink" title="列表比较"></a>列表比较</h4><p>python 2.7 直接使用 cmp() 函数比较，0 表示相等。</p>
+<h4 id="列表排序"><a href="#列表排序" class="headerlink" title="列表排序"></a>列表排序</h4><p>详见 <a href="http://www.runoob.com/python/att-list-sort.html" target="_blank" rel="noopener">菜鸟教程</a>，</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list.sort(<span class="attribute">cmp</span>=None, <span class="attribute">key</span>=None, <span class="attribute">reverse</span>=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+<p>key 表示要比较的元素，贴一下样例代码：</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/python</span></span><br><span class="line"><span class="meta"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line"><span class="meta"># 获取列表的第二个元素</span></span><br><span class="line">def takeSecond(elem):</span><br><span class="line">    <span class="keyword">return</span> elem[<span class="number">1</span>]</span><br><span class="line"> </span><br><span class="line"><span class="meta"># 列表</span></span><br><span class="line">random = [(<span class="number">2</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>), (<span class="number">4</span>, <span class="number">1</span>), (<span class="number">1</span>, <span class="number">3</span>)]</span><br><span class="line"> </span><br><span class="line"><span class="meta"># 指定第二个元素排序</span></span><br><span class="line">random.sort(key=takeSecond)</span><br><span class="line"> </span><br><span class="line"><span class="meta"># 输出类别</span></span><br><span class="line">print <span class="string">'排序列表：'</span>, random</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">排序列表：[(<span class="number">4</span>, <span class="number">1</span>), (<span class="number">2</span>, <span class="number">2</span>), (<span class="number">1</span>, <span class="number">3</span>), (<span class="number">3</span>, <span class="number">4</span>)]</span><br></pre></td></tr></table></figure>
+<h3 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h3><p>赋值：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">myDict = &#123;&#125;</span><br><span class="line"></span><br><span class="line">myDict[<span class="string">'test'</span>] = <span class="string">"Value"</span></span><br><span class="line"></span><br><span class="line"><span class="symbol">Python3</span>:</span><br><span class="line">myDict[b<span class="string">'test'</span>] = <span class="string">"Value"</span></span><br></pre></td></tr></table></figure>
+<p>如果使用不当时，key 找不到，会出现 KeyError。此时通过 myDict.get(b’test’, None)，判断返回值是否为 None，再进行进一步的操作。</p>
+<h3 id="copy-赋值、浅复制和深复制的差异"><a href="#copy-赋值、浅复制和深复制的差异" class="headerlink" title="copy 赋值、浅复制和深复制的差异"></a>copy 赋值、浅复制和深复制的差异</h3><p><a href="http://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html" target="_blank" rel="noopener">http://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html</a></p>
+<h3 id="集合（set）"><a href="#集合（set）" class="headerlink" title="集合（set）"></a>集合（set）</h3><p>集合，内置函数，<code>set([&#39;a&#39;, &#39;b&#39;])</code>，可将列表的数据转换为集合，也是列表格式。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python</span><br><span class="line">Python 2.7.12 (default, Nov 20 2017, 18:23:56) </span><br><span class="line">[GCC 5.4.0 20160609] on linux2</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> <span class="keyword">or</span> <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; a = [1, 2 ,3, 4, 1, 1, 2, 2, 3]</span><br><span class="line">&gt;&gt;&gt; b = <span class="builtin-name">set</span>(a)</span><br><span class="line">&gt;&gt;&gt; <span class="builtin-name">print</span> b</span><br><span class="line"><span class="builtin-name">set</span>([1, 2, 3, 4])</span><br></pre></td></tr></table></figure>
+<h2 id="多线程处理"><a href="#多线程处理" class="headerlink" title="多线程处理"></a>多线程处理</h2><p>这里先只讨论 python 2.7 的。<br>线程和锁都隶属 <a href="https://docs.python.org/2/library/threading.html" target="_blank" rel="noopener">threading</a> 库。</p>
+<p>threading 库包含几种 objects：</p>
+<ul>
+<li>Thread，创建、启动线程</li>
+<li>Lock，普通锁，不支持嵌套</li>
+<li>Rlock，嵌套锁</li>
+<li>Condition，条件锁</li>
+<li>Semaphore，信号量</li>
+<li>Timer，定时器</li>
+<li>Event</li>
+</ul>
+<h3 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h3><h3 id="在-with-语句中使用-locks-conditions-and-semaphores"><a href="#在-with-语句中使用-locks-conditions-and-semaphores" class="headerlink" title="在 with 语句中使用 locks, conditions, and semaphores"></a>在 with 语句中使用 locks, conditions, and semaphores</h3><h2 id="log"><a href="#log" class="headerlink" title="log"></a>log</h2><h3 id="print"><a href="#print" class="headerlink" title="print"></a>print</h3><p>两种格式化方法：</p>
+<ul>
+<li>使用 format，<code>print &#39;{name} {test}&#39;format(name=&#39;yyy&#39;, test=&#39;zzz&#39;)</code></li>
+<li>原生，<code>print &#39;%s %s&#39;%(&#39;yyy&#39;, &#39;zzz&#39;)</code></li>
+</ul>
+<h3 id="syslog"><a href="#syslog" class="headerlink" title="syslog"></a>syslog</h3><p>相比 logging，syslog 比较简单易入手，不过没有 logging 灵活。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">syslog</span><span class="selector-class">.syslog</span>(<span class="string">'%%Hello: %s'</span>%(<span class="string">'your_name'</span>))</span><br></pre></td></tr></table></figure>
+<h3 id="logging"><a href="#logging" class="headerlink" title="logging"></a>logging</h3><p>个人觉得比 syslog 好用，可以同时输出到 console 和文件中。<br>注意 logging 比较复杂，比如在 class 中用，和在 main 函数中用，写法有很多差异。</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop/python$ python test_logging.py </span><br><span class="line">2018-10-23 08:58:41,998 - spam_application - INFO - creating an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary</span><br><span class="line">2018-10-23 08:58:42,000 - spam_application.auxiliary.Auxiliary - INFO - creating an<span class="built_in"> instance </span>of Auxiliary</span><br><span class="line">2018-10-23 08:58:42,000 - spam_application - INFO - created an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - calling auxiliary_module.Auxiliary.do_something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application.auxiliary.Auxiliary - INFO - doing something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application.auxiliary.Auxiliary - INFO - done doing something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - finished auxiliary_module.Auxiliary.do_something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - calling auxiliary_module.some_function()</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - done with auxiliary_module.some_function()</span><br><span class="line">jeromesun@km:~/workshop/python$ cat test_logging.py       </span><br><span class="line">import logging</span><br><span class="line"></span><br><span class="line">class hello:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.logger = logging.getLogger('spam_application.auxiliary.Auxiliary')</span><br><span class="line">        self.logger.info('creating an<span class="built_in"> instance </span>of Auxiliary')</span><br><span class="line"></span><br><span class="line">    def do_something(self):</span><br><span class="line">        self.logger.info('doing something')</span><br><span class="line">        a = 1 + 1</span><br><span class="line">        self.logger.info('done doing something')</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    <span class="comment"># create logger with 'spam_application'</span></span><br><span class="line">    logger = logging.getLogger('spam_application')</span><br><span class="line">    logger.setLevel(logging.DEBUG)</span><br><span class="line">    <span class="comment"># create file handler which logs even debug messages</span></span><br><span class="line">    fh = logging.FileHandler('spam.log')</span><br><span class="line">    fh.setLevel(logging.DEBUG)</span><br><span class="line">    <span class="comment"># create console handler with a higher log level</span></span><br><span class="line">    ch = logging.StreamHandler()</span><br><span class="line">    ch.setLevel(logging.DEBUG)</span><br><span class="line">    <span class="comment"># create formatter and add it to the handlers</span></span><br><span class="line">    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')</span><br><span class="line">    fh.setFormatter(formatter)</span><br><span class="line">    ch.setFormatter(formatter)</span><br><span class="line">    <span class="comment"># add the handlers to the logger</span></span><br><span class="line">    logger.addHandler(fh)</span><br><span class="line">    logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line">    logger.info('creating an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary')</span><br><span class="line">    a = hello()</span><br><span class="line">    logger.info('created an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary')</span><br><span class="line">    logger.info('calling auxiliary_module.Auxiliary.do_something')</span><br><span class="line">    a.do_something()</span><br><span class="line">    logger.info('finished auxiliary_module.Auxiliary.do_something')</span><br><span class="line">    logger.info('calling auxiliary_module.some_function()')</span><br><span class="line">    logger.info('done with auxiliary_module.some_function()')</span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    main()</span><br><span class="line">jeromesun@km:~/workshop/python$ tail -n 10 spam.log </span><br><span class="line">2018-10-22 10:24:27,924 - spam_application - INFO - done with auxiliary_module.some_function()</span><br><span class="line">2018-10-23 08:58:41,998 - spam_application - INFO - creating an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary</span><br><span class="line">2018-10-23 08:58:42,000 - spam_application.auxiliary.Auxiliary - INFO - creating an<span class="built_in"> instance </span>of Auxiliary</span><br><span class="line">2018-10-23 08:58:42,000 - spam_application - INFO - created an<span class="built_in"> instance </span>of auxiliary_module.Auxiliary</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - calling auxiliary_module.Auxiliary.do_something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application.auxiliary.Auxiliary - INFO - doing something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application.auxiliary.Auxiliary - INFO - done doing something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - finished auxiliary_module.Auxiliary.do_something</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - calling auxiliary_module.some_function()</span><br><span class="line">2018-10-23 08:58:42,001 - spam_application - INFO - done with auxiliary_module.some_function()</span><br><span class="line">jeromesun@km:~/workshop/python$</span><br></pre></td></tr></table></figure>
+<h2 id="常用工具"><a href="#常用工具" class="headerlink" title="常用工具"></a>常用工具</h2><h3 id="延迟几秒"><a href="#延迟几秒" class="headerlink" title="延迟几秒"></a>延迟几秒</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="字符串对比"><a href="#字符串对比" class="headerlink" title="字符串对比"></a>字符串对比</h3><p><code>if a == &#39;abcdefg&#39;</code></p>
+<h2 id="常见-error"><a href="#常见-error" class="headerlink" title="常见 error"></a>常见 error</h2><h3 id="TypeError-39-NoneType-39-object-is-not-iterable-in-Python"><a href="#TypeError-39-NoneType-39-object-is-not-iterable-in-Python" class="headerlink" title="TypeError: &#39;NoneType&#39; object is not iterable in Python"></a><code>TypeError: &#39;NoneType&#39; object is not iterable in Python</code></h3><p>遍历时，对应的 list 或 dict 为空。详见 <a href="https://stackoverflow.com/questions/3887381/typeerror-nonetype-object-is-not-iterable-in-python。" target="_blank" rel="noopener">https://stackoverflow.com/questions/3887381/typeerror-nonetype-object-is-not-iterable-in-python。</a><br>可通过 <code>or []</code> 或 <code>or {}</code> 规避。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="selector-tag">i</span> <span class="keyword">in</span> data or []:</span><br></pre></td></tr></table></figure>
+<h3 id="RuntimeError-dictionary-changed-size-during-iteration"><a href="#RuntimeError-dictionary-changed-size-during-iteration" class="headerlink" title="RuntimeError: dictionary changed size during iteration"></a><code>RuntimeError: dictionary changed size during iteration</code></h3><p>字典 items() 和 iteritems() 的差异，都是遍历。前者能遍历中删除的原因是，拷贝内存处理。<br>iteritems 使用时，不能变动字典的大小，即不能增删成员。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop$ python test_copy<span class="selector-class">.py</span> </span><br><span class="line">k <span class="number">1</span> &lt;type <span class="string">'str'</span>&gt; v <span class="number">1</span></span><br><span class="line">k <span class="number">3</span> &lt;type <span class="string">'str'</span>&gt; v <span class="number">3</span></span><br><span class="line">k <span class="number">2</span> &lt;type <span class="string">'str'</span>&gt; v <span class="number">2</span></span><br><span class="line">k <span class="number">4</span> &lt;type <span class="string">'str'</span>&gt; v <span class="number">4</span></span><br><span class="line">k <span class="number">1</span> &lt;type <span class="string">'str'</span>&gt; v <span class="number">1</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"test_copy.py"</span>, line <span class="number">10</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    <span class="keyword">for</span> (k,v) <span class="keyword">in</span> <span class="selector-tag">b</span>.iteritems() or &#123;&#125;:</span><br><span class="line">RuntimeError: dictionary changed size during iteration</span><br><span class="line">jeromesun@km:~/workshop$ </span><br><span class="line">jeromesun@km:~/workshop$ cat test_copy<span class="selector-class">.py</span>    </span><br><span class="line">import copy</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">a</span> = &#123;<span class="string">'1'</span>:<span class="number">1</span>, <span class="string">'2'</span>:<span class="number">2</span>, <span class="string">'3'</span>:<span class="number">3</span>, <span class="string">'4'</span>:<span class="number">4</span>&#125;</span><br><span class="line"><span class="keyword">for</span> (k,v) <span class="keyword">in</span> <span class="selector-tag">a</span>.items() or &#123;&#125;:</span><br><span class="line">    print <span class="string">"k &#123;&#125; &#123;&#125; v &#123;&#125;"</span>.format(k,type(k), v)</span><br><span class="line">    <span class="selector-tag">del</span> <span class="selector-tag">a</span>[k]</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">a</span> = &#123;<span class="string">'1'</span>:<span class="number">1</span>, <span class="string">'2'</span>:<span class="number">2</span>, <span class="string">'3'</span>:<span class="number">3</span>, <span class="string">'4'</span>:<span class="number">4</span>&#125;</span><br><span class="line"><span class="selector-tag">b</span> = copy.copy(a)</span><br><span class="line"><span class="keyword">for</span> (k,v) <span class="keyword">in</span> <span class="selector-tag">b</span>.iteritems() or &#123;&#125;:</span><br><span class="line">    print <span class="string">"k &#123;&#125; &#123;&#125; v &#123;&#125;"</span>.format(k,type(k), v)</span><br><span class="line">    <span class="selector-id">#del</span> <span class="selector-tag">a</span>[k]</span><br><span class="line">    <span class="selector-tag">b</span>[<span class="string">'5'</span>] = <span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>items 遍历的性能，在元素多的情况下，差很多：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop$ python test_copy.py </span><br><span class="line">len <span class="number">1000</span> item <span class="number">0.000249</span> a.k.a <span class="number">4016064</span>.<span class="number">25703</span> pps, iteritem <span class="number">0.000116</span> a.k.a <span class="number">8620689</span>.<span class="number">65517</span> pps</span><br><span class="line">len <span class="number">10000</span> item <span class="number">0.002774</span> a.k.a <span class="number">3604902</span>.<span class="number">66763</span> pps, iteritem <span class="number">0.001042</span> a.k.a <span class="number">9596928</span>.<span class="number">98273</span> pps</span><br><span class="line">len <span class="number">100000</span> item <span class="number">0.040658</span> a.k.a <span class="number">2459540</span>.<span class="number">55782</span> pps, iteritem <span class="number">0.013075</span> a.k.a <span class="number">7648183</span>.<span class="number">55641</span> pps</span><br><span class="line">len <span class="number">1000000</span> item <span class="number">0.724924</span> a.k.a <span class="number">1379454</span>.<span class="number">94976</span> pps, iteritem <span class="number">0.176209</span> a.k.a <span class="number">5675079</span>.<span class="number">02548</span> pps</span><br><span class="line">len <span class="number">10000000</span> item <span class="number">9.40743</span> a.k.a <span class="number">1062989</span>.<span class="number">57314</span> pps, iteritem <span class="number">2.154777</span> a.k.a <span class="number">4640851</span>.<span class="number">4663</span> pps</span><br><span class="line">jeromesun@km:~/workshop$ cat test_copy.py </span><br><span class="line">import copy</span><br><span class="line">import datetime</span><br><span class="line"></span><br><span class="line">def test_perf(size):</span><br><span class="line">    a = &#123;&#125;</span><br><span class="line">    for i in range(<span class="number">0</span>, size):</span><br><span class="line">        a[str(i)] = i</span><br><span class="line"></span><br><span class="line">    item_start = datetime.datetime.now()</span><br><span class="line">    for (k,v) in a.items() or &#123;&#125;:</span><br><span class="line">        a[k] += <span class="number">1</span></span><br><span class="line">    item_end = datetime.datetime.now()</span><br><span class="line"></span><br><span class="line">    iter_start = datetime.datetime.now()</span><br><span class="line">    for (k,v) in a.iteritems() or &#123;&#125;:</span><br><span class="line">        a[k] -= <span class="number">1</span></span><br><span class="line">    iter_end = datetime.datetime.now()</span><br><span class="line"></span><br><span class="line">    titem = (item_end - item_start).total_seconds()</span><br><span class="line">    titer = (iter_end - iter_start).total_seconds()</span><br><span class="line">    print "len &#123;&#125; item &#123;&#125; a.k.a &#123;&#125; pps, iteritem &#123;&#125; a.k.a &#123;&#125; pps".\</span><br><span class="line">        format(len(a), titem, size / titem, titer, size / titer)</span><br><span class="line"></span><br><span class="line">test_perf(<span class="number">1000</span>)</span><br><span class="line">test_perf(<span class="number">10000</span>)</span><br><span class="line">test_perf(<span class="number">100000</span>)</span><br><span class="line">test_perf(<span class="number">1000000</span>)</span><br><span class="line">test_perf(<span class="number">10000000</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><h3 id="多线程-python-程序运行时无法-ctrl-c-退出"><a href="#多线程-python-程序运行时无法-ctrl-c-退出" class="headerlink" title="多线程 python 程序运行时无法 ctrl + c 退出"></a>多线程 python 程序运行时无法 ctrl + c 退出</h3><p><a href="https://stackoverflow.com/questions/1489669/how-to-exit-the-entire-application-from-a-python-thread" target="_blank" rel="noopener">how-to-exit-the-entire-application-from-a-python-thread</a> 提到了几种解法，但是经过验证，发现 signal 的方法可行性最高。</p>
+<p>作为代码搬运工，找到了一个样例代码：<a href="https://www.g-loaded.eu/2016/11/24/how-to-terminate-running-python-threads-using-signals/" target="_blank" rel="noopener">How to terminate running Python threads using signals</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> signal</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Job</span><span class="params">(threading.Thread)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        threading.Thread.__init__(self)</span><br><span class="line"> </span><br><span class="line">        <span class="comment"># The shutdown_flag is a threading.Event object that</span></span><br><span class="line">        <span class="comment"># indicates whether the thread should be terminated.</span></span><br><span class="line">        self.shutdown_flag = threading.Event()</span><br><span class="line"> </span><br><span class="line">        <span class="comment"># ... Other thread setup code here ...</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'Thread #%s started'</span> % self.ident)</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.shutdown_flag.is_set():</span><br><span class="line">            <span class="comment"># ... Job code here ...</span></span><br><span class="line">            time.sleep(<span class="number">0.5</span>)</span><br><span class="line"> </span><br><span class="line">        <span class="comment"># ... Clean shutdown code here ...</span></span><br><span class="line">        print(<span class="string">'Thread #%s stopped'</span> % self.ident)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ServiceExit</span><span class="params">(Exception)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Custom exception which is used to trigger the clean exit</span></span><br><span class="line"><span class="string">    of all running threads and the main program.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">service_shutdown</span><span class="params">(signum, frame)</span>:</span></span><br><span class="line">    print(<span class="string">'Caught signal %d'</span> % signum)</span><br><span class="line">    <span class="keyword">raise</span> ServiceExit</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment"># Register the signal handlers</span></span><br><span class="line">    signal.signal(signal.SIGTERM, service_shutdown)</span><br><span class="line">    signal.signal(signal.SIGINT, service_shutdown)</span><br><span class="line"> </span><br><span class="line">    print(<span class="string">'Starting main program'</span>)</span><br><span class="line"> </span><br><span class="line">    <span class="comment"># Start the job threads</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        j1 = Job()</span><br><span class="line">        j2 = Job()</span><br><span class="line">        j1.start()</span><br><span class="line">        j2.start()</span><br><span class="line"> </span><br><span class="line">        <span class="comment"># Keep the main thread running, otherwise signals are ignored.</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            time.sleep(<span class="number">0.5</span>)</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">except</span> ServiceExit:</span><br><span class="line">        <span class="comment"># Terminate the running threads.</span></span><br><span class="line">        <span class="comment"># Set the shutdown flag on each thread to trigger a clean shutdown of each thread.</span></span><br><span class="line">        j1.shutdown_flag.set()</span><br><span class="line">        j2.shutdown_flag.set()</span><br><span class="line">        <span class="comment"># Wait for the threads to close...</span></span><br><span class="line">        j1.join()</span><br><span class="line">        j2.join()</span><br><span class="line"> </span><br><span class="line">    print(<span class="string">'Exiting main program'</span>)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/workshop/python</span><span class="variable">$ </span>python thread_signal.py </span><br><span class="line">Starting main program</span><br><span class="line">Thread <span class="comment">#139858881009408 started</span></span><br><span class="line"> Thread <span class="comment">#139858872616704 started</span></span><br><span class="line">^CCaught signal <span class="number">2</span></span><br><span class="line">Thread <span class="comment">#139858881009408 stopped</span></span><br><span class="line">Thread <span class="comment">#139858872616704 stopped</span></span><br><span class="line">Exiting main program</span><br><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/workshop/python</span>$</span><br></pre></td></tr></table></figure>
+<h3 id="想保密，如何发布-Python-组件？"><a href="#想保密，如何发布-Python-组件？" class="headerlink" title="想保密，如何发布 Python 组件？"></a>想保密，如何发布 Python 组件？</h3><h3 id="docker-中的-pyc-无法直接运行"><a href="#docker-中的-pyc-无法直接运行" class="headerlink" title="docker 中的 pyc 无法直接运行"></a>docker 中的 pyc 无法直接运行</h3><h3 id="docker-中的-pyc-无法-import"><a href="#docker-中的-pyc-无法-import" class="headerlink" title="docker 中的 pyc 无法 import"></a>docker 中的 pyc 无法 import</h3>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201805/networks/linux_arp.html" rel="next" title="linux arp">
+                <i class="fa fa-chevron-left"></i> linux arp
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201807/linux/sshd_config.html" rel="prev" title="sshd 配置">
+                sshd 配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#运算符"><span class="nav-number">1.</span> <span class="nav-text">运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语法"><span class="nav-number">2.</span> <span class="nav-text">语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#条件语句"><span class="nav-number">2.1.</span> <span class="nav-text">条件语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量-global"><span class="nav-number">2.2.</span> <span class="nav-text">全局变量 global</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据结构"><span class="nav-number">3.</span> <span class="nav-text">数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#list"><span class="nav-number">3.1.</span> <span class="nav-text">list</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#遍历列表"><span class="nav-number">3.1.1.</span> <span class="nav-text">遍历列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#列表比较"><span class="nav-number">3.1.2.</span> <span class="nav-text">列表比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#列表排序"><span class="nav-number">3.1.3.</span> <span class="nav-text">列表排序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dict"><span class="nav-number">3.2.</span> <span class="nav-text">dict</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#copy-赋值、浅复制和深复制的差异"><span class="nav-number">3.3.</span> <span class="nav-text">copy 赋值、浅复制和深复制的差异</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集合（set）"><span class="nav-number">3.4.</span> <span class="nav-text">集合（set）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程处理"><span class="nav-number">4.</span> <span class="nav-text">多线程处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Thread"><span class="nav-number">4.1.</span> <span class="nav-text">Thread</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在-with-语句中使用-locks-conditions-and-semaphores"><span class="nav-number">4.2.</span> <span class="nav-text">在 with 语句中使用 locks, conditions, and semaphores</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#log"><span class="nav-number">5.</span> <span class="nav-text">log</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#print"><span class="nav-number">5.1.</span> <span class="nav-text">print</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#syslog"><span class="nav-number">5.2.</span> <span class="nav-text">syslog</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#logging"><span class="nav-number">5.3.</span> <span class="nav-text">logging</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用工具"><span class="nav-number">6.</span> <span class="nav-text">常用工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#延迟几秒"><span class="nav-number">6.1.</span> <span class="nav-text">延迟几秒</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串对比"><span class="nav-number">6.2.</span> <span class="nav-text">字符串对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见-error"><span class="nav-number">7.</span> <span class="nav-text">常见 error</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TypeError-39-NoneType-39-object-is-not-iterable-in-Python"><span class="nav-number">7.1.</span> <span class="nav-text">TypeError: &#39;NoneType&#39; object is not iterable in Python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RuntimeError-dictionary-changed-size-during-iteration"><span class="nav-number">7.2.</span> <span class="nav-text">RuntimeError: dictionary changed size during iteration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">8.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程-python-程序运行时无法-ctrl-c-退出"><span class="nav-number">8.1.</span> <span class="nav-text">多线程 python 程序运行时无法 ctrl + c 退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#想保密，如何发布-Python-组件？"><span class="nav-number">8.2.</span> <span class="nav-text">想保密，如何发布 Python 组件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-中的-pyc-无法直接运行"><span class="nav-number">8.3.</span> <span class="nav-text">docker 中的 pyc 无法直接运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-中的-pyc-无法-import"><span class="nav-number">8.4.</span> <span class="nav-text">docker 中的 pyc 无法 import</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201806/programmer/python/note.html";
+    this.page.identifier = "201806/programmer/python/note.html";
+    this.page.title = 'python 学习笔记';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

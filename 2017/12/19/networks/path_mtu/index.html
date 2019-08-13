@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Path MTU 概述 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Path MTU 简述。">
+<meta name="keywords" content="Linux,kernel,don&#39;t fragment,DF,MTU,PMTU,TUNNEL,GRE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Path MTU 概述">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/networks/path_mtu/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Path MTU 简述。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.074Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Path MTU 概述">
+<meta name="twitter:description" content="Path MTU 简述。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-networks/path_mtu" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/19/networks/path_mtu/" class="article-date">
+  <time datetime="2017-12-19T01:56:24.000Z" itemprop="datePublished">2017-12-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/c/">c</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Path MTU 概述
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><ul>
+<li><p>概念</p>
+<ul>
+<li>PMTU，Path MTU，以路由为单位，作为路由表的属性信息缓存于路由表。</li>
+<li>PMTU发现机制，若网络设备收到超MTU IP报文且该IP报文不允许分片，则返回一个ICMP type 3 code 4报文（<code>The datagram is too big. Packet fragmentation is required but the &#39;don&#39;t fragment&#39; (DF) flag is on.</code>），将网络设备支持的MTU大小附在ICMP报文中，返回给报文源主机，由报文源主机调整该路径的PMTU。该机制利用IP头部<code>flags</code>中的<code>Don&#39;t fragment</code>位，为1时表示不允许分片。</li>
+</ul>
+</li>
+<li><p>影响。在GRE IP隧道叠加网中，报文将在IP头部后添加上24字节GRE IP头部。以默认IP MTU为1500字节为例，原先一个1514字节大小的报文（IP头部 + 数据刚好为IP MTU 1500字节）在公网上可以正常传输，若此时将路径切换到GRE IP隧道叠加网，则报文长度将变成1528字节（IP头部 + 数据 = 1524字节），将超过默认IP MTU。<br>详见 H3C 文章 <a href="http://www.h3c.com/cn/d_201411/921527_30005_0.htm" target="_blank" rel="noopener">看招MTU!!!——高端路由器GRE组网中需要注意的问题</a>。</p>
+<ul>
+<li>如果分片发生在旁挂设备，则将导致GRE IP报文被分片，无法在隧道终结处重组，因为第二个分片不带GRE头部。</li>
+<li>IP报文不允许分片<ul>
+<li>对于TCP报文<ul>
+<li>将通过PMTU发现机制，调整主机PMTU</li>
+<li>通过快速重传机制，迅速恢复</li>
+<li>主机调整TCP报文大小，以适应PMTU</li>
+</ul>
+</li>
+<li>对于UDP报文<ul>
+<li>将通过PMTU发现机制，调整主机PMTU</li>
+<li><strong>丢弃该报文</strong></li>
+<li>后续传输时，对超过PMTU的报文，在主机处主动进行分片。</li>
+<li>若有需要，超时重传、调整报文大小的机制由UDP的上层协议支持。</li>
+</ul>
+</li>
+<li>对于其他IP报文（以ping报文为例）<ul>
+<li>将通过PMTU发现机制，调整主机PMTU</li>
+<li><strong>丢弃该报文</strong></li>
+<li>后续传输时，在主机处主动分片（以Linux为例）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>IP报文允许分片<ul>
+<li>如果业务开始前，主机已经调整PMTU，则分片在主机进行，业务可正常运行。</li>
+<li><strong>如果主机未调整PMTU，则分片在旁挂设备进行，将导致业务中断</strong>。此问题将影响整个方案。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>规避手段</p>
+<ul>
+<li>规避目标：将分片的行为转移至主机上，不允许旁挂设备上进行任何分片行为。</li>
+<li>方案：对所有超IP MTU送旁挂设备CPU的报文，皆返回ICMP type 3 code 4。需验证此规避对允许分片IP报文的影响。</li>
+<li>风险：对控制面和管理面的影响待评估。</li>
+</ul>
+</li>
+<li><p>分析</p>
+<ul>
+<li><p>Linux</p>
+<ul>
+<li>PMTU发现机制默认为<code>IP_PMTUDISC_WANT</code>，如果报文不超过PMTU，默认开启PMTU发现机制，如果报文超过PMTU，则主动在终端进行分片处理。（<code>will fragment a datagram if needed according to the path MTU, or will set the don’t-fragment flag otherwise.</code>）</li>
+</ul>
+</li>
+<li><p>Windows</p>
+<ul>
+<li>TCP报文，默认不允许分片</li>
+<li>其他报文，默认允许分片</li>
+<li>对允许分片的报文，如果报文长度超过PMTU，则主动在终端处进行分片</li>
+</ul>
+</li>
+<li><p>不能假定网络上的所有的TCP报文都不允许分片（如新浪网，默认TCP报文允许分片）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><table>
+<thead>
+<tr>
+<th style="text-align:left">系统</th>
+<th style="text-align:center">协议</th>
+<th style="text-align:center">默认是否加DF</th>
+<th style="text-align:left">默认对超PMTU的处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">调整TCP段长度</td>
+</tr>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">UDP</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">不做处理，用户程序处理</td>
+</tr>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">RTSP（UDP）</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">丢掉ICMP packet too big的那几个包，后续分片</td>
+</tr>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">TFTP（UDP）</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">等不到ACK，timeout退出</td>
+</tr>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">ping</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">不重传报文，主机提示<code>From 3.3.3.3 icmp_seq=93 Frag needed and DF set (mtu = 0)</code>，后开始在主机对ping报文进行分片，分片后的报文DF=0；如果强制设置DF：<code>-M = do</code>，则提示<code>ping: local error: Message too long, mtu=552</code></td>
+</tr>
+<tr>
+<td style="text-align:left">Linux</td>
+<td style="text-align:center">TCP(自己构造)</td>
+<td style="text-align:center">否</td>
+<td style="text-align:left">默认在交换机中送CPU分片，如果此时有一个ICMP packet too big返回至主机（比如由ping触发），则会转在主机分片</td>
+</tr>
+<tr>
+<td style="text-align:left">Windows</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">调整TCP段长度</td>
+</tr>
+<tr>
+<td style="text-align:left">Windows</td>
+<td style="text-align:center">UDP</td>
+<td style="text-align:center">否</td>
+<td style="text-align:left">被路由器分片或被主机分片</td>
+</tr>
+<tr>
+<td style="text-align:left">Windows</td>
+<td style="text-align:center">ping</td>
+<td style="text-align:center">否</td>
+<td style="text-align:left">无处理，在交换机中分片，如果此时有ICMP packet too big（如TCP触发），则会主动在终端分片。如果强制设置DF：<code>-f</code>，则提示<code>Packet needs to be fragmented but DF set.</code></td>
+</tr>
+</tbody>
+</table>
+<p>如上实验结果，得出以下结论：</p>
+<ol>
+<li>Linux下，TCP/UDP报文默认都置上DF位；</li>
+<li>Windows下，TCP报文默认置上DF位，UDP报文默认不置DF位；</li>
+<li>Linux下，UDP的对ICMP packet too big报文的处理取决于用户，Linux内核不进行处理</li>
+<li>不管Linux还是Windows下，如果要发出的UDP报文大于PMTU，则会主动在HOST端进行分片。</li>
+<li>PMTU以路由（SIP + DIP + TOS）为单位影响系统，UDP虽然没有主动调整数据报的大小，但是因UDP报文返回的ICMP packet too big报文会影响对应路由的PMTU。</li>
+</ol>
+<h2 id="标准"><a href="#标准" class="headerlink" title="标准"></a>标准</h2><ul>
+<li><a href="http://tools.ietf.org/html/rfc1191" target="_blank" rel="noopener">RFC 1191 Path MTU Discovery</a></li>
+<li><a href="http://tools.ietf.org/html/rfc4821" target="_blank" rel="noopener">RFC 4821  Packetization Layer Path MTU Discovery</a> </li>
+</ul>
+<p>按RFC 1191的定义，PMTU发现机制为Packetization Protocol服务，TCP是这种可调节报文大小的协议，因此可直接使用；而UDP协议需要靠上层协议来实现报文大小调整。</p>
+<p>RFC 1191 第6章“Host Implementation”讲述PMTU Discovery对终端的建议（仅仅是suggestion，不是specification）：</p>
+<ul>
+<li>在哪个或哪些层次实现PMTU发现机制；<ul>
+<li>由IP以上层次决定报文要发多大；</li>
+<li>Pakcetization Protocol必须能影响PMTU变化，含更新报文大小、控制DF位。（IP层不控制DF位）</li>
+</ul>
+</li>
+<li>PMTU信息缓存在哪；<ul>
+<li>把PMTU做为路由表项的一个属性成员。</li>
+<li>对于UDP这种无连接的报文，若返回ICMP packet too big，需要其上层协议通过超时重传机制，重传被dropped的报文。</li>
+</ul>
+</li>
+<li>旧PMTU信息如何被老化；</li>
+<li>PMTU如何上涨；</li>
+</ul>
+<h2 id="Linux的处理"><a href="#Linux的处理" class="headerlink" title="Linux的处理"></a>Linux的处理</h2><p>Linux Kernel的实现参考：<a href="http://linux.die.net/man/7/ip" target="_blank" rel="noopener">man 7 ip</a> 中关于<code>IP_MTU_DISCOVER</code>的描述。</p>
+<p>IP_MTU_DISCOVER (since Linux 2.2)<br>Set or receive the Path MTU Discovery setting for a socket. <strong>When enabled, Linux will perform Path MTU Discovery as defined in RFC 1191 on SOCK_STREAM sockets. For non-SOCK_STREAM sockets, IP_PMTUDISC_DO forces the don’t-fragment flag to be set on all outgoing packets. It is the user’s responsibility to packetize the data in MTU-sized chunks and to do the retransmits if necessary. The kernel will reject (with EMSGSIZE) datagrams that are bigger than the known path MTU. IP_PMTUDISC_WANT will fragment a datagram if needed according to the path MTU, or will set the don’t-fragment flag otherwise. </strong><br>The system-wide default can be toggled between IP_PMTUDISC_WANT and IP_PMTUDISC_DONT by writing (respectively, zero and nonzero values) to the /proc/sys/net/ipv4/ip_no_pmtu_disc file.</p>
+<p><strong>When PMTU discovery is enabled, the kernel automatically keeps track of the path MTU per destination host.</strong> When it is connected to a specific peer with connect(2), the currently known path MTU can be retrieved conveniently using the IP_MTU socket option (e.g., after an EMSGSIZE error occurred). The path MTU may change over time. For connectionless sockets with many destinations, the new MTU for a given destination can also be accessed using the error queue (see IP_RECVERR). A new error will be queued for every incoming MTU update.</p>
+<p>While MTU discovery is in progress, initial packets from datagram sockets may be dropped. Applications using UDP should be aware of this and not take it into account for their packet retransmit strategy.</p>
+<p>To bootstrap the path MTU discovery process on unconnected sockets, it is possible to start with a big datagram size (up to 64K-headers bytes long) and let it shrink by updates of the path MTU.</p>
+<p>To get an initial estimate of the path MTU, connect a datagram socket to the destination address using connect(2) and retrieve the MTU by calling getsockopt(2) with the IP_MTU option.</p>
+<p>It is possible to implement RFC 4821 MTU probing with SOCK_DGRAM or SOCK_RAW sockets by setting a value of IP_PMTUDISC_PROBE (available since Linux 2.6.22). This is also particularly useful for diagnostic tools such as tracepath(8) that wish to deliberately send probe packets larger than the observed Path MTU.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/19/networks/path_mtu/" data-id="cjz95gt3k00dsw5r9ofivfj0d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MTU/">MTU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/packet/">packet</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/20/networks/cables_and_ports/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          线缆和端口形态总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/19/networks/kernel_handle_rfc1191/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux内核源码处理ICMP packet too big与DF</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

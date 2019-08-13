@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Linux开发环境配置记录 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+<meta name="keywords" content="ubuntu,remmina,freerdp,serialport,kermit,samba,tftp,windows,远程登陆,samba 密码错误,拷贝粘贴,失败,串口,lrz,wine,共享,ser2net,comfoolery,linux,启机进入命令行,startup to command line">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux开发环境配置记录">
+<meta property="og:url" content="http://yoursite.com/2015/09/10/linux/dev-conf/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.061Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux开发环境配置记录">
+<meta name="twitter:description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/dev-conf" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/09/10/linux/dev-conf/" class="article-date">
+  <time datetime="2015-09-10T13:13:24.000Z" itemprop="datePublished">2015-09-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux开发环境配置记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="远程登录windows"><a href="#远程登录windows" class="headerlink" title="远程登录windows"></a>远程登录windows</h2><h3 id="remmina"><a href="#remmina" class="headerlink" title="remmina"></a>remmina</h3><p>安装包：</p>
+<ul>
+<li><code>remmina</code></li>
+<li><code>remmina-plugin-rdp</code></li>
+</ul>
+<p>配置：</p>
+<ol>
+<li>Protocol，选择“RDP - Remote Desktop Protocol”</li>
+<li>Basic标签<ul>
+<li>Server，windows的IP</li>
+<li>User name</li>
+<li>Password</li>
+</ul>
+</li>
+<li>Advanced标签<ul>
+<li>Security，选择“Negotiate”</li>
+</ul>
+</li>
+<li>SSH标签<ul>
+<li>去掉Enable SSH tunnel</li>
+</ul>
+</li>
+</ol>
+<a id="more"></a>
+<h3 id="freerdp"><a href="#freerdp" class="headerlink" title="freerdp"></a>freerdp</h3><p>本人倾向使用freerdp，简单易用。</p>
+<p>安装包：<code>freerdp</code>。<br>命令：（将username / password / 1.1.1.1替换成自己的内容）<br><code>xfreerdp -u username -p &quot;password&quot; -g 1024x768 -x l --plugin cliprdr --plugin rdpsnd 1.1.1.1</code></p>
+<p>因为版本不同，可能命令参数不一样：<br><code>xfreerdp --sec rdp -u username -p &quot;password&quot; -g 1440x790 -x l --plugin cliprdr --plugin rdpsnd 1.1.1.1</code></p>
+<h4 id="跨系统拷贝粘贴失败问题"><a href="#跨系统拷贝粘贴失败问题" class="headerlink" title="跨系统拷贝粘贴失败问题"></a>跨系统拷贝粘贴失败问题</h4><p>注意，windows 7有bug，导致clipboard有问题。即windows与Linux的copy、paste无法共用。解决方法见<a href="https://social.technet.microsoft.com/Forums/windows/zh-CN/5bbc11e8-ca2d-41ac-b640-d66ce971f58f/copy-paste-clipboard-issues-not-working" target="_blank" rel="noopener">链接</a>，其中mike 1504的做法，通过任务管理器杀掉rdpclip.exe再重启rdpclip.exe进程规避本问题。</p>
+<blockquote>
+<p>This is an old problem.  It has been around since pre2004, and microsoft is well aware of it.  The cause is tied to MS Office as well as the OS.  It usually occurs during Remote desktop sessions, and the problem is on the remote machine.  The best solution I have found is to pull up task man, end the process rdpclip.exe, and then restart it by first changing focus from task manager to another program and back to task manager, choose file&gt;new task (run) and then typing in rdpclip.exe and hit enter.  The remote clip service will restart, and usually the copy you wanted to paste immediately becomes available.<br>If you fail to change focus from Task Manager to another program and back you may find the remote session locks up.  If so, don’t panic, simply end the remote session and begin a new one.</p>
+<p>In case you don’t know how to access task manager on the remote machine (CTRL ALT DELETE is always to the local machine), simply right click on the task bar and choose it from the context menu.<br>I would have thought by win7 this would have been fixed, but I am running Win7 enterprise trial right now and having the problem there.</p>
+</blockquote>
+<h3 id="ssh远程登录Linux"><a href="#ssh远程登录Linux" class="headerlink" title="ssh远程登录Linux"></a>ssh远程登录Linux</h3><p>安装包：<code>openssh-server</code><br>客户端登录：<code>ssh username@hostIP</code></p>
+<h2 id="串口"><a href="#串口" class="headerlink" title="串口"></a>串口</h2><h3 id="PAC-Manager"><a href="#PAC-Manager" class="headerlink" title="PAC Manager"></a>PAC Manager</h3><p>安装包：</p>
+<ul>
+<li>PAC Manager，不在Ubuntu仓库中，Sourceforge<a href="http://sourceforge.net/projects/pacmanager/" target="_blank" rel="noopener">链接</a>。</li>
+<li><code>cu</code></li>
+</ul>
+<p>需要把/dev/ttyUSB0的用户切换成cu的uucp才能被cu使用。<br>使用cu时需要用sudo<br>还没有明白remote-tty怎么用。</p>
+<h3 id="kermit"><a href="#kermit" class="headerlink" title="kermit"></a>kermit</h3><p>安装包：</p>
+<ul>
+<li><code>ckermit</code></li>
+<li><code>lrzsz</code>，用于xmodem传输</li>
+</ul>
+<p>不改权限的话，只有用超级用户才能正常用kermit访问串口。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo kermit</span><br><span class="line">set line /dev/ttyUSB0</span><br><span class="line">set speed 115200</span><br><span class="line">set carrier-watch off</span><br><span class="line">set handshake none</span><br><span class="line">set flow-control none</span><br><span class="line">robust </span><br><span class="line"></span><br><span class="line">set receive packet-length 9024</span><br><span class="line">set send packekt-length 9024</span><br><span class="line"></span><br><span class="line">set protocol xmodem</span><br></pre></td></tr></table></figure></p>
+<p>在ckermit命令提示符下：</p>
+<ul>
+<li>connect，连接串口；</li>
+<li>?，查看所有命令，前面的配置命令在此都可以看到；</li>
+<li>send /path/to/file，传输文件，支持相对路径；</li>
+<li>在串口控制台下，通过ctrl + \，再敲c，返回ckermit控制台。</li>
+</ul>
+<h3 id="Ser2net"><a href="#Ser2net" class="headerlink" title="Ser2net"></a>Ser2net</h3><p>共享串口（SerialPort），提供telnet服务。</p>
+<p>配置文件<code>/etc/ser2net.conf</code>，类似下面的配置依葫芦画瓢就可以了。</p>
+<ul>
+<li>2001，端口号</li>
+<li>telnet，用telnet访问串口</li>
+<li>/dev/ttyUSB1，表示实际串口</li>
+<li>9600，波特率</li>
+<li>8DATABITS NONE 1STOPBIT，常见的8N1</li>
+<li>600，port timeout，如果在超时时间间隔内没有对串口进行任何操作，ser2net会自动退出。</li>
+</ul>
+<p>可以将所有的波特率的配置都添加进去，注意使用不同的端口号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2001:telnet:600:/dev/ttyUSB1:9600 8DATABITS NONE 1STOPBIT -XONXOFF -RTSCTS banner </span><br><span class="line">3001:telnet:600:/dev/ttyUSB1:115200 8DATABITS NONE 1STOPBIT -XONXOFF -RTSCTS banner</span><br></pre></td></tr></table></figure>
+<p>Windows下，可使用<a href="https://github.com/sunnogo/comfoolery" target="_blank" rel="noopener"><code>Comfoolery</code></a>共享串口，功能更加强大。</p>
+<h3 id="wine连接不上串口"><a href="#wine连接不上串口" class="headerlink" title="wine连接不上串口"></a>wine连接不上串口</h3><p>来源<a href="http://goodgreyhound.com/usb-serial-port-converter-for-wine/" target="_blank" rel="noopener">链接</a>。<br>步骤：</p>
+<ul>
+<li>映射/dev/ttyUSB0成windows中的概念com1</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s /dev/ttyUSB0 ~/.wine/dosdevices/com1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看/dev/ttyUSB0的用户组，如下，用户组为dialout</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls -l /dev/ttyUSB0</span><br><span class="line">crw-rw---T 1 root dialout 4, 6 Nov 18 20:34 ttyUSB0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将当前用户加入用户组dialout</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/group</span><br><span class="line"></span><br><span class="line">修改</span><br><span class="line">dialout:x:20:</span><br><span class="line">为</span><br><span class="line">dialout:x:20:your_user_name</span><br></pre></td></tr></table></figure>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><h3 id="samba"><a href="#samba" class="headerlink" title="samba"></a>samba</h3><p>安装包：<code>samba</code></p>
+<p>配置：</p>
+<ul>
+<li>修改配置文件<code>/etc/samba/smb.conf</code>，确认要共享的目录。<code>sudo service samba restart</code>生效。配置样例如下。</li>
+<li>创建samba用户：<code>sudo smbpasswd -a user_name</code>，user_name填成自己想要的名称。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[linuxMint]</span><br><span class="line">    comment = linux</span><br><span class="line">    path = /home/sunyongfeng/</span><br><span class="line">    writeable = yes</span><br><span class="line">    valid users = sunyongfeng</span><br></pre></td></tr></table></figure>
+<p>其中，linuxMint是共享目录显示给使用者的名称。path是实际共享的目录，valid users是合法的用户。</p>
+<h4 id="windows-7-如何清除自动登录的凭据"><a href="#windows-7-如何清除自动登录的凭据" class="headerlink" title="windows 7 如何清除自动登录的凭据"></a>windows 7 如何清除自动登录的凭据</h4><p><code>控制面板</code> -&gt; <code>用户账户</code> -&gt; <code>管理您的凭据</code>，然后单击要清除的那个凭据，点击<code>从保管库中删除</code>，重启生效。</p>
+<p>解决Ubuntu用户名变动后，无法从win7 登录 samba。</p>
+<h3 id="Linux-访问-Windows-共享目录"><a href="#Linux-访问-Windows-共享目录" class="headerlink" title="Linux 访问 Windows 共享目录"></a>Linux 访问 Windows 共享目录</h3><ol>
+<li>在 windows 设置好共享目录；</li>
+<li>使用 <code>smbclient</code> 访问共享目录（可测试共享目录是否可用）： <code>smbclient //IP/share_dir -U your_username</code> ；</li>
+<li>挂载共享目录到 linux： <code>sudo mount -t cifs -o username=your_username,password=your_passwd //IP/share_dir /mnt</code></li>
+<li>亦可直接在文件管理器中直接输入<code>smb://IP</code>，按提示输入用户名密码，即可从 Linux 文件管理器中直接查看 windows 的共享目录。</li>
+</ol>
+<ul>
+<li><code>smbclient</code> 访问 log：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@sunnogo:~$ smbclient //IP/share_dir -U your_name</span><br><span class="line">Enter oa&apos;s password:</span><br><span class="line">Domain=[sunnogo] OS=[Windows 7 Ultimate 7601 Service Pack 1] Server=[Windows 7 Ultimate 6.1]</span><br><span class="line">smb: \&gt; ls</span><br><span class="line">  .                                   D        0  Thu Mar 10 19:24:05 2016</span><br><span class="line">  ..                                  D        0  Thu Mar 10 19:24:05 2016</span><br><span class="line">  asic                                D        0  Thu Mar 10 18:58:41 2016</span><br><span class="line">  linux                               D        0  Thu Mar 10 18:58:43 2016</span><br><span class="line">  python                              D        0  Thu Mar 10 18:59:04 2016</span><br><span class="line">  工具                              D        0  Thu Mar 10 19:06:10 2016</span><br><span class="line">  项目                              D        0  Thu Mar 10 20:08:25 2016</span><br><span class="line"></span><br><span class="line">                40960 blocks of size 4194304. 33262 blocks available</span><br><span class="line">smb: \&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>mount</code>挂载 log：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@sunnogo:~$ sudo mount -t cifs -o username=your_username,password=your_passwd //IP/share_dir /mnt</span><br><span class="line">sunyongfeng@sunnogo:~$ ls -al /mnt/</span><br><span class="line">总用量 3244</span><br><span class="line">drwxr-xr-x 2 root root    4096  3月 10 19:24 .</span><br><span class="line">drwxr-xr-x 3 root root    4096  3月 11 09:35 ..</span><br><span class="line">drwxr-xr-x 2 root root       0  3月 10 18:58 linux</span><br><span class="line">drwxr-xr-x 2 root root       0  3月 10 18:59 python</span><br><span class="line">drwxr-xr-x 2 root root       0  3月 10 19:06 工具</span><br><span class="line">drwxr-xr-x 2 root root       0  3月 10 20:08 项目</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="tftp"><a href="#tftp" class="headerlink" title="tftp"></a>tftp</h3><p>安装包：<code>tftpd-hpa</code></p>
+<p>配置：</p>
+<ul>
+<li>修改配置文件<code>/etc/default/tftpd-hpa</code>，样例如下。</li>
+<li>需要<code>chmod 777 /home/sunyongfeng/tftpboot</code>，否则可能出现权限问题，<code>TFTP error: &#39;Permission denied&#39; (0)</code>。tftpboot为tftp共享的主目录。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># /etc/default/tftpd-hpa  </span><br><span class="line"></span><br><span class="line">TFTP_USERNAME=&quot;tftp&quot;</span><br><span class="line">#TFTP_DIRECTORY=&quot;/var/lib/tftpboot&quot;</span><br><span class="line">TFTP_DIRECTORY=&quot;/home/sunyongfeng/tftpboot&quot;</span><br><span class="line">TFTP_ADDRESS=&quot;[::]:69&quot;</span><br><span class="line">#TFTP_OPTIONS=&quot;--secure&quot;                                                                            </span><br><span class="line">TFTP_OPTIONS=&quot;-l -c -s&quot;</span><br></pre></td></tr></table></figure>
+<p><strong>异常</strong>：</p>
+<ul>
+<li>如果一直timeout，可能是网卡出问题了，<code>sudo service networking restart</code>，或者重启电脑。</li>
+<li>有时不清楚为何启机之后，tftpd-hpa在，但是tftp无法下载。<code>sudo service tftpd-hpa restart</code>可解决此问题。没有看系统log细究原因。</li>
+</ul>
+<h3 id="atftpd"><a href="#atftpd" class="headerlink" title="atftpd"></a>atftpd</h3><p>另一款tftp服务器。</p>
+<p>安装包：<code>atftpd</code><br>配置：</p>
+<ul>
+<li>修改<code>/etc/default/atftpd</code>，样例如下。</li>
+<li>把<code>/etc/inet.conf</code>中的tftp注释掉，不然会出现“atftpd: cannot bind port: 69/udp”。</li>
+</ul>
+<p><strong>限制</strong>：最大文件有限制，32M。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#/etc/default/atftpd</span><br><span class="line"></span><br><span class="line">USE_INETD=false    </span><br><span class="line">OPTIONS=&quot;--tftpd-timeout 300 --retry-timeout 5 --mcast-port 1758 --mcast-addr 239.239.239.0-255 --mcast-ttl 1 --maxthread 100 --verbose=7 /home/sunyongfeng/tftpboot&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="安装linaro-gcc交叉编译器"><a href="#安装linaro-gcc交叉编译器" class="headerlink" title="安装linaro gcc交叉编译器"></a>安装linaro gcc交叉编译器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:linaro-maintainers/toolchain</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install gcc-arm-linux-gnueabi</span><br></pre></td></tr></table></figure>
+<h2 id="终端（Terminal）"><a href="#终端（Terminal）" class="headerlink" title="终端（Terminal）"></a>终端（Terminal）</h2><h3 id="guake"><a href="#guake" class="headerlink" title="guake"></a>guake</h3><h3 id="fbterm"><a href="#fbterm" class="headerlink" title="fbterm"></a>fbterm</h3><h3 id="screen"><a href="#screen" class="headerlink" title="screen"></a>screen</h3><ul>
+<li>screen -S sessionName，为 screen 会话取名字</li>
+<li>screen -list，查看当前有哪些会话</li>
+<li>screen -r sessionName，Reattach 到 sessionName 会话</li>
+<li>ctrl + a + d，detach 当前会话</li>
+</ul>
+<h3 id="script"><a href="#script" class="headerlink" title="script"></a>script</h3><h2 id="启机进入命令行"><a href="#启机进入命令行" class="headerlink" title="启机进入命令行"></a>启机进入命令行</h2><blockquote>
+<p><code>/etc/default/grub</code>, change this line<br><code>RUB_CMDLINE_LINUX_DEFAULT=&quot;splash quiet&quot;</code> to<br><code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;text&quot;</code><br>Run <code>sudo update-grub</code> when done. This is easily reversed too if you need to change back.</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/09/10/linux/dev-conf/" data-id="cjz95gt3i00dlw5r9is1urpnh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/串口/">串口</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/09/22/networks/Scapy/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Scapy简述
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/09/02/linux/personal-faq/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux使用记录</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

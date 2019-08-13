@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>apt-deb 相关问题记录 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+<meta name="keywords" content="ubuntu,linux,deb,apt,package,control,dependency,dependencies,build dependency,source.list,build-dep,backports,编译依赖,查看,&#x2F;boot,full,满">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apt-deb 相关问题记录">
+<meta property="og:url" content="http://yoursite.com/2017/12/14/linux/apt_deb_issues/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.060Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="apt-deb 相关问题记录">
+<meta name="twitter:description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/apt_deb_issues" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/14/linux/apt_deb_issues/" class="article-date">
+  <time datetime="2017-12-14T02:42:00.000Z" itemprop="datePublished">2017-12-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      apt-deb 相关问题记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="修改源"><a href="#修改源" class="headerlink" title="修改源"></a>修改源</h2><h2 id="查看依赖关系"><a href="#查看依赖关系" class="headerlink" title="查看依赖关系"></a>查看依赖关系</h2><ul>
+<li>编译依赖，<code>apt-rdepends --build-depends package_name</code></li>
+</ul>
+<h2 id="问题记录"><a href="#问题记录" class="headerlink" title="问题记录"></a>问题记录</h2><h3 id="apt-get-y-build-dep-linux-失败"><a href="#apt-get-y-build-dep-linux-失败" class="headerlink" title="apt-get -y build-dep linux 失败"></a>apt-get -y build-dep linux 失败</h3><p>log：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# apt-get -y build-dep linux</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">E: Build-Depends dependency for linux cannot be satisfied because candidate version of package debhelper can&apos;t satisfy version requirements</span><br></pre></td></tr></table></figure>
+<p>分析：debhelper 的版本满足不了编译 linux 的依赖。</p>
+<ul>
+<li>通过 <code>apt-rdepends --build-depends linux &gt; linux.build-depends.txt</code> 查看 linux 的编译依赖。linux 的编译依赖好多，要等很长时间。</li>
+<li>通过 <code>cat linux.build-depends.txt | grep debhelper</code> 确认对 debhelper 的版本依赖发现有软件对其的版本依赖 &gt;= 10，而 debian jessie 的默认 debhelper 版本为 9.20xxx，在 repo 中可以看到 debhelper 当前最新版本为 10.10.9。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# cat linux.build-depends.txt | grep &quot;&gt;= 10&quot;  </span><br><span class="line">  Build-Depends: debhelper (&gt;= 10~)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10~)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10~)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br><span class="line">  Build-Depends: debhelper (&gt;= 10)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 debhelper 所有版本</li>
+</ul>
+<p>通过 <code>apt-cache madison debhelper</code> 查看 debhelper 的所有版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# apt-cache madison debhelper</span><br><span class="line"> debhelper | 10.2.5~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main amd64 Packages</span><br><span class="line"> debhelper | 9.20150101+deb8u2 | http://ftp.cn.debian.org/debian/ jessie/main amd64 Packages</span><br><span class="line"> debhelper | 9.20150101+deb8u2 | http://security.debian.org/ jessie/updates/main amd64 Packages</span><br><span class="line"> debhelper | 9.20150101+deb8u2 | http://ftp.cn.debian.org/debian/ jessie/main Sources</span><br><span class="line"> debhelper | 10.2.5~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main Sources</span><br><span class="line"> debhelper | 9.20150101+deb8u2 | http://security.debian.org/ jessie/updates/main Sources</span><br></pre></td></tr></table></figure>
+<p>尝试安装 debhelper 版本 10.2.5~bp08+1，发现有新的依赖关系问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# apt-get install debhelper=10.2.5~bpo8+1</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Some packages could not be installed. This may mean that you have</span><br><span class="line">requested an impossible situation or if you are using the unstable</span><br><span class="line">distribution that some required packages have not yet been created</span><br><span class="line">or been moved out of Incoming.</span><br><span class="line">The following information may help to resolve the situation:</span><br><span class="line"></span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> debhelper : Depends: dh-autoreconf (&gt;= 12~) but 10 is to be installed</span><br><span class="line">             Depends: dh-strip-nondeterminism (&gt;= 0.028~) but 0.003-1 is to be installed</span><br><span class="line">E: Unable to correct problems, you have held broken packages.</span><br><span class="line">root@c60c282d2d76:/#</span><br></pre></td></tr></table></figure>
+<p>发现比较高版本的包都是来自 jessie-backports:</p>
+<blockquote>
+<p><a href="https://wiki.debian.org/Backports" target="_blank" rel="noopener">Backports</a>: Backports are recompiled packages from testing (mostly) and unstable (in a few cases only, e.g. security updates), so they will run without new libraries (wherever it is possible) on a stable Debian distribution. It is recommended to pick out single backports which fit your needs, and not to use all backports available.</p>
+</blockquote>
+<p>即，Backports 存放的软件为不稳定或仅用于测试目的的编译结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# apt-cache madison dh-autoreconf        </span><br><span class="line">dh-autoreconf |  12~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main amd64 Packages</span><br><span class="line">dh-autoreconf |         10 | http://ftp.cn.debian.org/debian/ jessie/main amd64 Packages</span><br><span class="line">dh-autoreconf |         10 | http://ftp.cn.debian.org/debian/ jessie/main Sources</span><br><span class="line">dh-autoreconf |  12~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main Sources</span><br><span class="line">root@c60c282d2d76:/# apt-cache madison dh-strip-nondeterminism </span><br><span class="line">dh-strip-nondeterminism | 0.034-1~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main amd64 Packages</span><br><span class="line">dh-strip-nondeterminism |    0.003-1 | http://ftp.cn.debian.org/debian/ jessie/main amd64 Packages</span><br><span class="line">strip-nondeterminism |    0.003-1 | http://ftp.cn.debian.org/debian/ jessie/main Sources</span><br><span class="line">strip-nondeterminism | 0.034-1~bpo8+1 | http://ftp.cn.debian.org/debian/ jessie-backports/main Sources</span><br><span class="line">root@c60c282d2d76:/#</span><br></pre></td></tr></table></figure>
+<p>OK，是时候把 Backports 的源踢掉了。</p>
+<p>故障时的源，被 <a href="http://mirrors.163.com/.help/debian.html" target="_blank" rel="noopener">163 的 Debian镜像使用帮助</a>误导了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.163.com/debian/ jessie main non-free contrib</span><br><span class="line">deb http://mirrors.163.com/debian/ jessie-updates main non-free contrib</span><br><span class="line">deb http://mirrors.163.com/debian/ jessie-backports main non-free contrib</span><br><span class="line">deb-src http://mirrors.163.com/debian/ jessie main non-free contrib</span><br><span class="line">deb-src http://mirrors.163.com/debian/ jessie-updates main non-free contrib</span><br><span class="line">deb-src http://mirrors.163.com/debian/ jessie-backports main non-free contrib</span><br><span class="line">deb http://mirrors.163.com/debian-security/ jessie/updates main non-free contrib</span><br><span class="line">deb-src http://mirrors.163.com/debian-security/ jessie/updates main non-free contrib</span><br></pre></td></tr></table></figure>
+<p>在调试的时候，一开始已注意到可能是源的问题，但是还是一遍一遍傻逼式地试不同的源，比如上面的 debian 官方中国源 ftp.cn.debian.org。</p>
+<p><strong>烂习惯。。。。。调东西还是乱试一通，没去找根本原因。。。</strong><br>教训是一个下午没了，正常已经半个小时就可以发现根本原因了。</p>
+<h3 id="boot-目录满了，无法增删内核-image"><a href="#boot-目录满了，无法增删内核-image" class="headerlink" title="/boot 目录满了，无法增删内核 image"></a>/boot 目录满了，无法增删内核 image</h3><p>如果 /boot 目录满了，无法正常地 apt-get intall / remove / purge 等操作。解决方法如下，来自：</p>
+<ul>
+<li><a href="https://gist.github.com/ipbastola/2760cfc28be62a5ee10036851c654600" target="_blank" rel="noopener">https://gist.github.com/ipbastola/2760cfc28be62a5ee10036851c654600</a></li>
+<li><a href="https://askubuntu.com/questions/585736/cant-clean-a-full-boot-because-of-unmet-dependencies" target="_blank" rel="noopener">https://askubuntu.com/questions/585736/cant-clean-a-full-boot-because-of-unmet-dependencies</a>, msa 的回答</li>
+</ul>
+<p>解决步骤:</p>
+<ul>
+<li>sudo apt autoremove –purge</li>
+<li>sudo apt autoremove</li>
+<li>sudo apt-get -f install</li>
+</ul>
+<p>异常 log：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~$ df -h</span><br><span class="line">Filesystem                   Size  Used Avail Use% Mounted on</span><br><span class="line">...</span><br><span class="line">/dev/sda1                    472M  468M     0 100% /boot</span><br><span class="line">...</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@kmc-b0232:~$ sudo apt-get autoremove </span><br><span class="line">[sudo] password for jeromesun: </span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">You might want to run &apos;apt-get -f install&apos; to correct these.</span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> linux-image-extra-4.13.0-37-generic : Depends: linux-image-4.13.0-37-generic but it is not installed</span><br><span class="line"> linux-image-generic-hwe-16.04 : Depends: linux-image-4.13.0-37-generic but it is not installed</span><br><span class="line">E: Unmet dependencies. Try using -f.</span><br><span class="line">jeromesun@km:~$ sudo apt-get -f</span><br><span class="line">E: Command line option &apos;f&apos; [from -f] is not understood in combination with the other options.</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ sudo apt-get -f install</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Correcting dependencies... Done</span><br><span class="line">The following packages were automatically installed and are no longer required:</span><br><span class="line">...</span><br><span class="line">  linux-headers-4.10.0-37 linux-headers-4.10.0-37-generic linux-headers-4.10.0-40 linux-headers-4.10.0-40-generic linux-headers-4.10.0-42 linux-headers-4.10.0-42-generic linux-headers-4.13.0-26</span><br><span class="line">  linux-headers-4.13.0-26-generic linux-headers-4.13.0-31 linux-headers-4.13.0-31-generic linux-image-4.10.0-37-generic linux-image-4.10.0-40-generic linux-image-4.10.0-42-generic</span><br><span class="line">  linux-image-4.13.0-26-generic linux-image-4.13.0-31-generic linux-image-extra-4.10.0-37-generic linux-image-extra-4.10.0-40-generic linux-image-extra-4.10.0-42-generic linux-image-extra-4.13.0-26-generic linux-image-extra-4.13.0-31-generic </span><br><span class="line">...  </span><br><span class="line">Use &apos;sudo apt autoremove&apos; to remove them.</span><br><span class="line">The following additional packages will be installed:</span><br><span class="line">  linux-image-4.13.0-37-generic</span><br><span class="line">Suggested packages:</span><br><span class="line">  fdutils linux-tools</span><br><span class="line">The following NEW packages will be installed:</span><br><span class="line">  linux-image-4.13.0-37-generic</span><br><span class="line">0 upgraded, 1 newly installed, 0 to remove and 205 not upgraded.</span><br><span class="line">9 not fully installed or removed.</span><br><span class="line">Need to get 0 B/20.9 MB of archives.</span><br><span class="line">After this operation, 72.6 MB of additional disk space will be used.</span><br><span class="line">Do you want to continue? [Y/n] y</span><br><span class="line">(Reading database ... 574107 files and directories currently installed.)</span><br><span class="line">Preparing to unpack .../linux-image-4.13.0-37-generic_4.13.0-37.42~16.04.1_amd64.deb ...</span><br><span class="line">Done.</span><br><span class="line">Unpacking linux-image-4.13.0-37-generic (4.13.0-37.42~16.04.1) ...</span><br><span class="line">dpkg: error processing archive /var/cache/apt/archives/linux-image-4.13.0-37-generic_4.13.0-37.42~16.04.1_amd64.deb (--unpack):</span><br><span class="line"> cannot copy extracted data for &apos;./boot/vmlinuz-4.13.0-37-generic&apos; to &apos;/boot/vmlinuz-4.13.0-37-generic.dpkg-new&apos;: failed to write (No space left on device)</span><br><span class="line">No apport report written because the error message indicates a disk full error</span><br><span class="line">                                                                              dpkg-deb: error: subprocess paste was killed by signal (Broken pipe)</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.13.0-37-generic /boot/vmlinuz-4.13.0-37-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.13.0-37-generic /boot/vmlinuz-4.13.0-37-generic</span><br><span class="line">Errors were encountered while processing:</span><br><span class="line"> /var/cache/apt/archives/linux-image-4.13.0-37-generic_4.13.0-37.42~16.04.1_amd64.deb</span><br><span class="line">E: Sub-process /usr/bin/dpkg returned an error code (1)</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ uname -a</span><br><span class="line">Linux km 4.10.0-38-generic #42~16.04.1-Ubuntu SMP Tue Oct 10 16:32:20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux</span><br><span class="line">jeromesun@km:~$ sudo dpkg --list &apos;linux-image*&apos;|awk &apos;&#123; if ($1==&quot;ii&quot;) print $2&#125;&apos;|grep -v `uname -r`</span><br><span class="line">linux-image-4.10.0-37-generic</span><br><span class="line">linux-image-4.10.0-40-generic</span><br><span class="line">linux-image-4.10.0-42-generic</span><br><span class="line">linux-image-4.13.0-26-generic</span><br><span class="line">linux-image-4.13.0-31-generic</span><br><span class="line">linux-image-4.13.0-32-generic</span><br><span class="line">linux-image-4.13.0-36-generic</span><br><span class="line">linux-image-extra-4.10.0-37-generic</span><br><span class="line">linux-image-extra-4.10.0-40-generic</span><br><span class="line">linux-image-extra-4.10.0-42-generic</span><br><span class="line">linux-image-extra-4.13.0-26-generic</span><br><span class="line">linux-image-extra-4.13.0-31-generic</span><br><span class="line">linux-image-extra-4.13.0-32-generic</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ sudo apt-get purge linux-image-4.10.0-37-generic</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">You might want to run &apos;apt-get -f install&apos; to correct these:</span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> linux-image-extra-4.10.0-37-generic : Depends: linux-image-4.10.0-37-generic but it is not going to be installed</span><br><span class="line"> linux-image-extra-4.13.0-37-generic : Depends: linux-image-4.13.0-37-generic but it is not going to be installed</span><br><span class="line"> linux-image-generic-hwe-16.04 : Depends: linux-image-4.13.0-37-generic but it is not going to be installed</span><br><span class="line">E: Unmet dependencies. Try &apos;apt-get -f install&apos; with no packages (or specify a solution).</span><br><span class="line">jeromesun@km:~$ sudo dpkg --force-all -P linux-image-4.10.0-37-generic</span><br><span class="line">dpkg: linux-image-4.10.0-37-generic: dependency problems, but removing anyway as you requested:</span><br><span class="line"> linux-image-extra-4.10.0-37-generic depends on linux-image-4.10.0-37-generic.</span><br><span class="line"></span><br><span class="line">(Reading database ... 574105 files and directories currently installed.)</span><br><span class="line">Removing linux-image-4.10.0-37-generic (4.10.0-37.41~16.04.1) ...</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.10.0-37-generic /boot/vmlinuz-4.10.0-37-generic</span><br><span class="line">update-initramfs: Deleting /boot/initrd.img-4.10.0-37-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.10.0-37-generic /boot/vmlinuz-4.10.0-37-generic</span><br><span class="line">Generating grub configuration file ...</span><br><span class="line">Warning: Setting GRUB_TIMEOUT to a non-zero value when GRUB_HIDDEN_TIMEOUT is set is no longer supported.</span><br><span class="line">Found linux image: /boot/vmlinuz-4.13.0-36-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.13.0-36-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.13.0-32-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.13.0-32-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.13.0-31-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.13.0-31-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.13.0-26-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.13.0-26-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.10.0-42-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.10.0-42-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.10.0-40-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.10.0-40-generic</span><br><span class="line">Found linux image: /boot/vmlinuz-4.10.0-38-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.10.0-38-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">done</span><br><span class="line">Purging configuration files for linux-image-4.10.0-37-generic (4.10.0-37.41~16.04.1) ...</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.10.0-37-generic /boot/vmlinuz-4.10.0-37-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.10.0-37-generic /boot/vmlinuz-4.10.0-37-generic</span><br><span class="line">jeromesun@km:~$</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/14/linux/apt_deb_issues/" data-id="cjz95gt3h00djw5r96h9msurz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/apt/">apt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/deb/">deb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/16/tools/git_mirror_to_new_repo/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Mirror 旧 git 仓库到新的 git 仓库（保留所有提交 / 分支 / tags）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/05/shell/sed/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux命令行 - sed</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="软件版本号概述">
+<meta name="keywords" content="software,version number,软件版本号,alpha,beta,rc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件版本号">
+<meta property="og:url" content="http://sunyongfeng.com/201704/programmer/version_number.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="软件版本号概述">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Software_dev2.svg/363px-Software_dev2.svg.png">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.087Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="软件版本号">
+<meta name="twitter:description" content="软件版本号概述">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Software_dev2.svg/363px-Software_dev2.svg.png">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/programmer/version_number">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>软件版本号 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/programmer/version_number.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">软件版本号
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-05 11:35:20" itemprop="dateCreated datePublished" datetime="2017-04-05T11:35:20+08:00">2017-04-05</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/programmer/version_number.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/programmer/version_number.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">软件版本号概述</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="版本号规则"><a href="#版本号规则" class="headerlink" title="版本号规则"></a>版本号规则</h1><p>[major].[minor].[revision]</p>
+<ul>
+<li>major，主版本号，软体有重大更新的时候递增，重大更新通常是指功能与介面都有大幅度变动的时候。不向下兼容。</li>
+<li>minor，次版本号，软体发布新功能，但是并不会大幅影响到整个软体的时候递增。可向下兼容。</li>
+<li>revision，修订版本号（打补丁），通常是在修订软件 bug 后，发布 bug 的修订版时递增。</li>
+</ul>
+<p>有些版本编号除了上述三者之外，还会有「build」。也就是只要每次 build 一次软件就会递增一次，有时候甚至会使用 build 的日期或时间。</p>
+<h1 id="软件版本周期"><a href="#软件版本周期" class="headerlink" title="软件版本周期"></a>软件版本周期</h1><p><a href="https://zh.wikipedia.org/wiki/%E8%BB%9F%E4%BB%B6%E7%89%88%E6%9C%AC%E8%99%9F" target="_blank" rel="noopener">软件版本周期</a>是指电脑软件的发展及发行过程，如下图，从Pre-alpha（准预览版本）发展到Alpha（预览版本）、Beta（测试版本）、Released candidate （最终测试版本）至最后的Gold（完成版）。<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Software_dev2.svg/363px-Software_dev2.svg.png" alt="软件版本周期"></p>
+<h2 id="pre-alpha（准预览版本）"><a href="#pre-alpha（准预览版本）" class="headerlink" title="pre-alpha（准预览版本）"></a>pre-alpha（准预览版本）</h2><p>有时候软件会在Alpha或Beta版本前先发布Pre-alpha版本。一般而言相对于Alpha或Beta版本，Pre-alpha版本是一个功能不完整的版本。</p>
+<h2 id="alpha（预览版本）"><a href="#alpha（预览版本）" class="headerlink" title="alpha（预览版本）"></a>alpha（预览版本）</h2><p>Alpha版本仍然需要测试，其功能亦未完善，因为它是整个软件发布周期中的第一个阶段，所以它的名称是“Alpha”，希腊字母中的第一个字母“α”。<br>Alpha版本通常会送到开发软件的组织或某群体中的软件测试者作内部测试。在市场上，越来越多公司会邀请外部客户或合作伙伴参与其测试。这令软件在此阶段有更大的可用性测试。<br>在测试的第一个阶段中，开发者通常会进行白盒测试。其他测试会在稍后时间由其他测试团体以黑盒或灰盒技术进行，不过有时会同时进行。</p>
+<h2 id="beta（测试版本）"><a href="#beta（测试版本）" class="headerlink" title="beta（测试版本）"></a>beta（测试版本）</h2><p>Beta版本是软件最早对外公开的软件版本，由公众参与测试。一般来说，Beta包含所有功能，但可能有一些已知问题和较轻微的程序错误（BUG）。Beta版本的测试者通常是开发软件的组织的客户，他们会以免费或优惠价钱得到软件。Beta版本亦作为测试产品的支持和市场反应等。<br>其他情况，例如微软曾以Community Technology Preview（简称CTP，中文称为“社区技术预览”）为发布软件的测试版本之一，微软将这个阶段的软件散布给有需要先行试用的用户或厂商，并收集这些人的使用经验，以便作为进一步修正软件的参考。</p>
+<h2 id="rc（最终测试版本）"><a href="#rc（最终测试版本）" class="headerlink" title="rc（最终测试版本）"></a>rc（最终测试版本）</h2><p>Release Candidate（简称RC）指可能成为最终产品的候选版本，如果未出现问题则可发布成为正式版本。在此阶段的产品通常包含所有功能、或接近完整，亦不会出现严重问题。<br>多数开源软件会推出两个RC版本，最后的RC2则成为正式版本。闭源软件较少公开使用，微软公司在Windows 7上应用此名称。苹果公司把在这阶段的产品称为“Golden Master”（简称GM），而最后的GM即成为正式版本。</p>
+<h2 id="RTM"><a href="#RTM" class="headerlink" title="RTM"></a>RTM</h2><p>RTM（Release To Manufacturing）之简称，意思是：发放给生产商。某些计算机程序以“RTM”作为软件版本代号，例如微软Windows 7发行零售版前的RTM版本主要是发放给组装机生产商用，使制造商能够提早进行集成工作或解决软件与硬件设备可能遇到的错误。RTM版本并不一定意味着创作者解决了软件所有问题；仍有可能向公众发布前更新版本。以Windows 7为例：RTM版与零售版的版本号是一样的。<br>另外一种RTM的称呼是RTW（Release To Web），表示正式版本的软件发布到Web网站上供客户免费下载，这个名词在ASP.NET组件以及Silverlight的发布上很常见。</p>
+<h2 id="Stable"><a href="#Stable" class="headerlink" title="Stable"></a>Stable</h2><p>稳定版本来自预览版本释出使用与改善而修正完成。为目前所使用的软件在匹配需求规格的硬件与操作系统中运行不会造成严重的不兼容或是硬件冲突，其已受过某定量的测试无误后所释出者。</p>
+<h1 id="windows-版本"><a href="#windows-版本" class="headerlink" title="windows 版本"></a>windows 版本</h1><h2 id="MSDN"><a href="#MSDN" class="headerlink" title="MSDN"></a>MSDN</h2><p>MSDN（Microsoft Developer Network）软件是微软公司面向软件开发者的一种版本。MSDN 涵盖了所有可以被开发扩充的平台和应用程序，如微软公司的百科全书 Encarta，或者是各种游戏，是不包括在 MSDN 之内的，因为这些产品直接面向最终用户，没有进行程序开发的必要。</p>
+<p>MSDN 在 Operating System 以上的等级都有附微软的软件授权，根据 MSDN 的使用者授权合约(EULA)，软件只授权给使用 MSDN 的那一位开发人员，专供开发与测试之用，其他人不可使用 MSDN 所附软件。包含企业不能用 MSDN附的 SQL Server Enterprise Edition 做为生产环境中的数据库服务器；秘书不能使用 MSDN 所附的 Office2007 等等。</p>
+<h2 id="OEM"><a href="#OEM" class="headerlink" title="OEM"></a>OEM</h2><p>OEM（Original Equipment Manufacturer）软件只能随机器出货，不能零售，所以也叫做随机版。OEM软件只能全新安装，不能从旧有作系统升级。</p>
+<p>如果买笔记型计算机或品牌计算机就会有随机版软件。包装不像零售版精美，通常只有一片cd和说明书(授权书)。这种系统通常会少一些驱动，而且目前的OEM软件很少放在光盘里能给你安装，要么就是恢复盘，要么就是硬盘镜像。</p>
+<h2 id="RTL"><a href="#RTL" class="headerlink" title="RTL"></a>RTL</h2><p>RTL版 Retail 正式零售版，供市面上架零售。</p>
+<h2 id="VOL"><a href="#VOL" class="headerlink" title="VOL"></a>VOL</h2><p>Volume OR Volume Licensing for Organizations，即团体批量许可证，根据这个许可，当企业或者政府需要大量购买一软件时可以获得优惠。这种产品的光盘的卷标都带有”VOL”字样，就取”Volume”前3个字母，以表明是批量。这种版本根据购买数量等又细分为“开放式许可证”(Open License)、“选择式许可证(Select  License)”、“企业协议(Enterprise Agreement)”、“学术教育许可证(Academic Volume Licensing)”等5种版本，上海政府 VOL版XP就是这种批量购买的版本。根据 VOL 计划规定， VOL 产品是不需要激活的(无论升级到SP1还是SP2)。</p>
+<h2 id="EVAL"><a href="#EVAL" class="headerlink" title="EVAL"></a>EVAL</h2><p>评估版</p>
+<h2 id="CTP"><a href="#CTP" class="headerlink" title="CTP"></a>CTP</h2><p>Community Test Preview</p>
+<h2 id="FPP"><a href="#FPP" class="headerlink" title="FPP"></a>FPP</h2><p>FPP就是零售版（盒装软件），这种产品的光盘的卷标都带有”FPP”字样，比如英文WXPPro的FPP版本的光盘卷标就是WXPFPP_EN，其中WX表示是Windows XP，P是Professional（H是Home），FPP表明是零售版本，EN是表明是英语。获得途径除了在商店购买之外，（H是Home），FPP表明是零售版本，EN是表明是英语。获得途径除了在商店购买之外，某些MSDN用户也可以得到。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li>SLMT’s Blog, <a href="http://www.slmt.tw/2015/07/20/version-number-naming-convention/" target="_blank" rel="noopener">版本編號的命名規則</a></li>
+<li>zh.wikipedia, <a href="https://zh.wikipedia.org/wiki/%E8%BB%9F%E4%BB%B6%E7%89%88%E6%9C%AC%E8%99%9F" target="_blank" rel="noopener">软件版本号</a></li>
+<li>en.wikipedia, <a href="https://en.wikipedia.org/wiki/Software_versioning" target="_blank" rel="noopener">software versioning</a></li>
+<li>zh.wikipedia，<a href="https://zh.wikipedia.org/wiki/%E8%BB%9F%E4%BB%B6%E7%89%88%E6%9C%AC%E9%80%B1%E6%9C%9F" target="_blank" rel="noopener">软件版本周期</a></li>
+<li>gdaily，<a href="https://www.gdaily.org/4275/windows-edition" target="_blank" rel="noopener">查看你的完整 Windows 版本 Retail、VOL、OEM、RTM</a></li>
+<li>web duper，<a href="http://materliu.github.io/all/web/ideas/2014/04/23/windows-msdn-oem-rtm-vol.html" target="_blank" rel="noopener">Windows MSDN、OEM、RTM、VOL等各版本的区别</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/software/" rel="tag"># software</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/administrator/dokuwiki/dokuwiki_chinese.html" rel="next" title="dokuwiki 中文支持">
+                <i class="fa fa-chevron-left"></i> dokuwiki 中文支持
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/misc/file_management.html" rel="prev" title="文件归档管理经验">
+                文件归档管理经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#版本号规则"><span class="nav-number">1.</span> <span class="nav-text">版本号规则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#软件版本周期"><span class="nav-number">2.</span> <span class="nav-text">软件版本周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre-alpha（准预览版本）"><span class="nav-number">2.1.</span> <span class="nav-text">pre-alpha（准预览版本）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alpha（预览版本）"><span class="nav-number">2.2.</span> <span class="nav-text">alpha（预览版本）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#beta（测试版本）"><span class="nav-number">2.3.</span> <span class="nav-text">beta（测试版本）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rc（最终测试版本）"><span class="nav-number">2.4.</span> <span class="nav-text">rc（最终测试版本）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTM"><span class="nav-number">2.5.</span> <span class="nav-text">RTM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Stable"><span class="nav-number">2.6.</span> <span class="nav-text">Stable</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#windows-版本"><span class="nav-number">3.</span> <span class="nav-text">windows 版本</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MSDN"><span class="nav-number">3.1.</span> <span class="nav-text">MSDN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OEM"><span class="nav-number">3.2.</span> <span class="nav-text">OEM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTL"><span class="nav-number">3.3.</span> <span class="nav-text">RTL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VOL"><span class="nav-number">3.4.</span> <span class="nav-text">VOL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EVAL"><span class="nav-number">3.5.</span> <span class="nav-text">EVAL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CTP"><span class="nav-number">3.6.</span> <span class="nav-text">CTP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FPP"><span class="nav-number">3.7.</span> <span class="nav-text">FPP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">4.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/programmer/version_number.html";
+    this.page.identifier = "201704/programmer/version_number.html";
+    this.page.title = '软件版本号';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>MAC地址 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="MAC地址概述">
+<meta name="keywords" content="computer,networks,mac,address,layer2,地址,OUI,特殊,组播">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MAC地址">
+<meta property="og:url" content="http://yoursite.com/2015/07/02/networks/mac/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="MAC地址概述">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/MAC-48_Address.svg/500px-MAC-48_Address.svg.png">
+<meta property="og:image" content="https://i-technet.sec.s-msft.com/dynimg/IC212799.gif">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.070Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAC地址">
+<meta name="twitter:description" content="MAC地址概述">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/MAC-48_Address.svg/500px-MAC-48_Address.svg.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-networks/mac" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/07/02/networks/mac/" class="article-date">
+  <time datetime="2015-07-02T14:07:18.000Z" itemprop="datePublished">2015-07-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/networks/">networks</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MAC地址
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><strong>MAC Address</strong>，Media Access Control Address，亦称为EHA（Ethernet Hardware Address）、硬件地址、物理地址（Physical Address）。在OSI节层模型中，属于第二层链路层概念。一个MAC地址唯一指定一台设备，全球唯一，并且通常烧写在固件中。</p>
+<p>MAC地址由IEEE（Institute of Electrical and Electronics Engineers）定义，有三种：MAC-48、EUI-48、EUI-64。EUI， Extended Unique Identifier。</p>
+<p>MAC-48，地址空间48比特，支持2^48即281,474,976,710,656个MAC地址。MAC-48的设计目标是一百年内够用。常以16进制数表示MAC地址，通用表示方法有三种格式，如<code>01-23-45-67-89-ab</code>、<code>01:23:45:67:89:ab</code>和<code>0123.4567.89ab</code>。</p>
+<a id="more"></a>
+<h2 id="组成"><a href="#组成" class="headerlink" title="组成"></a>组成</h2><p>MAC地址如下图所示，其前3字节表示OUI（Organizationally Unique Identifier），由IEEE的注册管理机构给不同厂家分配的代码，区分不同的厂家，<a href="http://standards-oui.ieee.org/oui.txt" target="_blank" rel="noopener">附IEEE当前OUI分配</a>。后3字节由厂家自行分配。</p>
+<p>MAC地址最高字节（MSB）的低第二位（LSb）表示这个MAC地址是全局的还是本地的，即U/L（Universal/Local）位，如果为0，表示是全局地址。所有的OUI这一位都是0。</p>
+<p>MAC地址最高字节（MSB）的低第一位(LSb），表示这个MAC地址是单播还是多播。0表示单播。</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/MAC-48_Address.svg/500px-MAC-48_Address.svg.png" alt="MAC地址"></p>
+<h2 id="MAC-48、EUI-48与EUI-64的关系"><a href="#MAC-48、EUI-48与EUI-64的关系" class="headerlink" title="MAC-48、EUI-48与EUI-64的关系"></a>MAC-48、EUI-48与EUI-64的关系</h2><p>疑问：</p>
+<ul>
+<li>EUI-48 MA-L、MA-M、MA-S有没有可能冲突？</li>
+<li>EUI-48的MA-M/MA-S的应用？</li>
+</ul>
+<h3 id="EUI-48"><a href="#EUI-48" class="headerlink" title="EUI-48"></a>EUI-48</h3><p>IEEE的《<a href="https://standards.ieee.org/develop/regauth/tut/eui48.pdf" target="_blank" rel="noopener">Guidelines for 48-Bit Global Identifier (EUI-48)</a>》对EUI-48标识符的使用范围进行定义： </p>
+<ul>
+<li>用为IEEE 802或类IEEE 802网络设备的硬件地址。</li>
+<li>用为特定硬件设备的标识，不需要为网络设备。</li>
+</ul>
+<p>EUI-48有三种格式：</p>
+<ul>
+<li>前24位由IEEE Registration Authority (IEEE RA) 分配，后24位由MA-L（MAC Address Block Large）的厂商或组织分配。这种格式即MAC-48。</li>
+<li>前28位由IEEE RA分配，后20位由MA-M（MAC Address Block Medium）的厂商或组织分配。</li>
+<li>前36位由IEEE RA分配，后12位由MA-S（MAC Address Block Small）分配。</li>
+</ul>
+<h3 id="EUI-64"><a href="#EUI-64" class="headerlink" title="EUI-64"></a>EUI-64</h3><p>待整理</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>（来自wikipedia）</p>
+<p>###MAC-48###</p>
+<ul>
+<li>Ethernet</li>
+<li>802.11 wireless networks</li>
+<li>Bluetooth</li>
+<li>IEEE 802.5 token ring</li>
+<li>most other IEEE 802 networks</li>
+<li>Fiber Distributed Data Interface (FDDI)</li>
+<li>Asynchronous Transfer Mode (ATM), switched virtual connections only, as part of an NSAP address</li>
+<li>Fibre Channel and Serial Attached SCSI (as part of a World Wide Name)</li>
+<li>The ITU-T G.hn standard, which provides a way to create a high-speed (up to 1 gigabit/s) local area network using existing home wiring (power lines, phone lines and coaxial cables). The G.hn Application Protocol Convergence (APC) layer accepts Ethernet frames that use the MAC-48 format and encapsulates them into G.hn Medium Access Control Service  Data Units (MSDUs).</li>
+</ul>
+<h3 id="EUI-64-1"><a href="#EUI-64-1" class="headerlink" title="EUI-64"></a>EUI-64</h3><ul>
+<li>FireWire</li>
+<li>IPv6 (Modified EUI-64 as the least-significant 64 bits of a unicast network address or link-local address when stateless autoconfiguration is used)</li>
+<li>ZigBee / 802.15.4 / 6LoWPAN wireless personal-area networks</li>
+</ul>
+<h2 id="特殊MAC地址"><a href="#特殊MAC地址" class="headerlink" title="特殊MAC地址"></a>特殊MAC地址</h2><p>###广播地址###<br>全F，在本VLAN内泛洪。</p>
+<p>###IANA注册###<br>详见<a href="http://www.iana.org/assignments/ethernet-numbers/ethernet-numbers.xhtml" target="_blank" rel="noopener">ethernet-numbers</a>，此处仅截取常见地址。</p>
+<p>####单播地址####<br>以<code>00-00-5e</code>开头：</p>
+<ul>
+<li><code>00-01-00</code> to <code>00-01-FF</code>  VRRP (Virtual Router Redundancy Protocol)   [RFC5798]</li>
+<li><code>00-02-00</code> to <code>00-02-FF</code>  VRRP IPv6 (Virtual Router Redundancy Protocol IPv6) [RFC5798]</li>
+<li><code>90-01-00</code>    TRILL OAM   [RFC7455]</li>
+</ul>
+<p>####组播地址####<br>以<code>01-00-5e</code>开头：</p>
+<ul>
+<li><code>00-00-00</code> to <code>7F-FF-FF</code>  IPv4 Multicast  [RFC1112]</li>
+<li><code>80-00-00</code> to <code>8F-FF-FF</code>  MPLS Multicast  [RFC5332]</li>
+<li><code>90-00-00</code>    MPLS-TP p2p [RFC7213]</li>
+<li><code>90-00-01</code>    Bidirectional Forwarding Detection (BFD) on Link Aggregation Group (LAG) Interfaces [RFC7130]</li>
+<li><code>90-01-00</code>    TRILL OAM   [RFC7455]</li>
+</ul>
+<h2 id="映射组播IP为组播MAC地址转换"><a href="#映射组播IP为组播MAC地址转换" class="headerlink" title="映射组播IP为组播MAC地址转换"></a>映射组播IP为组播MAC地址转换</h2><p>如下图（来自微软）所示，IPv4组播MAC地址为IANA定义，前25位固定。而组播IP为D类IP地址，其前4位固定为1110b。将组播IP的低23位直接映射到MAC地址的低23位，即可与前面固定的25位组成一个48位的MAC地址。</p>
+<p>由于组播IP还有5位没有映射到MAC地址中，因此组播MAC地址与组播IP不是一一映射，而是一对多的关系，一个组播MAC地址对应32位组播IP地址。</p>
+<p><img src="https://i-technet.sec.s-msft.com/dynimg/IC212799.gif" alt="Mapping IP Multicast to MAC-Layer Multicast"></p>
+<blockquote>
+<p>Written with <a href="https://stackedit.io/" target="_blank" rel="noopener">StackEdit</a>.</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/07/02/networks/mac/" data-id="cjz95gt0r002fw5r9kr3jfdmj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/L2/">L2</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/07/02/linux/ubuntu-endless-loop-at-startup-greeter/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          【解决】Ubuntu 12.04启机到登陆界面后，在登陆界面死循环
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/06/17/programmer/tools/gdb/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">GDB使用记录</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

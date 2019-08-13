@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Linux telnet 服务器调研、验证与分析。">
+<meta name="keywords" content="telnet,telnetd,telnet 服务器,server,inetd,xinetd,openbsd-inetd,tcpd,tcp-wrapper,utelnetd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux telnet 服务器调研">
+<meta property="og:url" content="http://sunyongfeng.com/201810/networks/telnet.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Linux telnet 服务器调研、验证与分析。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.076Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux telnet 服务器调研">
+<meta name="twitter:description" content="Linux telnet 服务器调研、验证与分析。">
+  <link rel="canonical" href="http://sunyongfeng.com/201810/networks/telnet">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux telnet 服务器调研 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201810/networks/telnet.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux telnet 服务器调研
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-10-26 16:03:55" itemprop="dateCreated datePublished" datetime="2018-10-26T16:03:55+08:00">2018-10-26</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201810/networks/telnet.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201810/networks/telnet.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Linux telnet 服务器调研、验证与分析。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="linux-telnetd-分析"><a href="#linux-telnetd-分析" class="headerlink" title="linux telnetd 分析"></a>linux telnetd 分析</h2><p>Linux 发行版本视 telnet 为不安全工具，对 telnet 的支持比较差。<br>目前发行版主要使用 inetd (internet “super-server”) + telnetd 的形式，并没有独立的 telnet 服务器。一般只有在嵌入式系统中才有 telnet standalone 服务器。</p>
+<ul>
+<li><a href="https://packages.debian.org/jessie/telnetd" target="_blank" rel="noopener">telnetd</a>, 源码隶属 netkit-telnet <ul>
+<li>xinetd + telnetd</li>
+<li>openbsd-inetd + tcpd + telnetd</li>
+</ul>
+</li>
+<li>standalone telnetd:<ul>
+<li>utelnetd, <a href="https://wiki.gentoo.org/wiki/Utelnetd" target="_blank" rel="noopener">https://wiki.gentoo.org/wiki/Utelnetd</a>, 代码<a href="https://public.pengutronix.de/software/utelnetd/" target="_blank" rel="noopener">https://public.pengutronix.de/software/utelnetd/</a>, 用于 optware/gentoo 等。</li>
+<li>busybox telnetd</li>
+</ul>
+</li>
+</ul>
+<p>优缺点分析：</p>
+<ul>
+<li>inetd + telnetd<ul>
+<li>目前各大发行版本支持</li>
+<li>正常情况下，可直接安装使用。目前在 ubuntu 上验证，即装即可用，但是在 debian jessie 上，不可用。下文详细介绍 fix 过程，fix 后 openbsd-inetd (debian 默认 inetd) + telnetd 可用。</li>
+<li>不方便维护，除 telnetd，还需要引进 inetd，多一个故障点</li>
+<li>多一个 inetd，多一个代码维护点</li>
+</ul>
+</li>
+<li>standalone telnetd<ul>
+<li>代码少，以 utelnetd 来讲，空行算进去，总的也才 600 多行。</li>
+<li>相比 inetd + telnetd 方式，部署简单，方便维护。</li>
+<li>busybox 的 telnetd 在整个 busybox 框架下，如果单独剥离出来，需要一定工作量。相比之下，utelnetd 很方便。</li>
+</ul>
+</li>
+</ul>
+<h3 id="关于-inetd"><a href="#关于-inetd" class="headerlink" title="关于 inetd"></a>关于 inetd</h3><p>网上推荐使用 xinetd，redhat 系用 xinetd 比较多。debian 系支持的比较少，像 update-inetd 就明确安装时就说明不完全支持 xinetd。</p>
+<blockquote>
+<pre><code>inetd listens for connections on certain internet sockets.  When a connection is found on one of its sockets, it decides what service the socket corresponds to, and invokes a program to service the request.  After the program is finished, it continues to listen on the socket (except in some cases which will be described below).  Essentially, inetd allows running one daemon to invoke several others, reducing load on the system.
+</code></pre></blockquote>
+<h2 id="utelnetd-验证"><a href="#utelnetd-验证" class="headerlink" title="utelnetd 验证"></a>utelnetd 验证</h2><p>验证可用。</p>
+<p>验证 log:</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>sudo lsof -<span class="symbol">i:</span><span class="number">23</span> -n</span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>sudo utelnetd -d</span><br><span class="line"><span class="symbol">telnetd:</span> starting</span><br><span class="line">  <span class="symbol">port:</span> <span class="number">23</span>; <span class="symbol">interface:</span> any; login <span class="symbol">program:</span> /bin/login</span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span></span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>sudo lsof -<span class="symbol">i:</span><span class="number">23</span> -n</span><br><span class="line">COMMAND    PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME</span><br><span class="line">utelnetd <span class="number">27898</span> root    <span class="number">3</span>u  IPv4 <span class="number">120819</span>      0t<span class="number">0</span>  TCP *<span class="symbol">:telnet</span> (LISTEN)</span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span></span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>telnet localhost </span><br><span class="line">Trying <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span>...</span><br><span class="line">Connected to localhost.</span><br><span class="line">Escape character is <span class="string">'^]'</span>.</span><br><span class="line">Debian GNU/Linux <span class="number">8</span></span><br><span class="line">xxx <span class="symbol">login:</span> a</span><br><span class="line"><span class="symbol">Password:</span> </span><br><span class="line">Last <span class="symbol">login:</span> Fri Oct <span class="number">26</span> <span class="number">22</span><span class="symbol">:</span><span class="number">46</span><span class="symbol">:</span><span class="number">25</span> CST <span class="number">2018</span> on pts/<span class="number">11</span></span><br><span class="line">Linux xxx <span class="number">3.16</span>.<span class="number">0</span>-<span class="number">5</span>-amd64 <span class="comment">#1 SMP Debian 3.16.51-3+deb8u1 (2018-01-08) x86_64</span></span><br><span class="line"></span><br><span class="line">Unauthorized access <span class="keyword">and</span>/<span class="keyword">or</span> <span class="keyword">use</span> are prohibited.</span><br><span class="line">All access <span class="keyword">and</span>/<span class="keyword">or</span> <span class="keyword">use</span> are subject to monitoring.</span><br><span class="line"></span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>ls</span><br><span class="line">libperl4-corelibs-perl_<span class="number">0</span>.<span class="number">003</span>-<span class="number">1_</span>all.deb  tcpd                       utelnetd</span><br><span class="line">lsof_4.<span class="number">86</span>+dfsg-<span class="number">1_</span>amd64.deb              telnetd_<span class="number">0</span>.<span class="number">17</span>-<span class="number">41_</span>amd64.deb</span><br><span class="line">a<span class="variable">@xxx</span><span class="symbol">:~</span><span class="variable">$ </span>logout</span><br><span class="line">Connection closed by foreign host.</span><br></pre></td></tr></table></figure>
+<h3 id="编译记录"><a href="#编译记录" class="headerlink" title="编译记录"></a>编译记录</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~/workshop$ tar xvf utelnetd-0.1.11.tar.gz </span><br><span class="line">utelnetd-0.1.11/</span><br><span class="line">utelnetd-0.1.11/utelnetd.c</span><br><span class="line">utelnetd-0.1.11/LICENSE</span><br><span class="line">utelnetd-0.1.11/Makefile</span><br><span class="line">utelnetd-0.1.11/ChangeLog</span><br><span class="line">utelnetd-0.1.11/README</span><br><span class="line">jeromesun@km:~/workshop$ cd utelnetd-0.1.11/</span><br><span class="line">jeromesun@km:~/workshop/utelnetd-0.1.11$ make</span><br><span class="line">gcc -I. -pipe <span class="attribute">-DSHELLPATH</span>=\"/bin/login\" -Wall -fomit-frame-pointer   -c -o utelnetd.o utelnetd.c</span><br><span class="line">utelnetd.c: <span class="keyword">In</span> function ‘perror_msg_and_die’:</span><br><span class="line">utelnetd.c:160:2: warning: format <span class="keyword">not</span> a string literal <span class="keyword">and</span> <span class="literal">no</span> format arguments [-Wformat-security]</span><br><span class="line">  fprintf(stderr,text);</span><br><span class="line">  ^</span><br><span class="line">utelnetd.c: <span class="keyword">In</span> function ‘make_new_session’:</span><br><span class="line">utelnetd.c:264:10: warning: variable ‘t2’ <span class="builtin-name">set</span> but <span class="keyword">not</span> used [-Wunused-but-set-variable]</span><br><span class="line">  int t1, t2;</span><br><span class="line">          ^</span><br><span class="line">utelnetd.c:264:6: warning: variable ‘t1’ <span class="builtin-name">set</span> but <span class="keyword">not</span> used [-Wunused-but-set-variable]</span><br><span class="line">  int t1, t2;</span><br><span class="line">      ^</span><br><span class="line">utelnetd.c: <span class="keyword">In</span> function ‘main’:</span><br><span class="line">utelnetd.c:561:7: warning: pointer targets <span class="keyword">in</span> passing argument 3 of ‘accept’ differ <span class="keyword">in</span> signedness [-Wpointer-sign]</span><br><span class="line">       &amp;salen)) &lt; 0) &#123;</span><br><span class="line">       ^</span><br><span class="line"><span class="keyword">In</span> file included <span class="keyword">from</span> utelnetd.c:45:0:</span><br><span class="line">/usr/include/x86_64-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * restrict &#123;aka unsigned int * restrict&#125;’ but argument is of<span class="built_in"> type </span>‘int *’</span><br><span class="line"> extern int accept (int __fd, __SOCKADDR_ARG __addr,</span><br><span class="line">            ^</span><br><span class="line">utelnetd.c:597:23: warning: pointer targets <span class="keyword">in</span> passing argument 1 of ‘remove_iacs’ differ <span class="keyword">in</span> signedness [-Wpointer-sign]</span><br><span class="line">     ptr = remove_iacs(ts-&gt;buf1 + ts-&gt;wridx1, maxlen, </span><br><span class="line">                       ^</span><br><span class="line">utelnetd.c:190:1: note: expected ‘unsigned char *’ but argument is of<span class="built_in"> type </span>‘char *’</span><br><span class="line"> remove_iacs(unsigned char <span class="number">*bf</span>, int len, int *processed, int *num_totty) &#123;</span><br><span class="line"> ^</span><br><span class="line">gcc  -I. -pipe <span class="attribute">-DSHELLPATH</span>=\"/bin/login\" -Wall -fomit-frame-pointer utelnetd.o  -o utelnetd</span><br><span class="line">strip  <span class="attribute">--remove-section</span>=.comment <span class="attribute">--remove-section</span>=.note utelnetd</span><br><span class="line">jeromesun@km:~/workshop/utelnetd-0.1.11$ ls</span><br><span class="line">ChangeLog  LICENSE  Makefile  README  utelnetd  utelnetd.c  utelnetd.o</span><br><span class="line">jeromesun@km:~/workshop/utelnetd-0.1.11$ ls -al</span><br><span class="line">total 96</span><br><span class="line">drwxr-xr-x  2 jeromesun jeromesun  4096 10月 26 14:10 .</span><br><span class="line">drwxrwxr-x 17 jeromesun jeromesun  4096 10月 26 14:10 <span class="built_in">..</span></span><br><span class="line">-rw-r--r--  1 jeromesun jeromesun  2545 8月  11  2008 ChangeLog</span><br><span class="line">-rw-r--r--  1 jeromesun jeromesun 17982 3月   6  2000 LICENSE</span><br><span class="line">-rw-r--r--  1 jeromesun jeromesun  1120 8月  11  2008 Makefile</span><br><span class="line">-rw-r--r--  1 jeromesun jeromesun   532 8月   8  2003 README</span><br><span class="line">-rwxrwxr-x  1 jeromesun jeromesun 18912 10月 26 14:10 utelnetd</span><br><span class="line">-rw-r--r--  1 jeromesun jeromesun 16430 8月   6  2003 utelnetd.c</span><br><span class="line">-rw-rw-r--  1 jeromesun jeromesun 14600 10月 26 14:10 utelnetd.o</span><br><span class="line">jeromesun@km:~/workshop/utelnetd-0.1.11$</span><br></pre></td></tr></table></figure>
+<h2 id="openbsd-inetd-telnetd-验证"><a href="#openbsd-inetd-telnetd-验证" class="headerlink" title="openbsd-inetd + telnetd 验证"></a>openbsd-inetd + telnetd 验证</h2><p>在 debian jessie 上验证。<br>虽然不用，但是存档。</p>
+<h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><p>问题现象：telnet 客户端在几秒钟后自行退出。</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">20181026</span>-<span class="number">091148.403</span>]a@xxx:~$ telnet localhost</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">091148.436</span>]Trying <span class="number">127.0.0.1</span>...</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">091148.443</span>]Connected to localhost.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">091148.444</span>]Escape character is '^]'.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">091149.726</span>]</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">091153.446</span>]Connection closed by foreign host.</span><br></pre></td></tr></table></figure>
+<p>log 分析:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: <span class="selector-tag">connect</span> <span class="selector-tag">from</span> 127<span class="selector-class">.0</span><span class="selector-class">.0</span><span class="selector-class">.1</span> (127<span class="selector-class">.0</span><span class="selector-class">.0</span><span class="selector-class">.1</span>)</span><br><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: <span class="selector-tag">error</span>: <span class="selector-tag">cannot</span> <span class="selector-tag">execute</span> : <span class="selector-tag">No</span> <span class="selector-tag">such</span> <span class="selector-tag">file</span> <span class="selector-tag">or</span> <span class="selector-tag">directory</span></span><br></pre></td></tr></table></figure>
+<p>下载 telnetd 源码，grep 并没有发现文件有 <code>cannot execute</code> 的字样。<br>进一步下载 tcp-wrapper 和 openbsd-inetd 源码，发现该 log 在 <code>tcp-wrappers/tcpd.c</code> 中。应该是入参有问题，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">main(argc, argv)</span><br><span class="line"><span class="keyword">int</span>     argc;</span><br><span class="line"><span class="keyword">char</span>  **argv;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_info</span> <span class="title">request</span>;</span></span><br><span class="line">    <span class="keyword">char</span>    path[MAXPATHNAMELEN];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Attempt to prevent the creation of world-writable files. */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> DAEMON_UMASK</span></span><br><span class="line">    umask(DAEMON_UMASK);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * If argv[0] is an absolute path name, ignore REAL_DAEMON_DIR, and strip</span></span><br><span class="line"><span class="comment">     * argv[0] to its basename.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argv[<span class="number">0</span>][<span class="number">0</span>] == <span class="string">'/'</span>) &#123;</span><br><span class="line">	<span class="built_in">strcpy</span>(path, argv[<span class="number">0</span>]);</span><br><span class="line">	argv[<span class="number">0</span>] = <span class="built_in">strrchr</span>(argv[<span class="number">0</span>], <span class="string">'/'</span>) + <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="built_in">sprintf</span>(path, <span class="string">"%s/%s"</span>, REAL_DAEMON_DIR, argv[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br><span class="line">    <span class="comment">/* Report request and invoke the real daemon program. */</span></span><br><span class="line"></span><br><span class="line">    syslog(allow_severity, <span class="string">"connect from %s"</span>, eval_client(&amp;request));</span><br><span class="line">    closelog();</span><br><span class="line">    (<span class="keyword">void</span>) execv(path, argv);</span><br><span class="line">    syslog(LOG_ERR, <span class="string">"error: cannot execute %s: %m"</span>, path);  &lt;---- 这时异常退出，关于 %m The ‘%m’ conversion prints the <span class="built_in">string</span> corresponding to the error code in errno. https:<span class="comment">//stackoverflow.com/questions/20577557/whats-the-meaning-of-the-m-formatting-specifier .</span></span><br><span class="line">    clean_exit(&amp;request);</span><br><span class="line">    <span class="comment">/* NOTREACHED */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>改下代码，把所有的 argv 打出来:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: <span class="selector-tag">argc</span> 0</span><br><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: 0: <span class="selector-tag">argv</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span></span><br><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: <span class="selector-tag">connect</span> <span class="selector-tag">from</span> 127<span class="selector-class">.0</span><span class="selector-class">.0</span><span class="selector-class">.1</span> (127<span class="selector-class">.0</span><span class="selector-class">.0</span><span class="selector-class">.1</span>)</span><br><span class="line"><span class="selector-tag">Oct</span> 26 18<span class="selector-pseudo">:17</span><span class="selector-pseudo">:42</span> <span class="selector-tag">xxx</span> <span class="selector-tag">in</span><span class="selector-class">.telnetd</span><span class="selector-attr">[4140]</span>: <span class="selector-tag">error</span>: <span class="selector-tag">cannot</span> <span class="selector-tag">execute</span> : <span class="selector-tag">No</span> <span class="selector-tag">such</span> <span class="selector-tag">file</span> <span class="selector-tag">or</span> <span class="selector-tag">directory</span></span><br></pre></td></tr></table></figure>
+<p>发现入参是 in.telnetd，不是 <code>/etc/inetd.conf</code> 中写的 <code>/usr/sbin/in.telnetd</code>。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">telnet          stream  tcp     nowait  telnetd <span class="regexp">/usr/</span>sbin<span class="regexp">/tcpd  /</span>usr<span class="regexp">/sbin/</span><span class="keyword">in</span>.telnetd</span><br></pre></td></tr></table></figure>
+<p>有点奇怪:</p>
+<ul>
+<li>openbsd-inetd 执行 telnet 服务时，执行的是什么命令</li>
+<li>即使 openbsd-inetd 执行时，以 in.telnetd 直接传入，<code>REAL_DAEMON_DIR</code> 在编译时也有定义，应该有值才对。</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cc -g -O2 -fstack-protector-strong -Wformat <span class="attribute">-Werror</span>=format-security -Wdate-time <span class="attribute">-D_FORTIFY_SOURCE</span>=2 <span class="attribute">-DFACILITY</span>=LOG_DAEMON -DHOSTS_ACCESS  -DNETGROUP    <span class="attribute">-DDAEMON_UMASK</span>=022 <span class="attribute">-DREAL_DAEMON_DIR</span>=\"/usr/sbin\" -DPROCESS_OPTIONS -DACLEXEC -DKILL_IP_OPTIONS <span class="attribute">-DSEVERITY</span>=LOG_INFO    <span class="attribute">-DRFC931_TIMEOUT</span>=10  <span class="attribute">-DHOSTS_DENY</span>=\"/etc/hosts.deny\" <span class="attribute">-DHOSTS_ALLOW</span>=\"/etc/hosts.allow\"   -DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS <span class="attribute">-DINET6</span>=1 <span class="attribute">-Dss_family</span>=__ss_family <span class="attribute">-Dss_len</span>=__ss_len    -o tcpd.o -c tcpd.c</span><br></pre></td></tr></table></figure>
+<p>先不管了，直接改 tcpd.c 的代码，将所有 telnet 服务的入参强制变成 /usr/sbin/in.telnet:</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- &lt;unnamed&gt;</span></span><br><span class="line"><span class="comment">+++ &lt;unnamed&gt;</span></span><br><span class="line"><span class="meta">@@ -77,6 +77,11 @@</span></span><br><span class="line">     (void) openlog(argv[0], LOG_PID);</span><br><span class="line"> #endif</span><br><span class="line"> </span><br><span class="line"><span class="addition">+    int i;</span></span><br><span class="line"><span class="addition">+    syslog(LOG_ERR, "argc %d", i);</span></span><br><span class="line"><span class="addition">+    for (i = 0; i &lt; argc; i++) &#123;</span></span><br><span class="line"><span class="addition">+        syslog(LOG_ERR, "%d: argv %s", i, argv[i]);</span></span><br><span class="line"><span class="addition">+    &#125;</span></span><br><span class="line">     /*</span><br><span class="line">      * Find out the endpoint addresses of this conversation. Host name</span><br><span class="line">      * lookups and double checks will be done on demand.</span><br><span class="line"><span class="meta">@@ -125,6 +130,13 @@</span></span><br><span class="line">            eval_client(&amp;request), eval_hostaddr(request.client));</span><br><span class="line"> #else</span><br><span class="line">     syslog(allow_severity, "connect from %s", eval_client(&amp;request));</span><br><span class="line"><span class="addition">+#endif</span></span><br><span class="line"><span class="addition">+    if (strcmp(argv[0], "in.telnetd") == 0) &#123;</span></span><br><span class="line"><span class="addition">+        syslog(LOG_ERR, "path before change: path %s, argv %s", path, argv[0]);</span></span><br><span class="line"><span class="addition">+        strcpy(path, "/usr/sbin/in.telnetd");</span></span><br><span class="line"><span class="addition">+        syslog(LOG_ERR, "path after change: path %s, argv %s", path, argv[0]);</span></span><br><span class="line"><span class="addition">+    &#125;</span></span><br><span class="line"><span class="addition">+</span></span><br><span class="line">     closelog();</span><br><span class="line">     (void) execv(path, argv);</span><br><span class="line">     syslog(LOG_ERR, "error: cannot execute %s: %m", path);</span><br></pre></td></tr></table></figure>
+<p>修改后正常:</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">20181026</span>-<span class="number">142113.815</span>][jeromesun@<span class="number">64</span> ~]$ telnet <span class="number">192.168.3.31</span></span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142113.815</span>]Trying <span class="number">192.168.3.31</span>...</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142113.816</span>]Connected to <span class="number">192.168.3.31</span>.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142113.817</span>]Escape character is '^]'.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142122.726</span>]</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142133.853</span>]Debian GNU/Linux <span class="number">8</span> &lt;---- 过了 <span class="number">20</span> 秒才进来，看这个时间很像进行 dns 解析 timeout 了</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142133.892</span>]</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.023</span>]xxx login: a</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.352</span>]Password: </span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.368</span>]Last login: Fri Oct <span class="number">26 19:46:52</span> CST <span class="number">2018</span> from <span class="number">11.1.1.99</span> on pts/<span class="number">10</span></span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.698</span>]Linux xxx <span class="number">3.16.0-5</span>-amd64 #<span class="number">1</span> SMP Debian <span class="number">3.16.51-3</span>+deb8u1 (<span class="number">2018-01-08</span>) x86_64</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.700</span>]Unauthorized access and/or use are prohibited.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.700</span>]All access and/or use are subject to monitoring.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142137.700</span>]</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142138.494</span>]a@xxx:~$ </span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142200.714</span>]a@xxx:~$ show version</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142201.869</span>]Distribution: Debian <span class="number">8</span>.<span class="number">11</span></span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142201.869</span>]Kernel: <span class="number">3.16.0-5</span>-amd64</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142201.870</span>]Build commit: <span class="number">62</span>a9f38</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142201.870</span>]Build date: Thu Oct <span class="number">25 20:56:07</span> CST <span class="number">2018</span></span><br><span class="line">...</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142202.045</span>]</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142202.575</span>]a@xxx:~$ </span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142203.202</span>]telnet&gt; q</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142203.203</span>]Connection closed.</span><br><span class="line">[<span class="number">20181026</span>-<span class="number">142203.579</span>][jeromesun@<span class="number">64</span> ~]$</span><br></pre></td></tr></table></figure>
+<h3 id="编译记录-1"><a href="#编译记录-1" class="headerlink" title="编译记录"></a>编译记录</h3><p>在源码根目录，执行 <code>dpkg-buildpackage -rfakeroot -b -us -uc -nc --as-root -Tbinary</code> 进行编译。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/tcp-wrappers-</span><span class="number">7.6</span>.q<span class="variable">$ </span>rm tcpd</span><br><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/tcp-wrappers-</span><span class="number">7.6</span>.q<span class="variable">$ </span>rm tcpd.o </span><br><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/tcp-wrappers-</span><span class="number">7.6</span>.q<span class="variable">$ </span>rm debian/.stamp-build </span><br><span class="line">jeromesun<span class="variable">@km</span><span class="symbol">:~/tcp-wrappers-</span><span class="number">7.6</span>.q<span class="variable">$ </span>dpkg-buildpackage -rfakeroot -b -us -uc -nc --as-root -Tbinary</span><br><span class="line">dpkg-<span class="symbol">buildpackage:</span> source package tcp-wrappers</span><br><span class="line">dpkg-<span class="symbol">buildpackage:</span> source version <span class="number">7.6</span>.q-<span class="number">25</span></span><br><span class="line">dpkg-<span class="symbol">buildpackage:</span> source distribution unstable</span><br><span class="line">dpkg-<span class="symbol">buildpackage:</span> source changed by Marco d<span class="string">'Itri &lt;md@linux.it&gt;</span></span><br><span class="line"><span class="string">dpkg-buildpackage: host architecture amd64</span></span><br><span class="line"><span class="string"> fakeroot debian/rules binary</span></span><br><span class="line"><span class="string">dh_testdir</span></span><br><span class="line"><span class="string">/usr/bin/make  COPTS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2" LDOPTS="-Wl,-Bsymbolic-functions -Wl,-z,relro" linux</span></span><br><span class="line"><span class="string">make[1]: Entering directory '</span>/home/jeromesun/tcp-wrappers-<span class="number">7.6</span>.q<span class="string">'</span></span><br><span class="line"><span class="string">make[2]: Entering directory '</span>/home/jeromesun/tcp-wrappers-<span class="number">7.6</span>.q<span class="string">'</span></span><br><span class="line"><span class="string">cc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -DFACILITY=LOG_DAEMON -DHOSTS_ACCESS  -DNETGROUP    -DDAEMON_UMASK=022 -DREAL_DAEMON_DIR=\"/usr/sbin\" -DPROCESS_OPTIONS -DACLEXEC -DKILL_IP_OPTIONS -DSEVERITY=LOG_INFO    -DRFC931_TIMEOUT=10  -DHOSTS_DENY=\"/etc/hosts.deny\" -DHOSTS_ALLOW=\"/etc/hosts.allow\"   -DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len    -o tcpd.o -c tcpd.c</span></span><br><span class="line"><span class="string">tcpd.c:44:1: warning: return type defaults to ‘int’ [-Wimplicit-int]</span></span><br><span class="line"><span class="string"> main(argc, argv)</span></span><br><span class="line"><span class="string"> ^</span></span><br><span class="line"><span class="string">tcpd.c: In function ‘main’:</span></span><br><span class="line"><span class="string">tcpd.c:112:5: warning: implicit declaration of function ‘fix_options’ [-Wimplicit-function-declaration]</span></span><br><span class="line"><span class="string">     fix_options(&amp;request);</span></span><br><span class="line"><span class="string">     ^</span></span><br><span class="line"><span class="string">tcpd.c:141:12: warning: implicit declaration of function ‘execv’ [-Wimplicit-function-declaration]</span></span><br><span class="line"><span class="string">     (void) execv(path, argv);</span></span><br><span class="line"><span class="string">            ^</span></span><br><span class="line"><span class="string">cc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -DFACILITY=LOG_DAEMON -DHOSTS_ACCESS  -DNETGROUP    -DDAEMON_UMASK=022 -DREAL_DAEMON_DIR=\"/usr/sbin\" -DPROCESS_OPTIONS -DACLEXEC -DKILL_IP_OPTIONS -DSEVERITY=LOG_INFO    -DRFC931_TIMEOUT=10  -DHOSTS_DENY=\"/etc/hosts.deny\" -DHOSTS_ALLOW=\"/etc/hosts.allow\"   -DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len    -Wl,-Bsymbolic-functions -Wl,-z,relro -o tcpd tcpd.o -Lshared -lwrap</span></span><br><span class="line"><span class="string">make[2]: Leaving directory '</span>/home/jeromesun/tcp-wrappers-<span class="number">7.6</span>.q<span class="string">'</span></span><br><span class="line"><span class="string">make[1]: Leaving directory '</span>/home/jeromesun/tcp-wrappers-<span class="number">7.6</span>.q<span class="string">'</span></span><br><span class="line"><span class="string">touch debian/.stamp-build</span></span><br><span class="line"><span class="string">test root = "`whoami`"</span></span><br><span class="line"><span class="string">dh_testdir</span></span><br><span class="line"><span class="string">dh_prep</span></span><br><span class="line"><span class="string">dh_installdirs</span></span><br><span class="line"><span class="string">dh_install</span></span><br><span class="line"><span class="string">dh_installdocs --link-doc=libwrap0</span></span><br><span class="line"><span class="string">dh_installdocs -p libwrap0 README</span></span><br><span class="line"><span class="string">dh_installchangelogs CHANGES</span></span><br><span class="line"><span class="string">dh_installman -p tcpd *.8</span></span><br><span class="line"><span class="string">dh_installman -p libwrap0 *.5</span></span><br><span class="line"><span class="string">dh_installman -p libwrap0-dev *.3</span></span><br><span class="line"><span class="string">dh_link</span></span><br><span class="line"><span class="string">mkdir -p /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0/lib/x86_64-linux-gnu/ /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0-dev/usr/lib/x86_64-linux-gnu/</span></span><br><span class="line"><span class="string">cp shared/libwrap.so.0.7.6 /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0/lib/x86_64-linux-gnu/</span></span><br><span class="line"><span class="string">ln -s libwrap.so.0.7.6 /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0/lib/x86_64-linux-gnu/libwrap.so.0</span></span><br><span class="line"><span class="string">ln -s /lib/x86_64-linux-gnu/libwrap.so.0 \</span></span><br><span class="line"><span class="string">        /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0-dev/usr/lib/x86_64-linux-gnu/libwrap.so</span></span><br><span class="line"><span class="string">mv /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0-dev/usr/lib/libwrap.a /home/jeromesun/tcp-wrappers-7.6.q/debian/libwrap0-dev/usr/lib/x86_64-linux-gnu/</span></span><br><span class="line"><span class="string">dh_link</span></span><br><span class="line"><span class="string">dh_strip</span></span><br><span class="line"><span class="string">dh_compress</span></span><br><span class="line"><span class="string">dh_fixperms</span></span><br><span class="line"><span class="string">dh_installdebconf</span></span><br><span class="line"><span class="string">dh_makeshlibs -- -c4</span></span><br><span class="line"><span class="string">dh_installdeb</span></span><br><span class="line"><span class="string">dh_shlibdeps</span></span><br><span class="line"><span class="string">dh_gencontrol</span></span><br><span class="line"><span class="string">dh_md5sums</span></span><br><span class="line"><span class="string">dh_builddeb</span></span><br><span class="line"><span class="string">dpkg-deb: building package '</span>tcpd<span class="string">' in '</span>../tcpd_7.<span class="number">6</span>.q-<span class="number">25_</span>amd64.deb<span class="string">'.</span></span><br><span class="line"><span class="string">dpkg-deb: building package '</span>libwrap<span class="number">0</span><span class="string">' in '</span>../libwrap0_7.<span class="number">6</span>.q-<span class="number">25_</span>amd64.deb<span class="string">'.</span></span><br><span class="line"><span class="string">dpkg-deb: building package '</span>libwrap<span class="number">0</span>-dev<span class="string">' in '</span>../libwrap<span class="number">0</span>-dev_7.<span class="number">6</span>.q-<span class="number">25_</span>amd64.deb<span class="string">'.</span></span><br><span class="line"><span class="string">jeromesun@km:~/tcp-wrappers-7.6.q$</span></span><br></pre></td></tr></table></figure>
+<h2 id="xinetd-telnetd"><a href="#xinetd-telnetd" class="headerlink" title="xinetd + telnetd"></a>xinetd + telnetd</h2><p>在 debian jessie 上验证。未成功。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/networks/" rel="tag"># networks</a>
+          
+            <a href="/tags/telnet/" rel="tag"># telnet</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201810/shell/string.html" rel="next" title="Linux shell 字符串处理">
+                <i class="fa fa-chevron-left"></i> Linux shell 字符串处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201811/programmer/tools/scrt_note.html" rel="prev" title="SecureCRT 使用记录">
+                SecureCRT 使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-telnetd-分析"><span class="nav-number">1.</span> <span class="nav-text">linux telnetd 分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#关于-inetd"><span class="nav-number">1.1.</span> <span class="nav-text">关于 inetd</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#utelnetd-验证"><span class="nav-number">2.</span> <span class="nav-text">utelnetd 验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译记录"><span class="nav-number">2.1.</span> <span class="nav-text">编译记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#openbsd-inetd-telnetd-验证"><span class="nav-number">3.</span> <span class="nav-text">openbsd-inetd + telnetd 验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题分析"><span class="nav-number">3.1.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译记录-1"><span class="nav-number">3.2.</span> <span class="nav-text">编译记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xinetd-telnetd"><span class="nav-number">4.</span> <span class="nav-text">xinetd + telnetd</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201810/networks/telnet.html";
+    this.page.identifier = "201810/networks/telnet.html";
+    this.page.title = 'Linux telnet 服务器调研';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

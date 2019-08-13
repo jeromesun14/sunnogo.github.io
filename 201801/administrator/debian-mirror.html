@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="本地镜像 debian 的记录。">
+<meta name="keywords" content="local,mirror,debian,debian-security,administrator,本地,镜像,jessie,ustc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="本地 mirror debian">
+<meta property="og:url" content="http://sunyongfeng.com/201801/administrator/debian-mirror.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="本地镜像 debian 的记录。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="本地 mirror debian">
+<meta name="twitter:description" content="本地镜像 debian 的记录。">
+  <link rel="canonical" href="http://sunyongfeng.com/201801/administrator/debian-mirror">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>本地 mirror debian | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201801/administrator/debian-mirror.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">本地 mirror debian
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-01-10 19:57:20" itemprop="dateCreated datePublished" datetime="2018-01-10T19:57:20+08:00">2018-01-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/administrator/" itemprop="url" rel="index"><span itemprop="name">administrator</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201801/administrator/debian-mirror.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201801/administrator/debian-mirror.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">本地镜像 debian 的记录。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>为快速编译，本地镜像 debian。</p>
+<h2 id="镜像工具"><a href="#镜像工具" class="headerlink" title="镜像工具"></a>镜像工具</h2><ul>
+<li>ftpsync，debian 官方推荐</li>
+<li>apt-mirror，实测速率太慢</li>
+<li>debmirror，未测</li>
+</ul>
+<p>一开始使用 apt-mirror，在 ubuntu 中 apt-get install 的 apt-mirror 并不能做 debian 镜像，出现各种提示错误。所以如果要用 apt-mirror，ubuntu 做 ubuntu 的，debian 上做 debian的。如果想在 ubuntu 上做 debian 镜像，那就搞一个 debian docker 吧。</p>
+<h2 id="ftpsync-使用记录"><a href="#ftpsync-使用记录" class="headerlink" title="ftpsync 使用记录"></a>ftpsync 使用记录</h2><p>官方对做 mirror 的说明，详见<a href="https://www.debian.org/mirror/ftpmirror。" target="_blank" rel="noopener">https://www.debian.org/mirror/ftpmirror。</a></p>
+<p>ftpsync 的获取方式：</p>
+<ul>
+<li>tar 包 from <a href="https://ftp-master.debian.org/ftpsync.tar.gz" target="_blank" rel="noopener">https://ftp-master.debian.org/ftpsync.tar.gz</a></li>
+<li>git repository: git clone <a href="https://anonscm.debian.org/git/mirror/archvsync.git" target="_blank" rel="noopener">https://anonscm.debian.org/git/mirror/archvsync.git</a> (see <a href="https://anonscm.debian.org/cgit/mirror/archvsync.git/" target="_blank" rel="noopener">https://anonscm.debian.org/cgit/mirror/archvsync.git/</a>)</li>
+</ul>
+<p>使用说明见：<a href="https://anonscm.debian.org/cgit/mirror/archvsync.git/tree/README.md，相对简单。" target="_blank" rel="noopener">https://anonscm.debian.org/cgit/mirror/archvsync.git/tree/README.md，相对简单。</a></p>
+<p>快速入门：</p>
+<ul>
+<li>建议创建一个特定的用户用于整个镜像源制作（我未做）</li>
+<li>建议创建一个独立的目录用于整个镜像源制作，上一步创建的用户有写权限。（这一步肯定有必要）</li>
+<li>将 ftpsync 脚本放在 $HOME/bin 或者 $HOME 下（我觉得这是为什么要创建特定用户的原因，保证这个目录只用于做镜像源用，其他用户也不会烦要在 /home/xxx 目录下有这种业务脚本）</li>
+<li>将 ftpsync.conf.sample 重命名为 ftpsync.conf 放到 $HOME/etc 中，并根据你自己的需要做配置。至少你得改 <code>TO=</code> 和 <code>RSYNC_HOST</code> 两行。<ul>
+<li><code>TO=</code> 指明下载的结果存放在本地哪个路径</li>
+<li><code>RSYNC_HOST</code> 指明上级镜像源，即你将从哪个服务器下载</li>
+</ul>
+</li>
+<li>创建 $HOME/log 目录，或者在 $LOGDIR 中指定</li>
+<li>执行 ftpsync，等下载结束了！</li>
+</ul>
+<p>还有另一处方式，由上级镜像源触发更新操作，则需要做其他处理：</p>
+<blockquote>
+<p>If only you receive an update trigger, Setup the .ssh/authorized_keys for the mirror user and place the public key of your upstream mirror into it. Preface it with <code>no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,command=&quot;~/bin/ftpsync&quot;,from=&quot;IPADDRESS&quot;</code> and replace $IPADDRESS with that of your upstream mirror.</p>
+</blockquote>
+<p>arch 配置项，有两个互斥的选项，<code>ARCH_INCLUDE</code> 和 <code>ARCH_EXCLUDE</code>，相当于要下载的白名单和黑名单。查看 <code>bin/ftpsync</code> 脚本的源码，可以看出两个选项只能配置一个。建议直接配置 ARCH_INCLUDE，因为 ARCH_EXCLUDE 容易有漏网之鱼。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># Learn which archs to include/exclude based on ARCH_EXCLUDE <span class="keyword">and</span> ARCH_INCLUDE</span><br><span class="line"># settings.</span><br><span class="line"># Sets EXCLUDE (which might also have <span class="comment">--include statements</span></span><br><span class="line"># followed by a <span class="comment">--exclude *_*.&lt;things&gt;.</span></span><br><span class="line">set_exclude_include_archs() &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="string">[[ -n "$&#123;ARCH_EXCLUDE&#125;" ]]</span> &amp;&amp; <span class="string">[[ -n "$&#123;ARCH_INCLUDE&#125;" ]]</span>; <span class="keyword">then</span></span><br><span class="line">        echo &gt;&amp;<span class="number">2</span> <span class="string">"ARCH_EXCLUDE and ARCH_INCLUDE are mutually exclusive.  Set only one."</span></span><br><span class="line">        <span class="built_in">exit</span> <span class="number">1</span></span><br><span class="line">    fi</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="string">[[ -n "$&#123;ARCH_EXCLUDE&#125;" ]]</span>; <span class="keyword">then</span></span><br><span class="line">        <span class="keyword">for</span> ARCH <span class="keyword">in</span> $&#123;ARCH_EXCLUDE&#125;; <span class="keyword">do</span></span><br><span class="line">            arch_exclude $&#123;ARCH&#125;</span><br><span class="line">        done</span><br><span class="line">        arch_include <span class="string">'*'</span></span><br><span class="line">        arch_include source</span><br><span class="line">    elif <span class="string">[[ -n "$&#123;ARCH_INCLUDE&#125;" ]]</span>; <span class="keyword">then</span></span><br><span class="line">        <span class="keyword">local</span> include_arch_all=<span class="literal">false</span> </span><br><span class="line">        <span class="keyword">for</span> ARCH <span class="keyword">in</span> $&#123;ARCH_INCLUDE&#125;; <span class="keyword">do</span></span><br><span class="line">            arch_include $&#123;ARCH&#125;</span><br><span class="line">            <span class="keyword">if</span> <span class="string">[[ $&#123;ARCH&#125; != source ]]</span>; <span class="keyword">then</span></span><br><span class="line">                include_arch_all=<span class="literal">true</span></span><br><span class="line">            fi</span><br><span class="line">        done</span><br><span class="line">        <span class="keyword">if</span> <span class="string">[[ true = $&#123;include_arch_all&#125; ]]</span>; <span class="keyword">then</span></span><br><span class="line">            arch_include all</span><br><span class="line">        fi</span><br><span class="line">        arch_exclude <span class="string">'*'</span></span><br><span class="line">        arch_exclude source</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><h3 id="HOME-etc-ftpsync-conf"><a href="#HOME-etc-ftpsync-conf" class="headerlink" title="$HOME/etc/ftpsync.conf"></a>$HOME/etc/ftpsync.conf</h3><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">########################################################################</span><br><span class="line">########################################################################</span><br><span class="line">## This is a sample configuration file for the ftpsync mirror script. ##</span><br><span class="line">## Only options most users may need are included.  For documentation  ##</span><br><span class="line">## and all available options see ftpsync.conf(<span class="number">5</span>).                     ##</span><br><span class="line">########################################################################</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line">MIRRORNAME=`hostname -f`</span><br><span class="line">TO=<span class="string">"/home/mirror/mirror/debian"</span></span><br><span class="line">MAILTO=<span class="string">"$LOGNAME"</span></span><br><span class="line"># HUB=false</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Connection options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line">RSYNC_HOST=<span class="string">"ftp.cn.debian.org"</span></span><br><span class="line">RSYNC_PATH=<span class="string">"debian"</span></span><br><span class="line"># RSYNC_USER=</span><br><span class="line"># RSYNC_PASSWORD=</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Mirror information options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line"># INFO_MAINTAINER=<span class="string">"Admins &lt;admins@example.com&gt;, Person &lt;person@example.com&gt;"</span></span><br><span class="line"># INFO_SPONSOR=<span class="string">"Example &lt;https://example.com&gt;"</span></span><br><span class="line"># INFO_COUNTRY=DE</span><br><span class="line"># INFO_LOCATION=<span class="string">"Example"</span></span><br><span class="line"># INFO_THROUGHPUT=<span class="number">10</span>Gb</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Include and exclude options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line">ARCH_INCLUDE=<span class="string">"amd64 source"</span></span><br><span class="line"># ARCH_EXCLUDE=</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Log option</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line"># LOGDIR=</span><br></pre></td></tr></table></figure>
+<h3 id="HOME-etc-ftpsync-security-conf"><a href="#HOME-etc-ftpsync-security-conf" class="headerlink" title="$HOME/etc/ftpsync-security.conf"></a>$HOME/etc/ftpsync-security.conf</h3><p>此配置只下载 amd64 和 source，其他架构忽略。<br>RSYNC_HOST 尝试 <code>ftp.cn.debian.org</code> 和 <code>mirrors.ustc.edu.cn&quot;</code>，都不行，只能用 <code>security.debian.org</code>。目前还没有搞懂，感觉很奇怪，这两个源都有 debian-security 目录。</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">########################################################################</span><br><span class="line">########################################################################</span><br><span class="line">## This is a sample configuration file for the ftpsync mirror script. ##</span><br><span class="line">## Only options most users may need are included.  For documentation  ##</span><br><span class="line">## and all available options see ftpsync.conf(<span class="number">5</span>).                     ##</span><br><span class="line">########################################################################</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line"># MIRRORNAME=`hostname -f`</span><br><span class="line"># TO=<span class="string">"/srv/mirrors/debian/"</span></span><br><span class="line"># MAILTO=<span class="string">"$LOGNAME"</span></span><br><span class="line"># HUB=false</span><br><span class="line">MIRRORNAME=`hostname -f`</span><br><span class="line">TO=<span class="string">"/home/mirror/mirror/debian-security"</span></span><br><span class="line">MAILTO=<span class="string">"$LOGNAME"</span></span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Connection options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line">RSYNC_HOST=<span class="string">"security.debian.org"</span></span><br><span class="line">RSYNC_PATH=<span class="string">"debian-security"</span></span><br><span class="line"># RSYNC_USER=</span><br><span class="line"># RSYNC_PASSWORD=</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Mirror information options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line"># INFO_MAINTAINER=<span class="string">"Admins &lt;admins@example.com&gt;, Person &lt;person@example.com&gt;"</span></span><br><span class="line"># INFO_SPONSOR=<span class="string">"Example &lt;https://example.com&gt;"</span></span><br><span class="line"># INFO_COUNTRY=DE</span><br><span class="line"># INFO_LOCATION=<span class="string">"Example"</span></span><br><span class="line"># INFO_THROUGHPUT=<span class="number">10</span>Gb</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Include and exclude options</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line">ARCH_INCLUDE=<span class="string">"amd64 source"</span></span><br><span class="line"># ARCH_EXCLUDE=</span><br><span class="line"></span><br><span class="line">########################################################################</span><br><span class="line">## Log option</span><br><span class="line">########################################################################</span><br><span class="line"></span><br><span class="line"># LOGDIR=</span><br></pre></td></tr></table></figure>
+<h3 id="做-debian-security-镜像源"><a href="#做-debian-security-镜像源" class="headerlink" title="做 debian-security 镜像源"></a>做 debian-security 镜像源</h3><p>配置文件如上所示，执行的命令为 <code>./bin/ftpsync sync:archive:security</code>，注意字符串的一致，这里 security 要和配置文件 ftpsync-security.conf 中的 security 保持一致。</p>
+<h3 id="cron-每天定时-sync"><a href="#cron-每天定时-sync" class="headerlink" title="cron 每天定时 sync"></a>cron 每天定时 sync</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ cat /etc/cron.d/ftpsync</span><br><span class="line"><span class="attribute">SHELL</span>=/bin/bash</span><br><span class="line"><span class="attribute">PATH</span>=/home/mirror/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line"></span><br><span class="line"><span class="comment">#minute hour day_of_month month day_of_week user command</span></span><br><span class="line">0 2 * * *<span class="built_in"> mirror </span>ftpsync sync:archive:security</span><br><span class="line">0 2 * * *<span class="built_in"> mirror </span>ftpsync</span><br></pre></td></tr></table></figure>
+<h3 id="log"><a href="#log" class="headerlink" title="log"></a>log</h3><p>如果下载失败，中间过程可见 LOGDIR 中的 log 进行排查。例如先前排查 debian-security 下载失败的问题。</p>
+<ul>
+<li>ftpsync.log，ftpsync 脚本的 log</li>
+<li>rsync-ftpsync.log，rsync 的正常 log，很多。。</li>
+<li>rsync-ftpsync.error，rsync 的异常 log，出问题看这里，可以看到 rsync 的 error code 及出现这个 error code 的原因。</li>
+</ul>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ ls <span class="built_in">log</span>/</span><br><span class="line">ftpsync.<span class="built_in">log</span>    ftpsync-security.<span class="built_in">log</span>    rsync-ftpsync.error<span class="number">.1</span>  rsync-ftpsync.<span class="built_in">log</span><span class="number">.1</span>             rsync-ftpsync-security.error<span class="number">.1</span></span><br><span class="line">ftpsync.<span class="built_in">log</span><span class="number">.0</span>  ftpsync-security.<span class="built_in">log</span><span class="number">.0</span>  rsync-ftpsync.error<span class="number">.2</span>  rsync-ftpsync.<span class="built_in">log</span><span class="number">.2</span>             rsync-ftpsync-security.<span class="built_in">log</span></span><br><span class="line">ftpsync.<span class="built_in">log</span><span class="number">.1</span>  ftpsync-security.<span class="built_in">log</span><span class="number">.1</span>  rsync-ftpsync.error<span class="number">.3</span>  rsync-ftpsync.<span class="built_in">log</span><span class="number">.3</span>             rsync-ftpsync-security.<span class="built_in">log</span><span class="number">.0</span></span><br><span class="line">ftpsync.<span class="built_in">log</span><span class="number">.2</span>  rsync-ftpsync.error     rsync-ftpsync.<span class="built_in">log</span>      rsync-ftpsync-security.error    rsync-ftpsync-security.<span class="built_in">log</span><span class="number">.1</span></span><br><span class="line">ftpsync.<span class="built_in">log</span><span class="number">.3</span>  rsync-ftpsync.error<span class="number">.0</span>   rsync-ftpsync.<span class="built_in">log</span><span class="number">.0</span>    rsync-ftpsync-security.error<span class="number">.0</span></span><br><span class="line"></span><br><span class="line">$ cat <span class="built_in">log</span>/ftpsync-security.<span class="built_in">log</span><span class="number">.0</span> </span><br><span class="line"><span class="number">1</span>月 <span class="number">10</span> <span class="number">19</span>:<span class="number">38</span>:<span class="number">10</span> hostname ftpsync-security[<span class="number">12253</span>]: Mirrorsync start</span><br><span class="line"><span class="number">1</span>月 <span class="number">10</span> <span class="number">19</span>:<span class="number">38</span>:<span class="number">10</span> hostname ftpsync-security[<span class="number">12253</span>]: We got pushed from <span class="number">10.13</span><span class="number">.70</span><span class="number">.86</span></span><br><span class="line"><span class="number">1</span>月 <span class="number">10</span> <span class="number">19</span>:<span class="number">38</span>:<span class="number">10</span> hostname ftpsync-security[<span class="number">12253</span>]: Running mirrorsync, update is required, /home/mirror-user/mirrors/debian-security<span class="comment">//Archive-Update-Required-hostname exists</span></span><br><span class="line"><span class="number">1</span>月 <span class="number">10</span> <span class="number">19</span>:<span class="number">38</span>:<span class="number">10</span> hostname ftpsync-security[<span class="number">12253</span>]: Running stage1: rsync --<span class="built_in">filter</span>=exclude_/Archive-Update-in-Progress-hostname --<span class="built_in">filter</span>=protect_/Archive-Update-in-Progress-hostname --<span class="built_in">filter</span>=exclude_/Archive-Update-Required-hostname --<span class="built_in">filter</span>=protect_/Archive-Update-Required-hostname --<span class="built_in">filter</span>=exclude_/project/trace/hostname --<span class="built_in">filter</span>=protect_/project/trace/hostname --<span class="built_in">filter</span>=exclude_/project/trace/hostname-stage1 --<span class="built_in">filter</span>=protect_/project/trace/hostname-stage1 --<span class="built_in">filter</span>=exclude_/project/trace/_hierarchy --<span class="built_in">filter</span>=protect_/project/trace/_hierarchy --<span class="built_in">filter</span>=exclude_/project/trace/_traces --<span class="built_in">filter</span>=protect_/project/trace/_traces --<span class="built_in">filter</span>=include_/project/ --<span class="built_in">filter</span>=protect_/project/ --<span class="built_in">filter</span>=include_/project/trace/ --<span class="built_in">filter</span>=protect_/project/trace/ --<span class="built_in">filter</span>=include_/project/trace<span class="comment">/* --exclude=.~tmp~/ --filter=exclude_/dists/**/</span><span class="built_in">binary</span>-<span class="built_in">alpha</span>/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-<span class="built_in">alpha</span>/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-<span class="built_in">alpha</span>.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-<span class="built_in">alpha</span>.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-<span class="built_in">alpha</span>.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-<span class="built_in">alpha</span>.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-<span class="built_in">alpha</span>.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_alpha.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_alpha.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_alpha.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-arm/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-arm/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-arm.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-arm.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-arm.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-arm.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-arm.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_arm.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_arm.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_arm.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-armel/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-armel/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-armel.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-armel.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-armel.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-armel.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-armel.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armel.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armel.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armel.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-armhf/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-armhf/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-armhf.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-armhf.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-armhf.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-armhf.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-armhf.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armhf.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armhf.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_armhf.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-hppa/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-hppa/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-hppa.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-hppa.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-hppa.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-hppa.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-hppa.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hppa.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hppa.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hppa.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-hurd-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-hurd-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-hurd-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-hurd-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-hurd-i386.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-hurd-i386.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-hurd-i386.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hurd-i386.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hurd-i386.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_hurd-i386.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-i386.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-i386.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-i386.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_i386.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_i386.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_i386.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-ia64/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-ia64/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-ia64.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-ia64.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-ia64.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-ia64.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-ia64.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_ia64.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_ia64.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_ia64.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-kfreebsd-amd64/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-kfreebsd-amd64/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-kfreebsd-amd64.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-kfreebsd-amd64.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-kfreebsd-amd64.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-kfreebsd-amd64.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-kfreebsd-amd64.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-amd64.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-amd64.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-amd64.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-kfreebsd-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-kfreebsd-i386/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-kfreebsd-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-kfreebsd-i386.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-kfreebsd-i386.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-kfreebsd-i386.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-kfreebsd-i386.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-i386.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-i386.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_kfreebsd-i386.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-m68k/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-m68k/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-m68k.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-m68k.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-m68k.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-m68k.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-m68k.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_m68k.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_m68k.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_m68k.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-mipsel/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-mipsel/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-mipsel.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-mipsel.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-mipsel.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-mipsel.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-mipsel.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mipsel.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mipsel.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mipsel.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-mips/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-mips/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-mips.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-mips.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-mips.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-mips.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-mips.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mips.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mips.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_mips.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-powerpc/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-powerpc/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-powerpc.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-powerpc.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-powerpc.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-powerpc.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-powerpc.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_powerpc.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_powerpc.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_powerpc.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-s390/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-s390/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-s390.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-s390.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-s390.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-s390.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-s390.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-s390x/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-s390x/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-s390x.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-s390x.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-s390x.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-s390x.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-s390x.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390x.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390x.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_s390x.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-sh/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-sh/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-sh.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-sh.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-sh.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-sh.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-sh.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sh.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sh.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sh.changes --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-sparc/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>installer-sparc/ --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-sparc.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-udeb-sparc.gz --<span class="built_in">filter</span>=exclude_/dists<span class="comment">/**/</span>Contents-sparc.diff/ --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-sparc.files --<span class="built_in">filter</span>=exclude_/indices<span class="comment">/**/</span>arch-sparc.list.gz --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sparc.deb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sparc.udeb --<span class="built_in">filter</span>=exclude_/pool<span class="comment">/**/</span>*_sparc.changes --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span><span class="built_in">binary</span>-*/ --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span>installer-*/ --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span>Contents-*.gz --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span>Contents-udeb-*.gz --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span>Contents-*.diff/ --<span class="built_in">filter</span>=include_/indices<span class="comment">/**/</span>arch-*.files --<span class="built_in">filter</span>=include_/indices<span class="comment">/**/</span>arch-*.list.gz --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*_*.deb --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*_*.udeb --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*_*.changes --<span class="built_in">filter</span>=include_/dists<span class="comment">/**/</span>source/ --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*.tar.* --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*.diff.* --<span class="built_in">filter</span>=include_/pool<span class="comment">/**/</span>*.dsc mirrors.ustc.edu.cn::debian-security /home/mirror-user/mirrors/debian-security/ --bwlimit=<span class="number">0</span> -prltvHSB8192 --safe-links --chmod=D755,F644 --timeout <span class="number">3600</span> --stats --no-human-readable --include=*.diff/ --exclude=*.diff/Index --exclude=Packages* --exclude=Sources* --exclude=Release* --exclude=InRelease --include=i18n/by-hash --exclude=i18n<span class="comment">/* --exclude=ls-lR*</span></span><br><span class="line"><span class="comment">1月 10 19:38:11 hostname ftpsync-security[12253]: Back from rsync with returncode 5</span></span><br><span class="line"><span class="comment">1月 10 19:38:11 hostname ftpsync-security[12253]: ERROR: Sync step 1 went wrong, got errorcode 5. Logfile: /home/mirror-user/log/ftpsync-security.log</span></span><br><span class="line"><span class="comment">1月 10 19:39:12 hostname ftpsync-security[12253]: Mirrorsync done</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">$ cat log/rsync-ftpsync-security.error.0</span></span><br><span class="line"><span class="comment">@ERROR: Unknown module 'debian-security'</span></span><br><span class="line"><span class="comment">rsync error: error starting client-server protocol (code 5) at main.c(1653) [Receiver=3.1.1]</span></span><br></pre></td></tr></table></figure>
+<h3 id="镜像总大小"><a href="#镜像总大小" class="headerlink" title="镜像总大小"></a>镜像总大小</h3><p>详见官方的镜像大小记录，每日更新，<a href="https://www.debian.org/mirror/size。" target="_blank" rel="noopener">https://www.debian.org/mirror/size。</a></p>
+<p>如果要减少镜像的大小，需要配置 <code>ARCH_INCLUDE=</code>，ARCH_EXCLUDE 要排除太多东西。</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mirror$ du -hd <span class="number">1</span></span><br><span class="line"><span class="number">35</span>G     ./debian-security</span><br><span class="line"><span class="number">487</span>G    ./debian</span><br><span class="line"><span class="number">522</span>G    .</span><br></pre></td></tr></table></figure>
+<h2 id="设置本地-mirror"><a href="#设置本地-mirror" class="headerlink" title="设置本地 mirror"></a>设置本地 mirror</h2><h3 id="搭建局域网镜像源服务器"><a href="#搭建局域网镜像源服务器" class="headerlink" title="搭建局域网镜像源服务器"></a>搭建局域网镜像源服务器</h3><p>见 (<a href="http://www.cnblogs.com/beynol/p/nginx-simple-file-server.html" target="_blank" rel="noopener">http://www.cnblogs.com/beynol/p/nginx-simple-file-server.html</a>) 该链已失效。。</p>
+<ol>
+<li>安装 nginx, <code>sudo apt-get install nginx</code></li>
+<li>配置 <code>/etc/nginx/conf.d/files_server.conf</code></li>
+<li>重启 nginx 服务，<code>sudo service nginx restart</code></li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/nginx/conf.d/files_server.conf</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen  80;</span><br><span class="line">    server_name    192.168.250.250;</span><br><span class="line">    charset utf-8;</span><br><span class="line">    root /home/mirror/mirror;</span><br><span class="line">    location / &#123;</span><br><span class="line">        autoindex on;</span><br><span class="line">        autoindex_exact_size on;</span><br><span class="line">        autoindex_localtime on;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="debian-OS-中的-sources-list-配置"><a href="#debian-OS-中的-sources-list-配置" class="headerlink" title="debian OS 中的 sources.list 配置"></a>debian OS 中的 sources.list 配置</h3><ul>
+<li>sources.list</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">deb</span> [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian jessie main contrib non-free</span><br><span class="line">deb-src [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian jessie main contrib non-free</span><br><span class="line">deb [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian jessie-updates main</span><br><span class="line">deb-src [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian jessie-updates main</span><br><span class="line">deb [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian-security jessie/updates main contrib non-free</span><br><span class="line">deb-src [trusted=<span class="literal">yes</span>] http://192.168.250.250/debian-security jessie/updates main contrib non-free</span><br></pre></td></tr></table></figure>
+<ul>
+<li>apt-get update</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it debian:jessie bash</span><br><span class="line">root@bc80cd6b79e9:/<span class="comment"># cd /etc/apt/</span></span><br><span class="line">root@bc80cd6b79e9:/etc/apt<span class="comment"># apt-get update</span></span><br><span class="line">Ign http://192.168.250.250 jessie InRelease</span><br><span class="line">Get:1 http://192.168.250.250 jessie-updates InRelease [145 kB]</span><br><span class="line">Get:2 http://192.168.250.250 jessie/updates InRelease [94.4 kB]</span><br><span class="line">Get:3 http://192.168.250.250 jessie Release.gpg [<span class="number">2434</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">4</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie <span class="keyword">Release</span> [<span class="number">148</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">5</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie-updates/<span class="keyword">main</span> Sources [<span class="number">20.8</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie-updates/<span class="keyword">main</span> amd64 Packages [<span class="number">23.1</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/<span class="keyword">main</span> Sources [<span class="number">279</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/contrib Sources [<span class="number">1298</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/non-free Sources [<span class="number">20</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">10</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/<span class="keyword">main</span> amd64 Packages [<span class="number">644</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">11</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/contrib amd64 Packages [<span class="number">2366</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">12</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/updates/non-free amd64 Packages [<span class="number">20</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">13</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/<span class="keyword">main</span> Sources [<span class="number">9167</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">14</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/contrib Sources [<span class="number">58.9</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">15</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/non-free Sources [<span class="number">119</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">16</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/<span class="keyword">main</span> amd64 Packages [<span class="number">9064</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">17</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/contrib amd64 Packages [<span class="number">59.2</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">18</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span> jessie/non-free amd64 Packages [<span class="number">101</span> kB]</span><br><span class="line">Fetched <span class="number">19.9</span> MB <span class="keyword">in</span> <span class="number">4</span>s (<span class="number">4019</span> kB/s)</span><br><span class="line">Reading <span class="keyword">package</span> lists...</span><br><span class="line">Reading <span class="keyword">package</span> lists... Done</span><br><span class="line">root@bc80cd6b79e9:/etc/apt<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<h2 id="问题记录"><a href="#问题记录" class="headerlink" title="问题记录"></a>问题记录</h2><p>Update 失败。原因：ftpsync 可能不是一次性能能完成下载，需要下载比较久。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">root@b58bb3484992:/<span class="comment"># cat etc/apt/sources.list</span></span><br><span class="line">deb http://192.168.250.250/debian stretch main</span><br><span class="line">deb http://192.168.250.250/debian stretch-updates main</span><br><span class="line">deb http://192.168.250.250/debian-security stretch/updates main</span><br><span class="line"></span><br><span class="line">root@b58bb3484992:/<span class="comment"># cat etc/apt/sources.list</span></span><br><span class="line">deb http://192.168.250.250/debian stretch main</span><br><span class="line">deb http://192.168.250.250/debian stretch-updates main</span><br><span class="line">deb http://192.168.250.250/debian-security stretch/updates main</span><br><span class="line">root@b58bb3484992:/<span class="comment"># </span></span><br><span class="line">root@b58bb3484992:/<span class="comment"># apt-get update</span></span><br><span class="line">Ign:1 http://192.168.250.250/debian stretch InRelease</span><br><span class="line">Ign:2 http://192.168.250.250/debian stretch-updates InRelease</span><br><span class="line">Get:3 http://192.168.250.250/debian-security stretch/updates InRelease [63.0 kB]</span><br><span class="line">Ign:4 http://192.168.250.250/debian stretch <span class="keyword">Release</span></span><br><span class="line">Ign:<span class="number">5</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates <span class="keyword">Release</span></span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Ign:<span class="number">6</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line">Err:<span class="number">7</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">  <span class="number">404</span>  <span class="keyword">Not</span> <span class="keyword">Found</span></span><br><span class="line">Err:<span class="number">8</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> amd64 Packages</span><br><span class="line">  <span class="number">404</span>  <span class="keyword">Not</span> <span class="keyword">Found</span></span><br><span class="line">Ign:<span class="number">9</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates/<span class="keyword">main</span> <span class="keyword">all</span> Packages</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">10</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian-<span class="keyword">security</span> stretch/updates/<span class="keyword">main</span> amd64 Packages [<span class="number">333</span> kB]</span><br><span class="line">Fetched <span class="number">396</span> kB <span class="keyword">in</span> <span class="number">0</span>s (<span class="number">1023</span> kB/s)    </span><br><span class="line">Reading <span class="keyword">package</span> lists... Done</span><br><span class="line">W: The repository <span class="string">'http://192.168.250.250/debian stretch Release'</span> does <span class="keyword">not</span> have a <span class="keyword">Release</span> file.</span><br><span class="line">N: <span class="keyword">Data</span> <span class="keyword">from</span> such a repository can<span class="string">'t be authenticated and is therefore potentially dangerous to use.</span></span><br><span class="line"><span class="string">N: See apt-secure(8) manpage for repository creation and user configuration details.</span></span><br><span class="line"><span class="string">W: The repository '</span><span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian stretch-updates <span class="keyword">Release</span><span class="string">' does not have a Release file.</span></span><br><span class="line"><span class="string">N: Data from such a repository can'</span>t be <span class="keyword">authenticated</span> <span class="keyword">and</span> <span class="keyword">is</span> therefore potentially dangerous <span class="keyword">to</span> use.</span><br><span class="line">N: See apt-secure(<span class="number">8</span>) manpage <span class="keyword">for</span> repository <span class="keyword">creation</span> <span class="keyword">and</span> <span class="keyword">user</span> configuration details.</span><br><span class="line">E: <span class="keyword">Failed</span> <span class="keyword">to</span> <span class="keyword">fetch</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian/dists/stretch/<span class="keyword">main</span>/<span class="built_in">binary</span>-amd64/Packages  <span class="number">404</span>  <span class="keyword">Not</span> <span class="keyword">Found</span></span><br><span class="line">E: <span class="keyword">Failed</span> <span class="keyword">to</span> <span class="keyword">fetch</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.250</span><span class="number">.250</span>/debian/dists/stretch-updates/<span class="keyword">main</span>/<span class="built_in">binary</span>-amd64/Packages  <span class="number">404</span>  <span class="keyword">Not</span> <span class="keyword">Found</span></span><br><span class="line">E: <span class="keyword">Some</span> <span class="keyword">index</span> files <span class="keyword">failed</span> <span class="keyword">to</span> download. They have been ignored, <span class="keyword">or</span> <span class="keyword">old</span> ones used instead.</span><br><span class="line">root@b58bb3484992:/<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<h2 id="使用-apt-mirror-出现的问题"><a href="#使用-apt-mirror-出现的问题" class="headerlink" title="使用 apt-mirror 出现的问题"></a>使用 apt-mirror 出现的问题</h2><p>以下贴出 USTC 同学的邮件往来记录，谢谢 USTC LUG！</p>
+<ul>
+<li>发现问题：</li>
+</ul>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">因本地开发网与外网隔离，想做一个本地镜像站，但是发出使用 apt-mirror 做镜像时，通常下载一小会儿的时候就会 connection refused，此时正常使用也使用不了。请问是否 USTC mirror 对使用者的下载有限制，如果有限制，我应该如何做自己的本地镜像站？</span><br><span class="line"></span><br><span class="line">Need <span class="built_in">to</span> <span class="built_in">get</span> <span class="number">136</span> kB <span class="keyword">of</span> source archives.</span><br><span class="line">Err <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/ jessie/main tcp-wrappers <span class="number">7.6</span>.q<span class="number">-25</span> (dsc)</span><br><span class="line">  Could <span class="keyword">not</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="number">80</span> (<span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>). - connect (<span class="number">111</span>: Connection refused) [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line">Err <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/ jessie/main tcp-wrappers <span class="number">7.6</span>.q<span class="number">-25</span> (tar)</span><br><span class="line">  Unable <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="keyword">http</span>: [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line">Err <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/ jessie/main tcp-wrappers <span class="number">7.6</span>.q<span class="number">-25</span> (diff)</span><br><span class="line">  Unable <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="keyword">http</span>: [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line">E: Failed <span class="built_in">to</span> fetch <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/pool/main/t/tcp-wrappers/tcp-wrappers_7<span class="number">.6</span>.q<span class="number">-25.</span>dsc  Could <span class="keyword">not</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="number">80</span> (<span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>). - connect (<span class="number">111</span>: Connection refused) [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line"></span><br><span class="line">E: Failed <span class="built_in">to</span> fetch <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/pool/main/t/tcp-wrappers/tcp-wrappers_7<span class="number">.6</span>.q.orig.tar.gz  Unable <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="keyword">http</span>: [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line"></span><br><span class="line">E: Failed <span class="built_in">to</span> fetch <span class="keyword">http</span>://<span class="keyword">ftp</span>.cn.debian.org/debian/pool/main/t/tcp-wrappers/tcp-wrappers_7<span class="number">.6</span>.q<span class="number">-25.</span>debian.tar.xz  Unable <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn:<span class="keyword">http</span>: [IP: <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> <span class="number">80</span>]</span><br><span class="line"></span><br><span class="line">E: Failed <span class="built_in">to</span> fetch some archives.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Request more log</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">请您尝试重现这个故障， 并在故障发生时执行</span><br></pre></td></tr></table></figure>
+<p>curl -vvLI <a href="http://mirrors.ustc.edu.cn/debian/README" target="_blank" rel="noopener">http://mirrors.ustc.edu.cn/debian/README</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">请反馈该命令的完整输出。</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>Reply more log</li>
+</ul>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">Log 如下所示</span><br><span class="line"></span><br><span class="line">$ curl -vvLI <span class="keyword">http</span>://mirrors.ustc.edu.cn/debian/README</span><br><span class="line">*   Trying <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span>...</span><br><span class="line">* connect <span class="built_in">to</span> <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span> port <span class="number">80</span> failed: Connection refused</span><br><span class="line">*   Trying <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>...</span><br><span class="line">* connect <span class="built_in">to</span> <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span> port <span class="number">80</span> failed: Connection refused</span><br><span class="line">*   Trying <span class="number">2001</span>:da8:d800:<span class="number">95</span>::<span class="number">110.</span>..</span><br><span class="line">* Immediate connect fail <span class="keyword">for</span> <span class="number">2001</span>:da8:d800:<span class="number">95</span>::<span class="number">110</span>: Network is unreachable</span><br><span class="line">*   Trying <span class="number">2001</span>:da8:d800:<span class="number">95</span>::<span class="number">110.</span>..</span><br><span class="line">* Immediate connect fail <span class="keyword">for</span> <span class="number">2001</span>:da8:d800:<span class="number">95</span>::<span class="number">110</span>: Network is unreachable</span><br><span class="line">* Failed <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn port <span class="number">80</span>: Connection refused</span><br><span class="line">* Closing connection <span class="number">0</span></span><br><span class="line">curl: (<span class="number">7</span>) Failed <span class="built_in">to</span> connect <span class="built_in">to</span> mirrors.ustc.edu.cn port <span class="number">80</span>: Connection refused</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ ping mirrors.ustc.edu.cn</span><br><span class="line">PING mirrors.ustc.edu.cn (<span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>) <span class="number">56</span>(<span class="number">84</span>) <span class="keyword">bytes</span> <span class="keyword">of</span> data.</span><br><span class="line"><span class="number">64</span> <span class="keyword">bytes</span> <span class="built_in">from</span> <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>: icmp_seq=<span class="number">1</span> ttl=<span class="number">52</span> <span class="built_in">time</span>=<span class="number">26.4</span> ms</span><br><span class="line"><span class="number">64</span> <span class="keyword">bytes</span> <span class="built_in">from</span> <span class="number">202.141</span><span class="number">.160</span><span class="number">.110</span>: icmp_seq=<span class="number">2</span> ttl=<span class="number">52</span> <span class="built_in">time</span>=<span class="number">25.5</span> ms</span><br><span class="line">^C</span><br><span class="line"><span class="comment">--- mirrors.ustc.edu.cn ping statistics ---</span></span><br><span class="line"><span class="number">2</span> packets transmitted, <span class="number">2</span> received, <span class="number">0</span>% packet loss, <span class="built_in">time</span> <span class="number">1001</span>ms</span><br><span class="line">rtt <span class="built_in">min</span>/<span class="built_in">avg</span>/<span class="built_in">max</span>/mdev = <span class="number">25.533</span>/<span class="number">25.994</span>/<span class="number">26.455</span>/<span class="number">0.461</span> ms</span><br><span class="line"></span><br><span class="line">$ ping <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span></span><br><span class="line">PING <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span> (<span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span>) <span class="number">56</span>(<span class="number">84</span>) <span class="keyword">bytes</span> <span class="keyword">of</span> data.</span><br><span class="line"><span class="number">64</span> <span class="keyword">bytes</span> <span class="built_in">from</span> <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span>: icmp_seq=<span class="number">1</span> ttl=<span class="number">46</span> <span class="built_in">time</span>=<span class="number">80.9</span> ms</span><br><span class="line"><span class="number">64</span> <span class="keyword">bytes</span> <span class="built_in">from</span> <span class="number">202.38</span><span class="number">.95</span><span class="number">.110</span>: icmp_seq=<span class="number">2</span> ttl=<span class="number">46</span> <span class="built_in">time</span>=<span class="number">76.6</span> ms</span><br><span class="line">^C</span><br><span class="line"><span class="comment">--- 202.38.95.110 ping statistics ---</span></span><br><span class="line"><span class="number">2</span> packets transmitted, <span class="number">2</span> received, <span class="number">0</span>% packet loss, <span class="built_in">time</span> <span class="number">1001</span>ms</span><br><span class="line">rtt <span class="built_in">min</span>/<span class="built_in">avg</span>/<span class="built_in">max</span>/mdev = <span class="number">76.614</span>/<span class="number">78.759</span>/<span class="number">80.905</span>/<span class="number">2.163</span> ms</span><br></pre></td></tr></table></figure>
+<ul>
+<li>反馈</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">你好！</span><br><span class="line"></span><br><span class="line">目前mirrors有两类流控措施：</span><br><span class="line"></span><br><span class="line"><span class="number">1</span>.  TCP并发连接数限制</span><br><span class="line"><span class="number">2</span>. HTTP请求频率限制</span><br><span class="line"></span><br><span class="line">根据您的反馈，我认为可能是触发了连接数限制。  目前HTTP/HTTPS类请求的连接数限制为<span class="number">11</span>。第<span class="number">12</span>个http连接将返回tcp reset。请议尝试降低apt-mirror的并发线程数量，然后重试一次。</span><br><span class="line"></span><br><span class="line">我们不推荐使用apt-mirorr执行大量同步，这是由于HTTP协议有较大的额外开销，会显著增加服务器负载。</span><br><span class="line">建议您使用rsync协议同步软件仓库，这也是debian官方向下游镜像分发软件包的协议。不仅传输速度更快，而且不需要繁琐的apt-mirror配置。</span><br><span class="line"></span><br><span class="line">可以使用debian官方制作的ftpsync脚本（虽然叫ftpsync，但实际上是rsync命令的包装），ftpsync能很好得解决当上游正在更新时，下游同步结果不一致的问题。也可以直接调用rsync命令，参考指令如下：</span><br><span class="line">rsync -avH --progress rsync<span class="selector-class">.mirrors</span><span class="selector-class">.ustc</span><span class="selector-class">.edu</span><span class="selector-class">.cn</span>::debian/  path/to/local/storage/</span><br><span class="line"></span><br><span class="line">如果任何疑问，欢迎来信交流。</span><br><span class="line"></span><br><span class="line">祝好</span><br></pre></td></tr></table></figure>
+<ul>
+<li>确认问题原因</li>
+</ul>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">谢谢你的回复！</span><br><span class="line">apt-mirror 的默认并连接数为 <span class="number">20</span> 个，超过 <span class="number">11</span> 个了。</span><br><span class="line">好的，接下来我尝试用 ftpsync 做。</span><br><span class="line"></span><br><span class="line">非常感谢！</span><br><span class="line"></span><br><span class="line">Regards,</span><br><span class="line">sunnogo</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/administrator/" rel="tag"># administrator</a>
+          
+            <a href="/tags/debian/" rel="tag"># debian</a>
+          
+            <a href="/tags/mirror/" rel="tag"># mirror</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201712/networks/cables_and_ports.html" rel="next" title="线缆和端口形态总结">
+                <i class="fa fa-chevron-left"></i> 线缆和端口形态总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201801/linux/apt&deb.html" rel="prev" title="apt&deb 工具使用记录">
+                apt&deb 工具使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求"><span class="nav-number">1.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像工具"><span class="nav-number">2.</span> <span class="nav-text">镜像工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ftpsync-使用记录"><span class="nav-number">3.</span> <span class="nav-text">ftpsync 使用记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件"><span class="nav-number">4.</span> <span class="nav-text">配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HOME-etc-ftpsync-conf"><span class="nav-number">4.1.</span> <span class="nav-text">$HOME/etc/ftpsync.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HOME-etc-ftpsync-security-conf"><span class="nav-number">4.2.</span> <span class="nav-text">$HOME/etc/ftpsync-security.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#做-debian-security-镜像源"><span class="nav-number">4.3.</span> <span class="nav-text">做 debian-security 镜像源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron-每天定时-sync"><span class="nav-number">4.4.</span> <span class="nav-text">cron 每天定时 sync</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#log"><span class="nav-number">4.5.</span> <span class="nav-text">log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#镜像总大小"><span class="nav-number">4.6.</span> <span class="nav-text">镜像总大小</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置本地-mirror"><span class="nav-number">5.</span> <span class="nav-text">设置本地 mirror</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#搭建局域网镜像源服务器"><span class="nav-number">5.1.</span> <span class="nav-text">搭建局域网镜像源服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#debian-OS-中的-sources-list-配置"><span class="nav-number">5.2.</span> <span class="nav-text">debian OS 中的 sources.list 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题记录"><span class="nav-number">6.</span> <span class="nav-text">问题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-apt-mirror-出现的问题"><span class="nav-number">7.</span> <span class="nav-text">使用 apt-mirror 出现的问题</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201801/administrator/debian-mirror.html";
+    this.page.identifier = "201801/administrator/debian-mirror.html";
+    this.page.title = '本地 mirror debian';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

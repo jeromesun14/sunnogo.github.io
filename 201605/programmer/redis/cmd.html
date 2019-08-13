@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Redis 使用过的命令备忘。">
+<meta name="keywords" content="Redis,command">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 命令集">
+<meta property="og:url" content="http://sunyongfeng.com/201605/programmer/redis/cmd.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Redis 使用过的命令备忘。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.083Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 命令集">
+<meta name="twitter:description" content="Redis 使用过的命令备忘。">
+  <link rel="canonical" href="http://sunyongfeng.com/201605/programmer/redis/cmd">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Redis 命令集 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201605/programmer/redis/cmd.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Redis 命令集
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-05-04 20:33:29" itemprop="dateCreated datePublished" datetime="2016-05-04T20:33:29+08:00">2016-05-04</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201605/programmer/redis/cmd.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201605/programmer/redis/cmd.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Redis 使用过的命令备忘。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>查看所有 key：KEYS *</li>
+<li>查看数据库大小：DBSIZE</li>
+<li><p>查看数据库基本信息：INFO</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">redis <span class="meta-keyword">/tmp/</span>redis.sock&gt; info</span><br><span class="line"><span class="meta"># Server</span></span><br><span class="line"><span class="symbol">redis_version:</span><span class="number">3.2</span><span class="number">.1</span></span><br><span class="line"><span class="symbol">redis_git_sha1:</span>ce18ff58</span><br><span class="line"><span class="symbol">redis_git_dirty:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">redis_build_id:</span><span class="number">2</span>de158ec05fb50c4</span><br><span class="line"><span class="symbol">redis_mode:</span>standalone</span><br><span class="line"><span class="symbol">os:</span>Linux <span class="number">2.6</span><span class="number">.32</span><span class="number">.13</span>-Cavium-Octeon mips64</span><br><span class="line"><span class="symbol">arch_bits:</span><span class="number">64</span></span><br><span class="line"><span class="symbol">multiplexing_api:</span>epoll</span><br><span class="line"><span class="symbol">gcc_version:</span><span class="number">4.3</span><span class="number">.3</span></span><br><span class="line"><span class="symbol">process_id:</span><span class="number">2877</span></span><br><span class="line"><span class="symbol">run_id:</span><span class="number">91</span>d28ac8ed2ab0f4ceb592d472a79ffcb10a1049</span><br><span class="line"><span class="symbol">tcp_port:</span><span class="number">16904192</span></span><br><span class="line"><span class="symbol">uptime_in_seconds:</span><span class="number">17846</span></span><br><span class="line"><span class="symbol">uptime_in_days:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">hz:</span><span class="number">10</span></span><br><span class="line"><span class="symbol">lru_clock:</span><span class="number">11220343</span></span><br><span class="line"><span class="symbol">executable:</span>/redis-server</span><br><span class="line"><span class="symbol">config_file:</span><span class="meta-keyword">/etc/</span>redis/redis_ce_global.conf</span><br><span class="line"></span><br><span class="line"><span class="meta"># Clients</span></span><br><span class="line"><span class="symbol">connected_clients:</span><span class="number">25</span></span><br><span class="line"><span class="symbol">client_longest_output_list:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">client_biggest_input_buf:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">blocked_clients:</span><span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Memory</span></span><br><span class="line"><span class="symbol">used_memory:</span><span class="number">2230112</span></span><br><span class="line"><span class="symbol">used_memory_human:</span><span class="number">2.13</span>M</span><br><span class="line"><span class="symbol">used_memory_rss:</span><span class="number">3670016</span></span><br><span class="line"><span class="symbol">used_memory_rss_human:</span><span class="number">3.50</span>M</span><br><span class="line"><span class="symbol">used_memory_peak:</span><span class="number">2296768</span></span><br><span class="line"><span class="symbol">used_memory_peak_human:</span><span class="number">2.19</span>M</span><br><span class="line"><span class="symbol">total_system_memory:</span><span class="number">4111892480</span></span><br><span class="line"><span class="symbol">total_system_memory_human:</span><span class="number">3.83</span>G</span><br><span class="line"><span class="symbol">used_memory_lua:</span><span class="number">37888</span></span><br><span class="line"><span class="symbol">used_memory_lua_human:</span><span class="number">37.00</span>K</span><br><span class="line"><span class="symbol">maxmemory:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">maxmemory_human:</span><span class="number">0</span>B</span><br><span class="line"><span class="symbol">maxmemory_policy:</span>noeviction</span><br><span class="line"><span class="symbol">mem_fragmentation_ratio:</span><span class="number">1.65</span></span><br><span class="line"><span class="symbol">mem_allocator:</span>libc</span><br><span class="line"></span><br><span class="line"><span class="meta"># Persistence</span></span><br><span class="line"><span class="symbol">loading:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">rdb_changes_since_last_save:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">rdb_bgsave_in_progress:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">rdb_last_save_time:</span><span class="number">1470820590</span></span><br><span class="line"><span class="symbol">rdb_last_bgsave_status:</span>ok</span><br><span class="line"><span class="symbol">rdb_last_bgsave_time_sec:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">rdb_current_bgsave_time_sec:</span><span class="number">-1</span></span><br><span class="line"><span class="symbol">aof_enabled:</span><span class="number">1</span></span><br><span class="line"><span class="symbol">aof_rewrite_in_progress:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_rewrite_scheduled:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_last_rewrite_time_sec:</span><span class="number">-1</span></span><br><span class="line"><span class="symbol">aof_current_rewrite_time_sec:</span><span class="number">-1</span></span><br><span class="line"><span class="symbol">aof_last_bgrewrite_status:</span>ok</span><br><span class="line"><span class="symbol">aof_last_write_status:</span>ok</span><br><span class="line"><span class="symbol">aof_current_size:</span><span class="number">623151</span></span><br><span class="line"><span class="symbol">aof_base_size:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_pending_rewrite:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_buffer_length:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_rewrite_buffer_length:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_pending_bio_fsync:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_delayed_fsync:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_file_cmd_num:</span><span class="number">3936</span></span><br><span class="line"><span class="symbol">aof_buf_cmd_num:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">aof_is_shadowfile:</span><span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Stats</span></span><br><span class="line"><span class="symbol">total_connections_received:</span><span class="number">25</span></span><br><span class="line"><span class="symbol">total_commands_processed:</span><span class="number">4483</span></span><br><span class="line"><span class="symbol">instantaneous_ops_per_sec:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">total_net_input_bytes:</span><span class="number">655148</span></span><br><span class="line"><span class="symbol">total_net_output_bytes:</span><span class="number">6071473</span></span><br><span class="line"><span class="symbol">instantaneous_input_kbps:</span><span class="number">0.00</span></span><br><span class="line"><span class="symbol">instantaneous_output_kbps:</span><span class="number">0.00</span></span><br><span class="line"><span class="symbol">rejected_connections:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">sync_full:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">sync_partial_ok:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">sync_partial_err:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">expired_keys:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">evicted_keys:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">keyspace_hits:</span><span class="number">528</span></span><br><span class="line"><span class="symbol">keyspace_misses:</span><span class="number">2</span></span><br><span class="line"><span class="symbol">pubsub_channels:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">pubsub_patterns:</span><span class="number">11</span></span><br><span class="line"><span class="symbol">latest_fork_usec:</span><span class="number">494</span></span><br><span class="line"><span class="symbol">migrate_cached_sockets:</span><span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Replication</span></span><br><span class="line"><span class="symbol">role:</span>master</span><br><span class="line"><span class="symbol">connected_slaves:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">master_repl_offset:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">repl_backlog_active:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">repl_backlog_size:</span><span class="number">1048576</span></span><br><span class="line"><span class="symbol">repl_backlog_first_byte_offset:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">repl_backlog_histlen:</span><span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># CPU</span></span><br><span class="line"><span class="symbol">used_cpu_sys:</span><span class="number">0.73</span></span><br><span class="line"><span class="symbol">used_cpu_user:</span><span class="number">0.61</span></span><br><span class="line"><span class="symbol">used_cpu_sys_children:</span><span class="number">0.01</span></span><br><span class="line"><span class="symbol">used_cpu_user_children:</span><span class="number">0.05</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Cluster</span></span><br><span class="line"><span class="symbol">cluster_enabled:</span><span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Keyspace</span></span><br><span class="line"><span class="symbol">db0:</span>keys=<span class="number">3073</span>,expires=<span class="number">0</span>,avg_ttl=<span class="number">0</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>MONITOR，监控数据库使用情况，CTRL C 退出。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[0809-09:49:06:833]</span> ~ # redis-cli -s /tmp/redis/redis_de_global.sock </span><br><span class="line"><span class="string">[0809-09:49:08:744]</span> redis /tmp/redis/redis_de_global.sock&gt; MONITOR</span><br><span class="line"><span class="string">[0809-09:49:08:753]</span> OK</span><br><span class="line"><span class="string">[0809-09:49:10:853]</span> </span><br><span class="line"><span class="string">[0809-09:49:14:849]</span> <span class="number">1470735840</span>.<span class="number">255050</span> <span class="string">[0 unix:/tmp/redis/redis_de_global.sock]</span> <span class="string">"HMSET"</span> <span class="string">"/SS/NHOP/TBL/7623"</span> <span class="string">"INTFID"</span> <span class="string">"1"</span> <span class="string">"VLAN"</span> <span class="string">"100"</span> <span class="string">"MAC"</span> <span class="string">"0000.0000.0003"</span> <span class="string">"PHYID"</span> <span class="string">"07001b0b"</span> <span class="string">"ACTION"</span> <span class="string">"2"</span> <span class="string">"FLOWID"</span> <span class="string">"0"</span> <span class="string">"FLAG"</span> <span class="string">"00000000"</span> <span class="string">"CTRL_FLAG"</span> <span class="string">"00000000"</span> <span class="string">"ENCAPID"</span> <span class="string">"0"</span></span><br><span class="line"><span class="string">[0809-09:49:14:870]</span> <span class="number">1470735840</span>.<span class="number">256824</span> <span class="string">[0 unix:/tmp/redis/redis_de_global.sock]</span> <span class="string">"HMSET"</span> <span class="string">"/SS/UC/RT/TBL/0/0/2.2.2.3/32/0"</span> <span class="string">"VID"</span> <span class="string">"0"</span> <span class="string">"URPF"</span> <span class="string">"0"</span> <span class="string">"ACTION"</span> <span class="string">"2"</span> <span class="string">"NH_TYPE"</span> <span class="string">"0"</span> <span class="string">"NH_SIZE"</span> <span class="string">"1"</span> <span class="string">"ECMPGRP_ID"</span> <span class="string">"0"</span> <span class="string">"NHBASE_ID"</span> <span class="string">"7623"</span> <span class="string">"ENCAP_ID"</span> <span class="string">"0"</span> <span class="string">"CLASSID"</span> <span class="string">"0"</span> <span class="string">"INTFID"</span> <span class="string">"0"</span> <span class="string">"PHYID"</span> <span class="string">"00000000"</span> <span class="string">"MAC"</span> <span class="string">"0001.0203.0405"</span></span><br><span class="line"><span class="string">[0809-09:49:14:894]</span> <span class="number">1470735840</span>.<span class="number">261173</span> <span class="string">[0 unix:/tmp/redis/redis_de_global.sock]</span> <span class="string">"HMSET"</span> <span class="string">"/SS/NHOP/TBL/7624"</span> <span class="string">"INTFID"</span> <span class="string">"1"</span> <span class="string">"VLAN"</span> <span class="string">"100"</span> <span class="string">"MAC"</span> <span class="string">"0000.0000.0004"</span> <span class="string">"PHYID"</span> <span class="string">"07001b0b"</span> <span class="string">"ACTION"</span> <span class="string">"2"</span> <span class="string">"FLOWID"</span> <span class="string">"0"</span> <span class="string">"FLAG"</span> <span class="string">"00000000"</span> <span class="string">"CTRL_FLAG"</span> <span class="string">"00000000"</span> <span class="string">"ENCAPID"</span> <span class="string">"0"</span></span><br><span class="line"><span class="string">[0809-09:53:05:655]</span> <span class="number">1470735856</span>.<span class="number">464859</span> <span class="string">[0 unix:/tmp/redis/redis_de_global.sock]</span> <span class="string">"HMSET"</span> <span class="string">"/SS/NHOP/TBL/12699"</span> <span class="string">"INTFID"</span> <span class="string">"1"</span> <span class="string">"VLAN"</span> <span class="string">"100"</span> <span class="string">"MAC"</span> <span class="string">"0000.0000.13d7"</span> <span class="string">"PHYID"</span> <span class="string">"07001b0b"</span> <span class="string">"ACTION"</span> <span class="string">"2"</span> <span class="string">"FLOWID"</span> <span class="string">"0"</span> <span class="string">"FLAG"</span> <span class="string">""</span>/SS/NHOP/TBL/<span class="number">12700</span><span class="string">" "</span>INTFID<span class="string">" "</span><span class="number">1</span><span class="string">" "</span>VLAN<span class="string">" "</span><span class="number">100</span><span class="string">" "</span>MAC<span class="string">" "</span><span class="number">0000</span>.<span class="number">0000</span>.13d8<span class="string">" "</span>PHYID<span class="string">" "</span>07001b0b<span class="string">" "</span>ACTION<span class="string">" "</span><span class="number">2</span><span class="string">" "</span>FLOWID<span class="string">" "</span><span class="number">0</span><span class="string">" "</span>FLAG<span class="string">" "</span><span class="number">00000000</span><span class="string">" "</span>CTRL_FL</span><br><span class="line"><span class="string">[0809-09:54:52:443]</span> ~ #</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201604/programmer/c/time.html" rel="next" title="Linux C 语言时间相关处理">
+                <i class="fa fa-chevron-left"></i> Linux C 语言时间相关处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201605/life/talk_about_research.html" rel="prev" title="关于研究">
+                关于研究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201605/programmer/redis/cmd.html";
+    this.page.identifier = "201605/programmer/redis/cmd.html";
+    this.page.title = 'Redis 命令集';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

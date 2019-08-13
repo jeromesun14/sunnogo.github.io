@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Vagrant + virtualBox 使用记录">
+<meta name="keywords" content="vagrant,virtualBox,ping,failed,NAT,网络配置,network configuration,private network,bridge,public network,vagrantfile,端口映射,失败,failed,ubuntu,16.04,默认密码,default password,下载位置,download location,打包,package,集群,多机,cluster,外网访问,服务,service,mapping">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vagrant 使用记录">
+<meta property="og:url" content="http://sunyongfeng.com/201703/programmer/tools/vagrant.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Vagrant + virtualBox 使用记录">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.086Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="vagrant 使用记录">
+<meta name="twitter:description" content="Vagrant + virtualBox 使用记录">
+  <link rel="canonical" href="http://sunyongfeng.com/201703/programmer/tools/vagrant">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>vagrant 使用记录 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201703/programmer/tools/vagrant.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">vagrant 使用记录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-03-31 11:39:24" itemprop="dateCreated datePublished" datetime="2017-03-31T11:39:24+08:00">2017-03-31</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201703/programmer/tools/vagrant.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201703/programmer/tools/vagrant.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Vagrant + virtualBox 使用记录</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="vagrant-如何-ping-通虚拟机"><a href="#vagrant-如何-ping-通虚拟机" class="headerlink" title="vagrant 如何 ping 通虚拟机"></a>vagrant 如何 ping 通虚拟机</h1><h2 id="vagrant-默认网络通信机制"><a href="#vagrant-默认网络通信机制" class="headerlink" title="vagrant 默认网络通信机制"></a>vagrant 默认网络通信机制</h2><p>vagrant 默认使用 NAT 端口映射，可以通过端口映射访问虚机内部端口号。但是默认情况下，vagrant 可以访问外网，但是外部世界访问不了 vagrant （类似以前在学校，学校内可以访问外网，但是外网访问不了教育网）。<br>如果你想在外部访问 vagrant 虚机提供的服务，需要配置端口映射，比如将虚机的端口 80 映射成 host 机的端口 8080，详见 <a href="https://www.vagrantup.com/docs/networking/basic_usage.html" target="_blank" rel="noopener">vagrant networking basic usage</a>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.vm.network &quot;forwarded_port&quot;, guest: 80, host: 8080</span><br></pre></td></tr></table></figure>
+<p>默认情况下，vagrant 虚机中有一张网卡，默认IP <code>10.0.2.15</code>。虚机可上外网，host 无法 ping 通虚机。</p>
+<h2 id="vagrant-其他通信机制"><a href="#vagrant-其他通信机制" class="headerlink" title="vagrant 其他通信机制"></a>vagrant 其他通信机制</h2><h3 id="private-network"><a href="#private-network" class="headerlink" title="private network"></a>private network</h3><p>详见<a href="https://www.vagrantup.com/docs/networking/private_network.html" target="_blank" rel="noopener">vagrant networking private_network</a>。</p>
+<p>通常利用 provider 创建的虚拟网卡，例如 virtualBox 的 Host-Only Network。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">以太网适配器 VirtualBox Host-Only Network:</span><br><span class="line"></span><br><span class="line">   连接特定的<span class="built_in"> DNS </span>后缀 . . . . . . . :</span><br><span class="line">   本地链接<span class="built_in"> IPv6 </span>地址. . . . . . . . : fe80::a801:a2e7:cbd9:7126%3</span><br><span class="line">   IPv4 地址 . . . . . . . . . . . . : 192.168.56.1</span><br><span class="line">   子网掩码  . . . . . . . . . . . . : 255.255.255.0</span><br><span class="line">   默认网关. . . . . . . . . . . . . :</span><br></pre></td></tr></table></figure>
+<p>vagrant 的配置：</p>
+<ul>
+<li>静态IP：</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">config</span><span class="selector-class">.vm</span><span class="selector-class">.network</span> "<span class="selector-tag">private_network</span>", <span class="selector-tag">ip</span>: "192<span class="selector-class">.168</span><span class="selector-class">.56</span><span class="selector-class">.10</span>"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>动态IP：</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config<span class="selector-class">.vm</span><span class="selector-class">.network</span> <span class="string">"private_network"</span>, type: <span class="string">"dhcp"</span></span><br></pre></td></tr></table></figure>
+<p>配置后虚机中新增一张网卡，如下的 enp0s8。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vagrant<span class="meta">@ubuntu</span>-<span class="string">xenial:</span>~$ sudo ifconfig -a</span><br><span class="line">enp0s3    Link <span class="string">encap:</span>Ethernet  HWaddr <span class="number">02</span>:<span class="number">6</span><span class="string">a:</span><span class="number">71</span>:<span class="string">da:</span><span class="number">1</span><span class="string">d:</span><span class="number">13</span></span><br><span class="line">          inet <span class="string">addr:</span><span class="number">10.0</span><span class="number">.2</span><span class="number">.15</span>  <span class="string">Bcast:</span><span class="number">10.0</span><span class="number">.2</span><span class="number">.255</span>  <span class="string">Mask:</span><span class="number">255.255</span><span class="number">.255</span><span class="number">.0</span></span><br><span class="line">          inet6 <span class="string">addr:</span> <span class="string">fe80:</span>:<span class="number">6</span><span class="string">a:</span><span class="number">71</span><span class="string">ff:</span><span class="string">feda:</span><span class="number">1</span>d13/<span class="number">64</span> <span class="string">Scope:</span>Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  <span class="string">MTU:</span><span class="number">1500</span>  <span class="string">Metric:</span><span class="number">1</span></span><br><span class="line">          RX <span class="string">packets:</span><span class="number">45731</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">frame:</span><span class="number">0</span></span><br><span class="line">          TX <span class="string">packets:</span><span class="number">20045</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">carrier:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">          collisions:</span><span class="number">0</span> <span class="string">txqueuelen:</span><span class="number">1000</span></span><br><span class="line">          RX <span class="string">bytes:</span><span class="number">37231206</span> (<span class="number">37.2</span> MB)  TX <span class="string">bytes:</span><span class="number">1387674</span> (<span class="number">1.3</span> MB)</span><br><span class="line"></span><br><span class="line">enp0s8    Link <span class="string">encap:</span>Ethernet  HWaddr <span class="number">08</span>:<span class="number">00</span>:<span class="number">27</span>:<span class="string">c4:</span><span class="string">aa:</span><span class="number">2</span>c</span><br><span class="line">          inet <span class="string">addr:</span><span class="number">192.168</span><span class="number">.56</span><span class="number">.10</span>  <span class="string">Bcast:</span><span class="number">192.168</span><span class="number">.56</span><span class="number">.255</span>  <span class="string">Mask:</span><span class="number">255.255</span><span class="number">.255</span><span class="number">.0</span></span><br><span class="line">          inet6 <span class="string">addr:</span> <span class="string">fe80:</span>:<span class="string">a00:</span><span class="number">27</span><span class="string">ff:</span><span class="string">fec4:</span>aa2c/<span class="number">64</span> <span class="string">Scope:</span>Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  <span class="string">MTU:</span><span class="number">1500</span>  <span class="string">Metric:</span><span class="number">1</span></span><br><span class="line">          RX <span class="string">packets:</span><span class="number">818</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">frame:</span><span class="number">0</span></span><br><span class="line">          TX <span class="string">packets:</span><span class="number">575</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">carrier:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">          collisions:</span><span class="number">0</span> <span class="string">txqueuelen:</span><span class="number">1000</span></span><br><span class="line">          RX <span class="string">bytes:</span><span class="number">96862</span> (<span class="number">96.8</span> KB)  TX <span class="string">bytes:</span><span class="number">100624</span> (<span class="number">100.6</span> KB)</span><br><span class="line"></span><br><span class="line">lo        Link <span class="string">encap:</span>Local Loopback</span><br><span class="line">          inet <span class="string">addr:</span><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>  <span class="string">Mask:</span><span class="number">255.0</span><span class="number">.0</span><span class="number">.0</span></span><br><span class="line">          inet6 <span class="string">addr:</span> ::<span class="number">1</span>/<span class="number">128</span> <span class="string">Scope:</span>Host</span><br><span class="line">          UP LOOPBACK RUNNING  <span class="string">MTU:</span><span class="number">65536</span>  <span class="string">Metric:</span><span class="number">1</span></span><br><span class="line">          RX <span class="string">packets:</span><span class="number">8</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">frame:</span><span class="number">0</span></span><br><span class="line">          TX <span class="string">packets:</span><span class="number">8</span> <span class="string">errors:</span><span class="number">0</span> <span class="string">dropped:</span><span class="number">0</span> <span class="string">overruns:</span><span class="number">0</span> <span class="string">carrier:</span><span class="number">0</span></span><br><span class="line"><span class="symbol">          collisions:</span><span class="number">0</span> <span class="string">txqueuelen:</span><span class="number">1</span></span><br><span class="line">          RX <span class="string">bytes:</span><span class="number">480</span> (<span class="number">480.0</span> B)  TX <span class="string">bytes:</span><span class="number">480</span> (<span class="number">480.0</span> B)</span><br></pre></td></tr></table></figure>
+<p>此是 host 可以 ping 通虚机。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\R0&gt;ping 192.168.56.10</span><br><span class="line"></span><br><span class="line">正在<span class="built_in"> Ping </span>192.168.56.10 具有 32 字节的数据:</span><br><span class="line">来自 192.168.56.10 的回复: 字节=32 时间&lt;1ms <span class="attribute">TTL</span>=64</span><br><span class="line">来自 192.168.56.10 的回复: 字节=32 时间&lt;1ms <span class="attribute">TTL</span>=64</span><br><span class="line">来自 192.168.56.10 的回复: 字节=32 时间&lt;1ms <span class="attribute">TTL</span>=64</span><br><span class="line">来自 192.168.56.10 的回复: 字节=32 时间&lt;1ms <span class="attribute">TTL</span>=64</span><br><span class="line"></span><br><span class="line">192.168.56.10 的<span class="built_in"> Ping </span>统计信息:</span><br><span class="line">    数据包: 已发送 = 4，已接收 = 4，丢失 = 0 (0% 丢失)，</span><br><span class="line">往返行程的估计时间(以毫秒为单位):</span><br><span class="line">    最短 = 0ms，最长 = 0ms，平均 = 0ms</span><br><span class="line"></span><br><span class="line">C:\Users\R0&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="public-network"><a href="#public-network" class="headerlink" title="public network"></a>public network</h3><p>利用 provider 提供的 bridge （桥接功能）。</p>
+<h1 id="vagrant-halt-无法关机"><a href="#vagrant-halt-无法关机" class="headerlink" title="vagrant halt 无法关机"></a>vagrant halt 无法关机</h1><p>失败 log：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">E:\vagrant&gt;Vagrant halt</span><br><span class="line">==&gt; default: Attempting graceful shutdown of VM...</span><br><span class="line">The following SSH command responded with a non-zero <span class="keyword">exit</span> status.</span><br><span class="line">Vagrant assumes that this means the command failed!</span><br><span class="line"></span><br><span class="line">shutdown -h now</span><br><span class="line"></span><br><span class="line">Stdout from the command:</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Stderr from the command:</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">E:\vagrant&gt;</span><br></pre></td></tr></table></figure>
+<p>解决方法，见 <a href="https://github.com/mitchellh/vagrant/issues/1659" target="_blank" rel="noopener">issue 1659</a> @rfay 的回答。即将默认用户配置为 sudoers 后，还要在 /etc/sudoers 中添加 <code>vagrant ALL=(ALL) NOPASSWD:ALL</code>。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@dengzhp I've done this <span class="keyword">to</span> myself any <span class="built_in">number</span> <span class="keyword">of</span> <span class="keyword">times</span> <span class="keyword">by</span> messing up <span class="keyword">the</span> /etc/sudoers <span class="keyword">or</span> /etc/sudoers.d. I did <span class="keyword">it</span> today, which <span class="keyword">is</span> why I landed here. Somewhere <span class="keyword">in</span> /etc/sudoers (<span class="keyword">or</span> /etc/sudoers.d <span class="keyword">if</span> <span class="keyword">it</span>'s included) you have <span class="keyword">to</span> have</span><br><span class="line"></span><br><span class="line">vagrant ALL=(ALL) NOPASSWD:ALL</span><br><span class="line">Defaults:vagrant !requiretty</span><br><span class="line"><span class="keyword">without</span> <span class="keyword">that</span>, <span class="keyword">the</span> vagrant ssh (<span class="keyword">without</span> tty) fails mysteriously. I once again had built a machine <span class="keyword">without</span> <span class="keyword">my</span> puppet vagrant module, which adds this <span class="keyword">in</span>.</span><br><span class="line"></span><br><span class="line">@mitchellh <span class="keyword">if</span> there's <span class="keyword">not</span> already an FAQ <span class="keyword">on</span> this, <span class="keyword">it</span>'s a good topic <span class="keyword">for</span> one. I seem <span class="keyword">to</span> do <span class="keyword">it</span> <span class="keyword">over</span> <span class="keyword">and</span> <span class="keyword">over</span> again :-)</span><br></pre></td></tr></table></figure>
+<p>不过我的环境中，/etc/sudoers 默认权限为只读，因此，直接将 <code>vagrant ALL=(ALL) NOPASSWD:ALL</code> 添加在 /etc/sudoers.d/username 中。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vagrant<span class="meta">@ubuntu</span>-<span class="string">xenial:</span>~$ ls -al <span class="regexp">/etc/</span>sudoers</span><br><span class="line">-r--r----- <span class="number">1</span> root root <span class="number">755</span> Jan <span class="number">20</span> <span class="number">16</span>:<span class="number">01</span> <span class="regexp">/etc/</span>sudoers</span><br><span class="line">vagrant<span class="meta">@ubuntu</span>-<span class="string">xenial:</span>~$ sudo cat <span class="regexp">/etc/</span>sudoers.d/vagrant</span><br><span class="line">vagrant ALL=(ALL) <span class="string">NOPASSWD:</span>ALL</span><br><span class="line">vagrant<span class="meta">@ubuntu</span>-<span class="string">xenial:</span>~$</span><br></pre></td></tr></table></figure>
+<h1 id="vagrantfile-添加端口映射后-vagrant-up-失败"><a href="#vagrantfile-添加端口映射后-vagrant-up-失败" class="headerlink" title="vagrantfile 添加端口映射后 vagrant up 失败"></a>vagrantfile 添加端口映射后 vagrant up 失败</h1><p>添加一个新的端口映射到 Vagrantfile，<code>config.vm.network &quot;forwarded_port&quot;, guest: 16385, host: 26385</code>。<br>之后执行 <code>vagrant up</code> 失败，log：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">E:</span>\vagrant&gt;Vagrant reload</span><br><span class="line">==&gt; <span class="symbol">default:</span> Attempting graceful shutdown <span class="keyword">of</span> VM...</span><br><span class="line">==&gt; <span class="symbol">default:</span> Clearing any previously set forwarded ports...</span><br><span class="line"><span class="symbol">C:</span>/HashiCorp/Vagrant/embedded/gems/gems/vagrant-<span class="number">1.9</span>.<span class="number">3</span>/<span class="class"><span class="keyword">lib</span>/<span class="title">vagrant</span>/<span class="title">util</span>/<span class="title">is_port_open</span>.<span class="title">rb</span>:21:<span class="title">in</span> `<span class="title">initialize</span>': <span class="title">The</span> <span class="title">requested</span> <span class="title">address</span> <span class="title">is</span> <span class="title">not</span> <span class="title">valid</span> <span class="title">in</span> <span class="title">its</span> <span class="title">context</span>. - <span class="title">connect</span>(2) <span class="title">for</span> "0.0.0.0" <span class="title">port</span> 16385 (<span class="title">Errno::EADDRNOTAVAIL</span>)</span></span><br></pre></td></tr></table></figure>
+<p>解决方法详见 <a href="https://github.com/mitchellh/vagrant/issues/8395" target="_blank" rel="noopener">issue 8395</a>，配置中加上 host_id，最终端口映射的配置为 <code>config.vm.network &quot;forwarded_port&quot;, guest: 16385, host: 26385, host_ip: &quot;127.0.0.1&quot;</code><br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Had <span class="keyword">the</span> same problem <span class="keyword">on</span> <span class="title">Windows</span> <span class="title">7</span>.</span><br><span class="line">This problem seems <span class="built_in">to</span> be caused <span class="keyword">by</span> <span class="keyword">the</span> <span class="built_in">new</span> host_ip parameter <span class="keyword">for</span> <span class="keyword">the</span> port forwarding feature.</span><br><span class="line">I suggest that <span class="keyword">for</span> compatibility reason, <span class="keyword">the</span> default host_ip parameter should be <span class="built_in">set</span> <span class="built_in">to</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> instead <span class="keyword">of</span> <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span></span><br><span class="line">I managed <span class="built_in">to</span> make <span class="keyword">the</span> <span class="number">1.9</span><span class="number">.3</span> <span class="built_in">version</span> working <span class="keyword">by</span> rewritten all my Vagrantfile(s) <span class="keyword">and</span> adding <span class="keyword">the</span> host_id: <span class="string">"127.0.0.1"</span> parameter <span class="keyword">for</span> <span class="keyword">each</span> <span class="keyword">of</span> <span class="keyword">the</span> <span class="string">"forwarded_port"</span> network configuration.</span><br><span class="line">E.g.:</span><br><span class="line">config.vm.network <span class="string">"forwarded_port"</span>, guest: <span class="number">22</span>, host: <span class="number">1022</span>, host_ip: <span class="string">"127.0.0.1"</span>, id: <span class="string">'ssh'</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="ubuntu-16-04-32-bit-box-用户名密码反人类"><a href="#ubuntu-16-04-32-bit-box-用户名密码反人类" class="headerlink" title="ubuntu 16.04 32-bit box 用户名密码反人类"></a>ubuntu 16.04 32-bit box 用户名密码反人类</h1><p>一般情况下，vagrant box 用户名密码都为 vagrant，但是使用的第一个 box 却违反这个规则。<a href="https://atlas.hashicorp.com/ubuntu/boxes/xenial32" target="_blank" rel="noopener">xenial32</a> 的默认用户名为 <code>ubuntu</code>，密码为<code>7ea1ebda4a3d566ade4dd808</code>。</p>
+<p>具体的 Box 内部 Vagrantfile 内容为：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Front load the includes</span><br><span class="line">include_vagrantfile = <span class="built_in">File</span>.expand_path(<span class="string">"../include/_Vagrantfile"</span>, __FILE__)</span><br><span class="line">load include_vagrantfile <span class="built_in">if</span> <span class="built_in">File</span>.exist?(include_vagrantfile)</span><br><span class="line"></span><br><span class="line">Vagrant.configure(<span class="string">"2"</span>) <span class="built_in">do</span> |<span class="built_in">config</span>|</span><br><span class="line">  <span class="built_in">config</span>.vm.base_mac = <span class="string">"026A71DA1D13"</span></span><br><span class="line">  <span class="built_in">config</span>.ssh.username = <span class="string">"ubuntu"</span></span><br><span class="line">  <span class="built_in">config</span>.ssh.password = <span class="string">"7ea1ebda4a3d566ade4dd808"</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">config</span>.vm.provider <span class="string">"virtualbox"</span> <span class="built_in">do</span> |vb|</span><br><span class="line">     vb.customize [ <span class="string">"modifyvm"</span>, :id, <span class="string">"--uart1"</span>, <span class="string">"0x3F8"</span>, <span class="string">"4"</span> ]</span><br><span class="line">     vb.customize [ <span class="string">"modifyvm"</span>, :id, <span class="string">"--uartmode1"</span>, <span class="string">"file"</span>, <span class="built_in">File</span>.join(Dir.pwd, <span class="string">"ubuntu-xenial-16.04-cloudimg-console.log"</span>) ]</span><br><span class="line">  <span class="built_in">end</span></span><br><span class="line"><span class="built_in">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="vagrant-box-add-base-ubuntu-xenial32-具体的下载位置"><a href="#vagrant-box-add-base-ubuntu-xenial32-具体的下载位置" class="headerlink" title="vagrant box add base ubuntu/xenial32  具体的下载位置"></a>vagrant box add base ubuntu/xenial32  具体的下载位置</h1><p>windows 下具体下载位置为 <code>C:\Users\yourName\.vagrant.d\boxes\base\</code>。</p>
+<h1 id="vagrant-如何打包？"><a href="#vagrant-如何打包？" class="headerlink" title="vagrant 如何打包？"></a>vagrant 如何打包？</h1><p>vagrant 打包事实上使用 tar + gzip 进行打包，后缀命名为 <code>.box</code>。<br><code>vagrant package</code> 命令的打包结果据说不好使，没有实测。</p>
+<h1 id="外网如何使用-vagrant-服务"><a href="#外网如何使用-vagrant-服务" class="headerlink" title="外网如何使用 vagrant 服务"></a>外网如何使用 vagrant 服务</h1><p>端口映射时，ip 填 <code>host IP</code>，而不是 <code>127.0.0.1</code> 本地地址。</p>
+<p>如下配置，实测可在 172.x.x.x 网段 ssh 远程登陆虚机。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">config</span><span class="selector-class">.vm</span><span class="selector-class">.network</span> "<span class="selector-tag">forwarded_port</span>", <span class="selector-tag">guest</span>: 16385, <span class="selector-tag">host</span>: 26385, <span class="selector-tag">host_ip</span>: "192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.2</span>"</span><br><span class="line"><span class="selector-tag">config</span><span class="selector-class">.vm</span><span class="selector-class">.network</span> "<span class="selector-tag">forwarded_port</span>", <span class="selector-tag">guest</span>: 22, <span class="selector-tag">host</span>: 2222, <span class="selector-tag">host_ip</span>: "192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.2</span>"</span><br></pre></td></tr></table></figure>
+<p>ssh 远程登陆 log：</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:~# ssh vagrant@<span class="number">192.168</span>.<span class="number">1.2</span> -p <span class="number">2222</span></span><br><span class="line">vagrant@<span class="number">192.168</span>.<span class="number">1.2</span><span class="symbol">'s</span> password: </span><br><span class="line">Welcome <span class="keyword">to</span> Ubuntu <span class="number">14.04</span>.<span class="number">5</span> LTS (GNU/Linux <span class="number">3.13</span>.<span class="number">0</span>-<span class="number">115</span>-<span class="keyword">generic</span> i686)</span><br><span class="line"></span><br><span class="line"> * Documentation:  https://help.ubuntu.com/</span><br><span class="line"></span><br><span class="line">  System information as <span class="keyword">of</span> Thu Apr  <span class="number">6</span> <span class="number">09</span>:<span class="number">03</span>:<span class="number">15</span> UTC <span class="number">2017</span></span><br><span class="line"></span><br><span class="line">  System load:  <span class="number">0.26</span>              Processes:           <span class="number">78</span></span><br><span class="line">  Usage <span class="keyword">of</span> /:   <span class="number">4.2</span>% <span class="keyword">of</span> <span class="number">39.34</span>GB   Users logged <span class="keyword">in</span>:     <span class="number">0</span></span><br><span class="line">  Memory usage: <span class="number">16</span>%               IP address <span class="keyword">for</span> eth0: <span class="number">10.0</span>.<span class="number">2.15</span></span><br><span class="line">  Swap usage:   <span class="number">0</span>%                IP address <span class="keyword">for</span> eth1: <span class="number">192.168</span>.<span class="number">56.10</span></span><br><span class="line"></span><br><span class="line">  Graph this data <span class="keyword">and</span> manage this system at:</span><br><span class="line">    https://landscape.canonical.com/</span><br><span class="line"></span><br><span class="line">  Get cloud support <span class="keyword">with</span> Ubuntu Advantage Cloud Guest:</span><br><span class="line">    http://www.ubuntu.com/business/services/cloud</span><br><span class="line"></span><br><span class="line"><span class="keyword">New</span> <span class="keyword">release</span> '<span class="number">16.04</span>.<span class="number">2</span> LTS' available.</span><br><span class="line">Run <span class="symbol">'do</span>-<span class="keyword">release</span>-upgrade' <span class="keyword">to</span> upgrade <span class="keyword">to</span> it.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Last login: Thu Apr  <span class="number">6</span> <span class="number">09</span>:<span class="number">03</span>:<span class="number">16</span> <span class="number">2017</span> from <span class="number">10.0</span>.<span class="number">2.2</span></span><br><span class="line">vagrant@vagrant-ubuntu-trusty-<span class="number">32</span>:~$</span><br></pre></td></tr></table></figure>
+<p>未决问题：bridge 模式下，跨网段 ping，内网可以 ping 通外网，外网 ping 不通内网。</p>
+<h1 id="三机集群配置"><a href="#三机集群配置" class="headerlink" title="三机集群配置"></a>三机集群配置</h1><p>支持变量，以程序的方式做配置。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- mode: ruby -*-</span></span><br><span class="line"><span class="comment"># vi: set ft=ruby :</span></span><br><span class="line"></span><br><span class="line">Vagrant.configure(<span class="string">"2"</span>) do |config|</span><br><span class="line">    (<span class="number">1</span>..<span class="number">3</span>).each do |i|</span><br><span class="line">        config.vm.define <span class="string">"node#&#123;i&#125;"</span> do |<span class="keyword">node</span><span class="title">|</span></span><br><span class="line"><span class="title">            # 设置虚拟机的Box</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.box = <span class="string">"ubuntu/trusty32"</span></span><br><span class="line">            <span class="comment"># 设置虚拟机的主机名</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.<span class="attr">hostname=</span><span class="string">"node#&#123;i&#125;"</span></span><br><span class="line">            <span class="comment"># 设置虚拟机的IP</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.network <span class="string">"private_network"</span>, ip: <span class="string">"192.168.56.1#&#123;i&#125;"</span></span><br><span class="line">            <span class="comment"># 设置端口映射</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.network <span class="string">"forwarded_port"</span>, guest: <span class="number">16385</span>, host: <span class="string">"#&#123;i&#125;6385"</span>, host_ip: <span class="string">"127.0.0.1"</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.network <span class="string">"forwarded_port"</span>, guest: <span class="number">22</span>, host: <span class="string">"#&#123;i&#125;0022"</span>, host_ip: <span class="string">"127.0.0.1"</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.box_check_update = <span class="literal">false</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 设置主机与虚拟机的共享目录</span></span><br><span class="line">            <span class="comment"># node.vm.synced_folder "~/Desktop/share", "/home/vagrant/share"</span></span><br><span class="line">            <span class="comment"># VirtaulBox相关配置</span></span><br><span class="line">            <span class="keyword">node</span>.<span class="title">vm</span>.provider <span class="string">"virtualbox"</span> do |v|</span><br><span class="line">                <span class="comment"># 设置虚拟机的名称</span></span><br><span class="line">                v.name = <span class="string">"node#&#123;i&#125;"</span></span><br><span class="line">                <span class="comment"># 设置虚拟机的内存大小  </span></span><br><span class="line">                v.memory = <span class="number">512</span></span><br><span class="line">                <span class="comment"># 设置虚拟机的CPU个数</span></span><br><span class="line">                v.cpus = <span class="number">1</span></span><br><span class="line">            end</span><br><span class="line">          </span><br><span class="line">            <span class="comment"># 使用shell脚本进行软件安装和配置</span></span><br><span class="line">            <span class="comment"># node.vm.provision "shell", inline: &lt;&lt;-SHELL</span></span><br><span class="line">            <span class="comment">#    </span></span><br><span class="line">            <span class="comment"># SHELL</span></span><br><span class="line">            <span class="comment"># end</span></span><br><span class="line">        end </span><br><span class="line">    end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/vagrant/" rel="tag"># vagrant</a>
+          
+            <a href="/tags/virtualBox/" rel="tag"># virtualBox</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201703/programmer/linux/hugetlbpage.html" rel="next" title="Huge page 概述">
+                <i class="fa fa-chevron-left"></i> Huge page 概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/programmer/java/32bit_in_64bit_system.html" rel="prev" title="解决 Can't load IA 32-bit .dll on a AMD 64-bit platform">
+                解决 Can't load IA 32-bit .dll on a AMD 64-bit platform <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#vagrant-如何-ping-通虚拟机"><span class="nav-number">1.</span> <span class="nav-text">vagrant 如何 ping 通虚拟机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vagrant-默认网络通信机制"><span class="nav-number">1.1.</span> <span class="nav-text">vagrant 默认网络通信机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vagrant-其他通信机制"><span class="nav-number">1.2.</span> <span class="nav-text">vagrant 其他通信机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#private-network"><span class="nav-number">1.2.1.</span> <span class="nav-text">private network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#public-network"><span class="nav-number">1.2.2.</span> <span class="nav-text">public network</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vagrant-halt-无法关机"><span class="nav-number">2.</span> <span class="nav-text">vagrant halt 无法关机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vagrantfile-添加端口映射后-vagrant-up-失败"><span class="nav-number">3.</span> <span class="nav-text">vagrantfile 添加端口映射后 vagrant up 失败</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ubuntu-16-04-32-bit-box-用户名密码反人类"><span class="nav-number">4.</span> <span class="nav-text">ubuntu 16.04 32-bit box 用户名密码反人类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vagrant-box-add-base-ubuntu-xenial32-具体的下载位置"><span class="nav-number">5.</span> <span class="nav-text">vagrant box add base ubuntu/xenial32  具体的下载位置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vagrant-如何打包？"><span class="nav-number">6.</span> <span class="nav-text">vagrant 如何打包？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#外网如何使用-vagrant-服务"><span class="nav-number">7.</span> <span class="nav-text">外网如何使用 vagrant 服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三机集群配置"><span class="nav-number">8.</span> <span class="nav-text">三机集群配置</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201703/programmer/tools/vagrant.html";
+    this.page.identifier = "201703/programmer/tools/vagrant.html";
+    this.page.title = 'vagrant 使用记录';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

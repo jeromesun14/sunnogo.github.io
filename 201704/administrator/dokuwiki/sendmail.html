@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="dokuwiki 解决无法发送邮件通知。">
+<meta name="keywords" content="administrator,dokuwiki,plugin,插件,发送邮件,sendmail,失败,fail,smtp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dokuwiki 邮件发送">
+<meta property="og:url" content="http://sunyongfeng.com/201704/administrator/dokuwiki/sendmail.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="dokuwiki 解决无法发送邮件通知。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dokuwiki 邮件发送">
+<meta name="twitter:description" content="dokuwiki 解决无法发送邮件通知。">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/administrator/dokuwiki/sendmail">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>dokuwiki 邮件发送 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/administrator/dokuwiki/sendmail.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">dokuwiki 邮件发送
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-06 13:51:00" itemprop="dateCreated datePublished" datetime="2017-04-06T13:51:00+08:00">2017-04-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/dokuwiki/" itemprop="url" rel="index"><span itemprop="name">dokuwiki</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/administrator/dokuwiki/sendmail.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/administrator/dokuwiki/sendmail.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">dokuwiki 解决无法发送邮件通知。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="不使用外部邮箱可直接发邮件"><a href="#不使用外部邮箱可直接发邮件" class="headerlink" title="不使用外部邮箱可直接发邮件"></a>不使用外部邮箱可直接发邮件</h1><h2 id="sendmail"><a href="#sendmail" class="headerlink" title="sendmail"></a>sendmail</h2><ul>
+<li>安装 sendmail，<code>apt-get install sendmail</code>，安装时间有点长，约 7 分钟。</li>
+<li>配置 hosts，详见 <a href="https://superuser.com/questions/626205/sendmail-very-slow-etc-hosts-configuration/626219#626219" target="_blank" rel="noopener">Sendmail very slow - /etc/hosts configuration</a>。<ul>
+<li><code>hostname</code>，获取本机 hostname，本样例值为 ubuntu</li>
+<li><code>vi /etc/hosts</code>，修改 <code>127.0.0.1 localhost</code> 一行为 <code>127.0.0.1       ubuntu.localdomain ubuntu localhost</code>。<strong>注意</strong>，<code>ubuntu.localdomain</code> 为必须值，而且不可另起一行。</li>
+</ul>
+</li>
+</ul>
+<h2 id="mail-发送失败问题排查"><a href="#mail-发送失败问题排查" class="headerlink" title="mail 发送失败问题排查"></a>mail 发送失败问题排查</h2><h3 id="注册用户后，邮件发送失败"><a href="#注册用户后，邮件发送失败" class="headerlink" title="注册用户后，邮件发送失败"></a>注册用户后，邮件发送失败</h3><p>提示 regmailfail “发送密码邮件时产生错误。请联系管理员！”，如果语言为英文的话，log 为“Looks like there was an error on sending the password mail. Please contact the admin!”。</p>
+<h3 id="查看发送失败的原因"><a href="#查看发送失败的原因" class="headerlink" title="查看发送失败的原因"></a>查看发送失败的原因</h3><p>查看 <code>/var/log/lighttpd/error.log</code>，确认原因为服务器没有安装 sendmail。</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2017</span><span class="number">-09</span><span class="number">-29</span> <span class="number">11</span>:<span class="number">13</span>:<span class="number">55</span>: (mod_fastcgi.c<span class="number">.2673</span>) FastCGI-<span class="keyword">stderr</span>: PHP Question2Answer email <span class="built_in">send</span> error: Could <span class="keyword">not</span> instantiate mail <span class="function"><span class="keyword">function</span>.</span></span><br></pre></td></tr></table></figure>
+<p><code>apt-get install sendmail</code>，安装时间有点长，约 7 分钟。</p>
+<h3 id="注册后，在注册页面卡很久"><a href="#注册后，在注册页面卡很久" class="headerlink" title="注册后，在注册页面卡很久"></a>注册后，在注册页面卡很久</h3><p>查看 <code>/var/log/mail.log</code>，确认发一封邮件约需要 20 分钟。原因为解析不到 hostname，sleep 一段时间后 retry。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Sep 29 16:40:27 ubuntu sm-msp-queue[21553]: My unqualified host name (ubuntu) unknown; sleeping <span class="keyword">for</span> retry</span><br><span class="line">Sep 29 16:42:27 ubuntu sm-msp-queue[21553]: unable <span class="keyword">to</span> qualify my own domain name (ubuntu) -- using short name</span><br><span class="line">Sep 29 16:57:19 ubuntu sendmail[21561]: My unqualified host name (ubuntu) unknown; sleeping <span class="keyword">for</span> retry</span><br><span class="line">Sep 29 16:59:19 ubuntu sendmail[21561]: unable <span class="keyword">to</span> qualify my own domain name (ubuntu) -- using short name</span><br><span class="line">Sep 29 16:59:19 ubuntu sendmail[21561]: v8T8xJkc021561: <span class="attribute">from</span>=www-data, <span class="attribute">size</span>=2020, <span class="attribute">class</span>=0, <span class="attribute">nrcpts</span>=1, <span class="attribute">msgid</span>=&lt;201</span><br><span class="line">709290859.v8T8xJkc021561@ubuntu&gt;, <span class="attribute">relay</span>=www-data@localhost</span><br><span class="line">Sep 29 17:00:19 ubuntu sm-mta[21562]: v8T8xJvo021562: <span class="attribute">from</span>=&lt;www-data@ubuntu&gt;, <span class="attribute">size</span>=2191, <span class="attribute">class</span>=0, <span class="attribute">nrcpts</span>=1, msg</span><br><span class="line"><span class="attribute">id</span>=&lt;201709290859.v8T8xJkc021561@ubuntu&gt;, <span class="attribute">proto</span>=ESMTP, <span class="attribute">daemon</span>=MTA-v4, <span class="attribute">relay</span>=localhost [127.0.0.1]</span><br><span class="line">Sep 29 17:00:19 ubuntu sendmail[21561]: v8T8xJkc021561: <span class="attribute">to</span>=sunnogo1 &lt;sun@xxx.com.cn&gt;, <span class="attribute">ctladdr</span>=www-da</span><br><span class="line">ta (33/33), <span class="attribute">delay</span>=00:01:00, <span class="attribute">xdelay</span>=00:01:00, <span class="attribute">mailer</span>=relay, <span class="attribute">pri</span>=32020, relay=[127.0.0.1] [127.0.0.1], <span class="attribute">dsn</span>=2.0.0,</span><br><span class="line"> <span class="attribute">stat</span>=Sent (v8T8xJvo021562 Message accepted <span class="keyword">for</span> delivery)</span><br><span class="line">Sep 29 17:00:40 ubuntu sm-mta[21582]: <span class="attribute">STARTTLS</span>=client, <span class="attribute">relay</span>=mx.xxx.com.cn., <span class="attribute">version</span>=TLSv1/SSLv3, <span class="attribute">verify</span>=F</span><br><span class="line">AIL, <span class="attribute">cipher</span>=ECDHE-RSA-AES256-SHA, <span class="attribute">bits</span>=256/256</span><br><span class="line">Sep 29 17:00:41 ubuntu sm-mta[21582]: v8T8xJvo021562: <span class="attribute">to</span>=&lt;sun@xxx.com.cn&gt;, <span class="attribute">ctladdr</span>=&lt;www-data@ubuntu&gt;</span><br><span class="line"> (33/33), <span class="attribute">delay</span>=00:00:22, <span class="attribute">xdelay</span>=00:00:22, <span class="attribute">mailer</span>=esmtp, <span class="attribute">pri</span>=122191, <span class="attribute">relay</span>=mx.xxx.com.cn. [172.16.2.173],</span><br><span class="line"><span class="attribute">dsn</span>=2.0.0, <span class="attribute">stat</span>=Sent (&lt;201709290859.v8T8xJkc021561@ubuntu&gt; [<span class="attribute">InternalId</span>=1588969] Queued mail <span class="keyword">for</span> delivery)</span><br></pre></td></tr></table></figure>
+<h3 id="配置好-hosts-之后，注册还需要等-20-多秒"><a href="#配置好-hosts-之后，注册还需要等-20-多秒" class="headerlink" title="配置好 hosts 之后，注册还需要等 20 多秒"></a>配置好 hosts 之后，注册还需要等 20 多秒</h3><p>安装后，发送一封邮件约 20s。从 log 上看，是公司邮件服务器响应太慢。dokuwiki 的邮件发送是同步发送。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Sep 29 17:38:12 ubuntu sendmail[1864]: v8T9cCZX001864: <span class="attribute">to</span>=sunnogo2 &lt;sun@xxx.com.cn&gt;, <span class="attribute">ctladdr</span>=www-dat</span><br><span class="line">a (33/33), <span class="attribute">delay</span>=00:00:00, <span class="attribute">xdelay</span>=00:00:00, <span class="attribute">mailer</span>=relay, <span class="attribute">pri</span>=32020, relay=[127.0.0.1] [127.0.0.1], <span class="attribute">dsn</span>=2.0.0,</span><br><span class="line"><span class="attribute">stat</span>=Sent (v8T9cCSA001865 Message accepted <span class="keyword">for</span> delivery)</span><br><span class="line">Sep 29 17:38:33 ubuntu sm-mta[1867]: <span class="attribute">STARTTLS</span>=client, <span class="attribute">relay</span>=mx.xxx.com.cn., <span class="attribute">version</span>=TLSv1/SSLv3, <span class="attribute">verify</span>=FA</span><br><span class="line">IL, <span class="attribute">cipher</span>=ECDHE-RSA-AES256-SHA, <span class="attribute">bits</span>=256/256</span><br><span class="line">Sep 29 17:38:34 ubuntu sm-mta[1867]: v8T9cCSA001865: <span class="attribute">to</span>=&lt;sun@xxx.com.cn&gt;, <span class="attribute">ctladdr</span>=&lt;www-data@ubuntu.l</span><br><span class="line">ocaldomain&gt; (33/33), <span class="attribute">delay</span>=00:00:22, <span class="attribute">xdelay</span>=00:00:22, <span class="attribute">mailer</span>=esmtp, <span class="attribute">pri</span>=122215, <span class="attribute">relay</span>=mx.xxx.com.cn. [172.</span><br><span class="line">16.2.173], <span class="attribute">dsn</span>=2.0.0, <span class="attribute">stat</span>=Sent (&lt;201709290938.v8T9cCZX001864@ubuntu.localdomain&gt; [<span class="attribute">InternalId</span>=1590347] Queued m</span><br><span class="line">ail <span class="keyword">for</span> delivery)</span><br></pre></td></tr></table></figure>
+<h2 id="附：SMTP发包方式"><a href="#附：SMTP发包方式" class="headerlink" title="附：SMTP发包方式"></a>附：SMTP发包方式</h2><p>详见 <a href="http://sunyongfeng.com/201704/administrator/dokuwiki/sendmail.html">dokuwiki 邮件发送</a></p>
+<h2 id="附：sendmail-安装-log"><a href="#附：sendmail-安装-log" class="headerlink" title="附：sendmail 安装 log"></a>附：sendmail 安装 log</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:/var/www/dokuwiki<span class="comment"># apt-get install sendmail</span></span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">The following extra packages will be installed:</span><br><span class="line">  m4 procmail sendmail-base sendmail-bin sendmail-cf sensible-mda</span><br><span class="line">Suggested packages:</span><br><span class="line">  sendmail-doc rmail logcheck sasl2-bin</span><br><span class="line">Recommended packages:</span><br><span class="line">  default-mta mail-transport-agent fetchmail</span><br><span class="line">The following NEW packages will be installed:</span><br><span class="line">  m4 procmail sendmail sendmail-base sendmail-bin sendmail-cf sensible-mda</span><br><span class="line">0 upgraded, 7 newly installed, 0 to remove and 169 not upgraded.</span><br><span class="line">Need to get 1,038 kB of archives.</span><br><span class="line">After this operation, 4,707 kB of additional disk space will be used.</span><br><span class="line"><span class="keyword">Do</span> you want <span class="keyword">to</span> continue? [Y/n] y</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">1</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/<span class="keyword">main</span> m4 amd64 <span class="number">1.4</span><span class="number">.17</span><span class="number">-2</span>ubuntu1 [<span class="number">195</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">2</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/universe sendmail-base <span class="keyword">all</span> <span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1 [<span class="number">139</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">3</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/universe sendmail-cf <span class="keyword">all</span> <span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1 [<span class="number">86.1</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">4</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/universe sendmail-<span class="keyword">bin</span> amd64 <span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1 [<span class="number">469</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">5</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty-updates/<span class="keyword">main</span> procmail amd64 <span class="number">3.22</span><span class="number">-21</span>ubuntu0<span class="number">.1</span> [<span class="number">135</span> kB]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">6</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/universe sensible-mda amd64 <span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1 [<span class="number">8</span>,<span class="number">246</span> B]</span><br><span class="line"><span class="keyword">Get</span>:<span class="number">7</span> <span class="keyword">http</span>://cn.archive.ubuntu.com/ubuntu/ trusty/universe sendmail <span class="keyword">all</span> <span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1 [<span class="number">6</span>,<span class="number">248</span> B]</span><br><span class="line">Fetched <span class="number">1</span>,<span class="number">038</span> kB <span class="keyword">in</span> <span class="number">0</span>s (<span class="number">1</span>,<span class="number">375</span> kB/s)   </span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> m4.</span><br><span class="line">(Reading <span class="keyword">database</span> ... <span class="number">64411</span> files <span class="keyword">and</span> directories currently installed.)</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../m4_1<span class="number">.4</span><span class="number">.17</span><span class="number">-2</span>ubuntu1_amd64.deb ...</span><br><span class="line">Unpacking m4 (<span class="number">1.4</span><span class="number">.17</span><span class="number">-2</span>ubuntu1) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> sendmail-base.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../sendmail-base_8<span class="number">.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1_all.deb ...</span><br><span class="line">Unpacking sendmail-base (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> sendmail-cf.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../sendmail-cf_8<span class="number">.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1_all.deb ...</span><br><span class="line">Unpacking sendmail-cf (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> sendmail-bin.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../sendmail-bin_8<span class="number">.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1_amd64.deb ...</span><br><span class="line">Unpacking sendmail-<span class="keyword">bin</span> (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> procmail.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../procmail_3<span class="number">.22</span><span class="number">-21</span>ubuntu0<span class="number">.1</span>_amd64.deb ...</span><br><span class="line">Unpacking procmail (<span class="number">3.22</span><span class="number">-21</span>ubuntu0<span class="number">.1</span>) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> sensible-mda.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../sensible-mda_8<span class="number">.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1_amd64.deb ...</span><br><span class="line">Unpacking sensible-mda (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Selecting previously unselected <span class="keyword">package</span> sendmail.</span><br><span class="line">Preparing <span class="keyword">to</span> unpack .../sendmail_8<span class="number">.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1_all.deb ...</span><br><span class="line">Unpacking sendmail (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Processing <span class="keyword">triggers</span> <span class="keyword">for</span> man-db (<span class="number">2.6</span><span class="number">.7</span><span class="number">.1</span><span class="number">-1</span>ubuntu1) ...</span><br><span class="line">Processing <span class="keyword">triggers</span> <span class="keyword">for</span> <span class="keyword">install</span>-info (<span class="number">5.2</span><span class="number">.0</span>.dfsg<span class="number">.1</span><span class="number">-2</span>) ...</span><br><span class="line">Processing <span class="keyword">triggers</span> <span class="keyword">for</span> ureadahead (<span class="number">0.100</span><span class="number">.0</span><span class="number">-16</span>) ...</span><br><span class="line">Setting up m4 (<span class="number">1.4</span><span class="number">.17</span><span class="number">-2</span>ubuntu1) ...</span><br><span class="line">Setting up sendmail-base (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Saving <span class="keyword">current</span> /etc/mail/sendmail.mc,cf <span class="keyword">to</span> /<span class="keyword">var</span>/backups</span><br><span class="line">Setting up sendmail-cf (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line">Setting up sendmail-<span class="keyword">bin</span> (<span class="number">8.14</span><span class="number">.4</span><span class="number">-4.1</span>ubuntu1) ...</span><br><span class="line"><span class="keyword">update</span>-rc.d: <span class="keyword">warning</span>: <span class="keyword">default</span> <span class="keyword">stop</span> runlevel arguments (<span class="number">0</span> <span class="number">1</span> <span class="number">6</span>) <span class="keyword">do</span> <span class="keyword">not</span> <span class="keyword">match</span> sendmail <span class="keyword">Default</span>-<span class="keyword">Stop</span> <span class="keyword">values</span> (<span class="number">1</span>)</span><br><span class="line"><span class="keyword">update</span>-alternatives: <span class="keyword">using</span> /usr/lib/sm.bin/sendmail <span class="keyword">to</span> provide /usr/sbin/sendmail-mta (sendmail-mta) <span class="keyword">in</span> <span class="keyword">auto</span> <span class="keyword">mode</span></span><br><span class="line"><span class="keyword">update</span>-alternatives: <span class="keyword">using</span> /usr/lib/sm.bin/sendmail <span class="keyword">to</span> provide /usr/sbin/sendmail-msp (sendmail-msp) <span class="keyword">in</span> <span class="keyword">auto</span> <span class="keyword">mode</span></span><br><span class="line"> * Stopping Mail Transport <span class="keyword">Agent</span> (MTA) sendmail                                                                                                               [ OK ] </span><br><span class="line">Updating sendmail environment ...</span><br><span class="line">Reading configuration <span class="keyword">from</span> /etc/mail/sendmail.conf.</span><br><span class="line">Validating configuration.</span><br><span class="line">Writing configuration <span class="keyword">to</span> /etc/mail/sendmail.conf.</span><br><span class="line">Writing /etc/cron.d/sendmail.</span><br><span class="line">Could <span class="keyword">not</span> <span class="keyword">open</span> /etc/mail/<span class="keyword">databases</span>(<span class="keyword">No</span> such <span class="keyword">file</span> <span class="keyword">or</span> <span class="keyword">directory</span>), creating it.</span><br><span class="line">Reading configuration <span class="keyword">from</span> /etc/mail/sendmail.conf.</span><br><span class="line">Validating configuration.</span><br><span class="line">Writing configuration <span class="keyword">to</span> /etc/mail/sendmail.conf.</span><br><span class="line">Writing /etc/cron.d/sendmail.</span><br><span class="line">Could <span class="keyword">not</span> <span class="keyword">open</span> /etc/mail/<span class="keyword">databases</span>(<span class="keyword">No</span> such <span class="keyword">file</span> <span class="keyword">or</span> <span class="keyword">directory</span>), creating it.</span><br><span class="line">Reading configuration <span class="keyword">from</span> /etc/mail/sendmail.conf.</span><br><span class="line">Validating configuration.</span><br><span class="line">Creating /etc/mail/databases...</span><br><span class="line"></span><br><span class="line">Checking filesystem, this may take <span class="keyword">some</span> <span class="built_in">time</span> - it will <span class="keyword">not</span> hang!</span><br><span class="line">  ...   Done.</span><br><span class="line"> </span><br><span class="line">Checking <span class="keyword">for</span> installed MDAs...</span><br><span class="line">Adding <span class="keyword">link</span> <span class="keyword">for</span> newly extant program (mail.local)</span><br><span class="line">Adding <span class="keyword">link</span> <span class="keyword">for</span> newly extant program (procmail)</span><br><span class="line">sasl2-<span class="keyword">bin</span> <span class="keyword">not</span> installed, <span class="keyword">not</span> configuring sendmail support.</span><br><span class="line"></span><br><span class="line"><span class="keyword">To</span> <span class="keyword">enable</span> sendmail SASL2 support <span class="keyword">at</span> a later <span class="built_in">date</span>, invoke <span class="string">"/usr/share/sendmail/update_auth"</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">Creating/Updating SSL(<span class="keyword">for</span> TLS) information</span><br><span class="line">Creating /etc/mail/tls/starttls.m4...</span><br><span class="line">Creating SSL certificates <span class="keyword">for</span> sendmail.</span><br><span class="line">Generating DSA <span class="keyword">parameters</span>, <span class="number">2048</span> <span class="built_in">bit</span> <span class="keyword">long</span> prime</span><br><span class="line">This could take <span class="keyword">some</span> <span class="built_in">time</span></span><br><span class="line">........+.+.........+.....................+.+.......+...............+.............+............+++++++++++++++++++++++++++++++++++++++++++++++++++*</span><br><span class="line">.+.................+.......+..............+.+..............................+....+...............+.+..+...+......+.......+..+....................+...................+................+.+..........+....+.+.....+..+..+.................+.............+....+....+.......+.................................+..............+....+..+.+......................+.......+.....+.............+.....+.........+............+......+....................+....+....+..+................................+.......+........+.+...+................+....................+++++++++++++++++++++++++++++++++++++++++++++++++++*</span><br><span class="line">Generating RSA <span class="keyword">private</span> <span class="keyword">key</span>, <span class="number">2048</span> <span class="built_in">bit</span> <span class="keyword">long</span> modulus</span><br><span class="line">...........................................................................+++</span><br><span class="line">..............+++</span><br><span class="line">e <span class="keyword">is</span> <span class="number">65537</span> (<span class="number">0x10001</span>)</span><br><span class="line"></span><br><span class="line">*** *** *** <span class="keyword">WARNING</span> *** <span class="keyword">WARNING</span> *** <span class="keyword">WARNING</span> *** <span class="keyword">WARNING</span> *** *** ***</span><br><span class="line"></span><br><span class="line">Everything you need <span class="keyword">to</span> support STARTTLS (encrypted mail transmission</span><br><span class="line"><span class="keyword">and</span> <span class="keyword">user</span> <span class="keyword">authentication</span> via certificates) <span class="keyword">is</span> installed <span class="keyword">and</span> configured</span><br><span class="line">but <span class="keyword">is</span> *<span class="keyword">NOT</span>* being used.</span><br><span class="line"></span><br><span class="line"><span class="keyword">To</span> <span class="keyword">enable</span> sendmail <span class="keyword">to</span> <span class="keyword">use</span> STARTTLS, you need <span class="keyword">to</span>:</span><br><span class="line"><span class="number">1</span>) <span class="keyword">Add</span> this line <span class="keyword">to</span> /etc/mail/sendmail.mc <span class="keyword">and</span> <span class="keyword">optionally</span></span><br><span class="line">   <span class="keyword">to</span> /etc/mail/submit.mc:</span><br><span class="line">  <span class="keyword">include</span>(<span class="string">`/etc/mail/tls/starttls.m4')dnl</span></span><br><span class="line"><span class="string">2) Run sendmailconfig</span></span><br><span class="line"><span class="string">3) Restart sendmail</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Checking &#123;sendmail,submit&#125;.mc and related databases...</span></span><br><span class="line"><span class="string">Reading configuration from /etc/mail/sendmail.conf.</span></span><br><span class="line"><span class="string">Validating configuration.</span></span><br><span class="line"><span class="string">Creating /etc/mail/databases...</span></span><br><span class="line"><span class="string">Reading configuration from /etc/mail/sendmail.conf.</span></span><br><span class="line"><span class="string">Validating configuration.</span></span><br><span class="line"><span class="string">Creating /etc/mail/databases...</span></span><br><span class="line"><span class="string">Reading configuration from /etc/mail/sendmail.conf.</span></span><br><span class="line"><span class="string">Validating configuration.</span></span><br><span class="line"><span class="string">Creating /etc/mail/Makefile...</span></span><br><span class="line"><span class="string">Reading configuration from /etc/mail/sendmail.conf.</span></span><br><span class="line"><span class="string">Validating configuration.</span></span><br><span class="line"><span class="string">Writing configuration to /etc/mail/sendmail.conf.</span></span><br><span class="line"><span class="string">Writing /etc/cron.d/sendmail.</span></span><br><span class="line"><span class="string">Disabling HOST statistics file(/var/lib/sendmail/host_status).</span></span><br><span class="line"><span class="string">Creating /etc/mail/sendmail.cf...</span></span><br><span class="line"><span class="string">Creating /etc/mail/submit.cf...</span></span><br><span class="line"><span class="string">Informational: confCR_FILE file empty: /etc/mail/relay-domains</span></span><br><span class="line"><span class="string">Warning: confCT_FILE source file not found: /etc/mail/trusted-users</span></span><br><span class="line"><span class="string"> it was created</span></span><br><span class="line"><span class="string">Informational: confCT_FILE file empty: /etc/mail/trusted-users</span></span><br><span class="line"><span class="string">Updating /etc/mail/access...</span></span><br><span class="line"><span class="string">Linking /etc/aliases to /etc/mail/aliases</span></span><br><span class="line"><span class="string">Informational: ALIAS_FILE file empty: /etc/mail/aliases</span></span><br><span class="line"><span class="string">Updating /etc/mail/aliases...</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">WARNING: local host name (ubuntu) is not qualified; see cf/README: WHO AM I?</span></span><br><span class="line"><span class="string">/etc/mail/aliases: 0 aliases, longest 0 bytes, 0 bytes total</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">Warning: 1 database(s) sources</span></span><br><span class="line"><span class="string">        were not found, (but were created)</span></span><br><span class="line"><span class="string">▽       please investigate.</span></span><br><span class="line"><span class="string"> * Starting Mail Transport Agent (MTA) sendmail                                                                                                                      </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">                                                                                                                                                              [ OK ]</span></span><br><span class="line"><span class="string">Setting up procmail (3.22-21ubuntu0.1) ...</span></span><br><span class="line"><span class="string">Setting up sensible-mda (8.14.4-4.1ubuntu1) ...</span></span><br><span class="line"><span class="string">Setting up sendmail (8.14.4-4.1ubuntu1) ...</span></span><br></pre></td></tr></table></figure>
+<h1 id="CAUTION！"><a href="#CAUTION！" class="headerlink" title="CAUTION！"></a>CAUTION！</h1><p>若开户 163 邮箱的“授权码”功能，本文无效。</p>
+<h1 id="问题概述"><a href="#问题概述" class="headerlink" title="问题概述"></a>问题概述</h1><ul>
+<li>插件 <a href="https://www.dokuwiki.org/plugin:smtp" target="_blank" rel="noopener">smtp</a></li>
+<li>问题：配置 163 邮箱后，无法发出邮件</li>
+<li>原因：发送邮件的 sender 邮箱与配置授权的 163 邮箱不一致</li>
+<li>解决：<code>配置设置</code>-&gt;<code>通知设置</code>，<code>mailfrom 自动发送邮件时使用的邮件地址</code> 填成与授权的 163 邮箱保持一致。</li>
+</ul>
+<h1 id="smtp-插件配置"><a href="#smtp-插件配置" class="headerlink" title="smtp 插件配置"></a>smtp 插件配置</h1><p>配置：<code>管理</code>-&gt;<code>配置设置</code>，点击目录，选择 <code>smtp</code>。</p>
+<p>配置项：</p>
+<ul>
+<li>plugin»smtp»smtp_host，您的 SMTP 发送服务器。比如 <code>smtp.163.com</code>。</li>
+<li>plugin»smtp»smtp_port，您的 SMTP 服务器监听端口。通常是 25，对于 SSL常是 465。比如，<code>25</code></li>
+<li>plugin»smtp»smtp_ssl，您的 SMTP 服务器所用的加密类型？有 ssl/tls/无，比如 <code>无</code></li>
+<li>plugin»smtp»auth_user，如果需要认证，在这里输入您的用户名。比如 <a href="mailto:`xxx@163.com" target="_blank" rel="noopener">`xxx@163.com</a>`</li>
+<li>plugin»smtp»auth_pass，对应 auth_user 用户名的密码。<strong>注意</strong>，每次进行 <code>配置设置</code>，都要重新输入密码。</li>
+<li>plugin»smtp»debug，在发送失败时显示完整的错误信息？在一切正常时请关闭！调试时勾选。</li>
+</ul>
+<h1 id="smtp-调试与553问题解决"><a href="#smtp-调试与553问题解决" class="headerlink" title="smtp 调试与553问题解决"></a>smtp 调试与553问题解决</h1><p>使用 plugin:smtp 自带的测试工具，在 <code>管理</code> -&gt; <code>附加插件</code>，点击 <code>@检查 SMTP 配置</code>，进入 SMTP 测试界面。写目标邮箱地址到 <code>to</code> 框中，点 <code>sendmail</code> 按钮。</p>
+<p>出现错误 Log：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"> There was <span class="keyword">an</span> unexpected problem communicating with SMTP: Unexpected <span class="keyword">return</span> code - Expected: <span class="number">250</span>, Go<span class="variable">t:</span> <span class="number">553</span> | <span class="number">553</span> Mail from must equal authorized user</span><br><span class="line"> SMTP <span class="keyword">lo</span><span class="variable">g:</span></span><br><span class="line">Se<span class="variable">t:</span> the server</span><br><span class="line">Se<span class="variable">t:</span> the auth</span><br><span class="line">Se<span class="variable">t:</span> <span class="keyword">a</span> message will <span class="keyword">be</span> sent</span><br><span class="line">Connecting <span class="keyword">to</span> smtp.<span class="number">163</span>.<span class="keyword">com</span> at <span class="number">25</span></span><br><span class="line">Go<span class="variable">t:</span> <span class="number">220</span> <span class="number">163</span>.<span class="keyword">com</span> Anti-spam GT <span class="keyword">for</span> Coremail System (<span class="number">163</span><span class="keyword">com</span>[<span class="number">20141201</span>])</span><br><span class="line">Sen<span class="variable">t:</span> EHLO [<span class="number">172.18</span>.<span class="number">111.192</span>]</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-mail</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-PIPELINING</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-AUTH LOGIN PLAIN</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-AUTH=LOGIN PLAIN</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-coremail <span class="number">1</span>Uxr2xKj7kG0xkI17xGrU7I0s8sdfsf808Cz28x1UUUUU7Ic2I0Y2UFdFM3xUCa0xDrUUUUj</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span>-STARTTLS</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">250</span> <span class="number">8</span>BITMIME</span><br><span class="line">Sen<span class="variable">t:</span> AUTH LOGIN</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">334</span> dXdsDFD806</span><br><span class="line">Sen<span class="variable">t:</span> c3Vu80FSKerjMuY29t</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">334</span> UGFz32380cmQ6</span><br><span class="line">Sen<span class="variable">t:</span> QVJzYW5iSDF8989bDYwNTk1</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">235</span> Authentication successful</span><br><span class="line">Sen<span class="variable">t:</span> MAIL FROM:&lt;noreply@<span class="number">163</span>.<span class="keyword">com</span>&gt;</span><br><span class="line">Go<span class="variable">t:</span> <span class="number">553</span> Mail from must equal authorized user</span><br><span class="line">Above may contain passwords - <span class="keyword">do</span> not post online!</span><br><span class="line"> Message wasn<span class="string">'t sent. SMTP seems not to work properly.</span></span><br></pre></td></tr></table></figure>
+<p>提醒 <a href="http://www.mail163.cn/fault/analysis/1109.html" target="_blank" rel="noopener">553 错误</a>，发送者的邮箱地址必须是登陆的邮箱地址。</p>
+<ul>
+<li>客户端错误代码, smtp sever reply:553 mail from must equal authorized user </li>
+<li>形成原因, 网易服务器smtp机器要求身份验证帐号和发信帐号必须一致，如果用户在发送邮件时，身份验证帐号和发件人帐号是不同的，因此拒绝发送。 </li>
+<li>解决办法/流程, 退信表明发信服务器要求身份验证. 建议：<ul>
+<li>确认一定要勾选“我的服务器要求身份验证”</li>
+<li>请核实客户端中设置的电子邮箱地址是否填写正确，确认是输入完整的正确的邮箱地址。</li>
+<li>设置的回复地址是否和邮箱地址是一致的，并且是完整的邮箱地址。 </li>
+</ul>
+</li>
+</ul>
+<p>回到 <code>管理</code> -&gt; <code>配置管理</code>界面，发现 <code>通知设置</code> 中的 <code>mailfrom 自动发送邮件时使用的邮件地址</code>，填为 <a href="mailto:`noreply@163.com" target="_blank" rel="noopener">`noreply@163.com</a>`，与授权的邮箱不一致。将此配置改为授权的 <a href="mailto:xxx@163.com" target="_blank" rel="noopener">xxx@163.com</a> 即可。修改后，重新测试，可正常发送邮件。</p>
+<p>log: </p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Message</span> was sent. SMTP seems <span class="keyword">to</span> work.</span><br></pre></td></tr></table></figure>
+<p>发送的邮件：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">发件人: xxx@163.com [mailto:xxx@163.com] </span><br><span class="line">发送时间: 2017年4月6日 14:08</span><br><span class="line">收件人: 孙勇峰 <span class="xml"><span class="tag">&lt;<span class="name">sunyongfeng@xxx.com</span>&gt;</span></span></span><br><span class="line">主题: [Administrator] DokuWiki says hello</span><br><span class="line"></span><br><span class="line">Hi sunyongfeng</span><br><span class="line"></span><br><span class="line">This is a test from http://xxx.com/dokuwiki/ </span><br><span class="line"><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span><span class="strong">_____</span></span><br><span class="line">本邮件由 DokuWiki 自动创建</span><br><span class="line">http://xxx.com/dokuwiki/</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/administrator/" rel="tag"># administrator</a>
+          
+            <a href="/tags/dokuwiki/" rel="tag"># dokuwiki</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/misc/file_management.html" rel="next" title="文件归档管理经验">
+                <i class="fa fa-chevron-left"></i> 文件归档管理经验
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/administrator/dokuwiki/plugin.html" rel="prev" title="使用的 dokuwiki plugin">
+                使用的 dokuwiki plugin <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#不使用外部邮箱可直接发邮件"><span class="nav-number">1.</span> <span class="nav-text">不使用外部邮箱可直接发邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sendmail"><span class="nav-number">1.1.</span> <span class="nav-text">sendmail</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mail-发送失败问题排查"><span class="nav-number">1.2.</span> <span class="nav-text">mail 发送失败问题排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注册用户后，邮件发送失败"><span class="nav-number">1.2.1.</span> <span class="nav-text">注册用户后，邮件发送失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看发送失败的原因"><span class="nav-number">1.2.2.</span> <span class="nav-text">查看发送失败的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册后，在注册页面卡很久"><span class="nav-number">1.2.3.</span> <span class="nav-text">注册后，在注册页面卡很久</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置好-hosts-之后，注册还需要等-20-多秒"><span class="nav-number">1.2.4.</span> <span class="nav-text">配置好 hosts 之后，注册还需要等 20 多秒</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附：SMTP发包方式"><span class="nav-number">1.3.</span> <span class="nav-text">附：SMTP发包方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附：sendmail-安装-log"><span class="nav-number">1.4.</span> <span class="nav-text">附：sendmail 安装 log</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CAUTION！"><span class="nav-number">2.</span> <span class="nav-text">CAUTION！</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题概述"><span class="nav-number">3.</span> <span class="nav-text">问题概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#smtp-插件配置"><span class="nav-number">4.</span> <span class="nav-text">smtp 插件配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#smtp-调试与553问题解决"><span class="nav-number">5.</span> <span class="nav-text">smtp 调试与553问题解决</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/administrator/dokuwiki/sendmail.html";
+    this.page.identifier = "201704/administrator/dokuwiki/sendmail.html";
+    this.page.title = 'dokuwiki 邮件发送';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

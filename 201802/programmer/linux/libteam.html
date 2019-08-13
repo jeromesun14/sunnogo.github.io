@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="linux 聚合口 team &amp; libteam 简介">
+<meta name="keywords" content="Linux,libteam,teamd,teamdctl,bonding,port channel,port group,lag,lacp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 聚合口 team &amp; libteam 简介">
+<meta property="og:url" content="http://sunyongfeng.com/201802/programmer/linux/libteam.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="linux 聚合口 team &amp; libteam 简介">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://sunyongfeng.com/images/linux/libteam.png">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.080Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux 聚合口 team &amp; libteam 简介">
+<meta name="twitter:description" content="linux 聚合口 team &amp; libteam 简介">
+<meta name="twitter:image" content="http://sunyongfeng.com/images/linux/libteam.png">
+  <link rel="canonical" href="http://sunyongfeng.com/201802/programmer/linux/libteam">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>linux 聚合口 team & libteam 简介 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201802/programmer/linux/libteam.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">linux 聚合口 team & libteam 简介
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-02-06 14:19:24" itemprop="dateCreated datePublished" datetime="2018-02-06T14:19:24+08:00">2018-02-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201802/programmer/linux/libteam.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201802/programmer/linux/libteam.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">linux 聚合口 team & libteam 简介</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>详见：</p>
+<ul>
+<li>libteam 项目 <a href="https://github.com/jpirko/libteam/wiki" target="_blank" rel="noopener">wiki</a></li>
+<li>libteam <a href="http://www.libteam.org/files/teamdev.pp.pdf" target="_blank" rel="noopener">ppt</a></li>
+</ul>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>目标：替代 bonding 功能，最终干掉 bonding。</p>
+<ul>
+<li>内核中的代码尽可能少。把内核当成是 puppet</li>
+<li>控制逻辑在用户空间实现，puppeteer</li>
+</ul>
+<p><img src="/images/linux/libteam.png" alt="libteam架构"></p>
+<p>整个项目称为 team project，其中用户空间的代码项目为 libteam，含 libteam 库、teamd daemon、teamd-utils 三个组件。</p>
+<h3 id="teamdev-driver"><a href="#teamdev-driver" class="headerlink" title="teamdev driver"></a>teamdev driver</h3><p>从 Linux 内核版本 3.3 开始支持。teamdev driver 遵循以下原则，只做报文的 rx/tx 处理，本身无业务逻辑。</p>
+<blockquote>
+<p>If something can be done in userspace, do it in userspace.</p>
+</blockquote>
+<ul>
+<li>fast-path （1.4KLOC）</li>
+<li>netlink 通信（0.6KLOC）<ul>
+<li>user space 配置、改变 teamdev 驱动的行为</li>
+<li>user space 从驱动获取端口状态变化等事件</li>
+</ul>
+</li>
+<li>Team 模式<ul>
+<li>一种 mode 一个内核模块</li>
+<li>activebackup</li>
+<li>broadcast</li>
+<li>loadbalance</li>
+<li>random</li>
+<li>roundrobin</li>
+</ul>
+</li>
+</ul>
+<p>一般称为 teamdev，接口名为 team0 等。</p>
+<h3 id="libteam-lib"><a href="#libteam-lib" class="headerlink" title="libteam lib"></a>libteam lib</h3><p>使用 libnl，封装 Team Netlink 通信。用户无需知道任何  Netlink API 相关的信息。<br>所有消息都来自 driver，并缓存在用户空间，使用者不需要发任何消息就能获取到请求的数据。</p>
+<p>同时封装 RT Netlink，用于使用者添加、删除 Teamdev 实例，或添加删除 port，或获取、设置网络接口的硬件 IP 等。</p>
+<h3 id="libteam-teamd"><a href="#libteam-teamd" class="headerlink" title="libteam teamd"></a>libteam teamd</h3><p>即 Team daemon，为 libteam 项目的一部分，使用 libteam lib。teamd 跑在后台，一个实例对应一个 Team softdev，用于支持多种多样的逻辑 Team 行为。比如 基础的 round-robin，或更复杂的 active-backup、load-balancing。这些逻辑在 teamd 中称为 runner，每个 Team softdev 只能运行一种 runner。</p>
+<h3 id="Team-Netlink"><a href="#Team-Netlink" class="headerlink" title="Team Netlink"></a>Team Netlink</h3><p>有两种类型的消息：Port list 和 option list。</p>
+<p>Port list 消息只存在 driver -&gt; lib 方向，只读数据。schema：</p>
+<ul>
+<li>port item<ul>
+<li>interface index</li>
+<li>changed flag，指明该端口任何状态是否有变化。</li>
+<li>removed flag，指明端口被删除了</li>
+<li>linkup，直接从 ethtool 获取 link 状态</li>
+<li>speed，直接从 ethtool 获取  Mbps</li>
+<li>duplex，直接从 ethtool 获取 duplex</li>
+</ul>
+</li>
+<li>port item<ul>
+<li>…</li>
+</ul>
+</li>
+<li>port item<ul>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<p>Option list 消息可能存在两个方向。driver -&gt; lib 方向，暴露并传输 driver 数据到  userspace。 lib-&gt; driver 方向，用于通告 driver 哪个 option 的值应变化，应怎么变化。schema 如下：</p>
+<ul>
+<li>option item<ul>
+<li>name，option 名</li>
+<li>changed flag</li>
+<li>removed flag</li>
+<li>type，指明以面 data 域的类型</li>
+<li>data，动态类型</li>
+<li>port interface index。如果 option 是 per-port 的，那么这个值为对应接口 index。</li>
+<li>array index，如果 option 是 array。</li>
+</ul>
+</li>
+<li>option item<ul>
+<li>…</li>
+</ul>
+</li>
+<li>option item<ul>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<p>存在以下消息：</p>
+<ol>
+<li>lib 请求 port list</li>
+<li>lib 请求 option list</li>
+<li>lib 请求 option 值变化</li>
+<li>driver port 状态变化事件。net core 通知 dirver 哪些端口状态变化或被删除。</li>
+<li>driver option 值变化事件。</li>
+</ol>
+<p>第4、5点，使用 netlink multicast facility，用于支撑多用户空间实例。</p>
+<ul>
+<li>teamnl，使用 libteam，并封装 Team device Netlink 通信。</li>
+</ul>
+<h2 id="Driver"><a href="#Driver" class="headerlink" title="Driver"></a>Driver</h2><p>通过 ip 工具集即可添加、删除 team 设备。</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ip link add name team0 type team</span></span><br><span class="line"><span class="meta"># ip link delete team0</span></span><br></pre></td></tr></table></figure>
+<p>创建 team 设备时，如果未指定硬件地址，将生成一个随机的。</p>
+<p>同样通过 ip 工具集添加、移除端口。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ip link <span class="built_in">set</span> eth0 master team0</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ip link <span class="built_in">set</span> eth0 nomaster</span></span><br></pre></td></tr></table></figure>
+<p>Team softdev 驱动使用 netdevice 通告机制获取 port 上面的事件，比如 link 状态变化、port 丢失等。当一个 team 设备实例创建时（例如 team0），它就与其他网络设备无异，用户可像普通网络设备那样配置 team0，比如配置 IP 地址、应用 iptables 规则等。不同的地方是它自己不能从收发 skb，它使用其他网络设备（物理端口）。</p>
+<p>发送 skb 时，team softdev 通过 port 选择算法选出一个 port，然后使用该 port 的 netdevice 发送 skb。</p>
+<p>接收端，team softdev 使用 net core rx 步骤的 rx_handle 钩子拦截报文。bonding、bridging、macvlan 和 openvswitch 使用同样的钩子。通过这个钩子，报文看起来就像是从 teamdev 中接收的。然后 Net 核心代码就将报文视为从 teamdev 中接收的，进行下一步处理。</p>
+<p>问题的重点在于如何达到最好的性能，因此 fast path（skb 发送、接收 paths）都是无锁的，只使用 RCU。同时将数据存到内存中，实现最大的局部性和最小的指针解引用。</p>
+<h3 id="Options"><a href="#Options" class="headerlink" title="Options"></a>Options</h3><p>【TBD】</p>
+<h3 id="Modes"><a href="#Modes" class="headerlink" title="Modes"></a>Modes</h3><p>每个 mode 实现成一个 module。Team core 代码使用用户空间应用配置的 mode 字符串，调用对应 mode 实现的 handler。这些 handler 定义以下行为：</p>
+<ul>
+<li><em>init</em>，在选择模式后调用，与通常的 init 函数一样，用于分配内存和注册 mode 特有的 option。</li>
+<li><em>exit</em>，反选 mode 后调用。</li>
+<li><em>receive</em>，由接收钩子调用，这个 handler 允许 mode 查看收到的 skb，并可修改 skb。</li>
+<li><em>transmit</em>，由 Team core 发送函数调用。在这里决策发送端口。</li>
+<li><em>port_enter</em>，当一个端口加入 teamdev 时调用</li>
+<li><em>port_leave</em>，当一个端口移除时调用</li>
+<li><em>port_change_mac</em>，当检测到硬件地址发生变化时调用。</li>
+</ul>
+<p>目前实现五种模式：</p>
+<ol>
+<li><em>broadcast</em>，Basic mode。将报文发送给所有可能的端口。</li>
+<li><em>roundrobin</em>，Basic mode。一种很简单的端口选择算法，基于端口列表，逐个循环选择端口。这是唯一一种可以不需要用户空间交互就可正常 运行的模式。</li>
+<li><em>random</em>，Basic mode。随机选择端口。</li>
+<li><em>activebackup</em>，在这种模式，只有一个端口处于 active 状态，该端口处理 skb 收发。其他端口都处于 backup 状态。用户空间通过 activeport 选项指定 active 端口。</li>
+<li><em>loadbalance</em>，一个复杂的模式。比如用于 LACP 和用户空间控制收发均衡。使用 hash 识别相同的 skb。Hash 长度 8 比特，所以总共有 256 种类型的 skb。hash 使用 BPF (Berkeley Packet Filter) 机制计算。这个模式使用以下选项：</li>
+</ol>
+<ul>
+<li><em>bpf_hash_func</em>，一个二进制 option，包含 BPF 函数，用于从 skb 计算 hash 值。应用空间可组合和配置 hash 计算函数。例如源、目的 IP 地址、MAC 地址等。</li>
+<li><em>lb_hash_stats</em> 和 <em>lb_port_stats</em>，只读数组选项。暴露 256 种可能的 skb 类型的收发计算器，以及每个端口的收发计算器。用户空间程序可使用这个统计值判断端口的均衡程序，如果均衡程度不够，再进行 hash 算法调整。</li>
+<li><em>lb_stats_refresh_interval</em>，下发统计值到用户空间的频率。</li>
+<li><em>lb_tx_hash_to_port_mapping</em>，用于 hash-to-port 映射的数组选项。允许用户空间应用程序告诉驱动程序某个特定 hash 值的 skb 应选择哪个端口发送。</li>
+<li><em>lb_tx_method</em>，字符串选择，有两个值。<ul>
+<li><em>hash</em>，告诉驱动使用 hash 值获取发送端口</li>
+<li><em>hash_to_port_mapping</em>，使能 hash_to_port_mapping 功能，并从先前的数组选项获取发送端口。</li>
+</ul>
+</li>
+</ul>
+<h2 id="teamd"><a href="#teamd" class="headerlink" title="teamd"></a>teamd</h2><p>libteam 项目的重要部分。如果可能，最好在 teamd 实现功能，而非 Team softdev Linux 驱动。把 teamdev 视为木偶，则 teamd 是操纵 teamdev 的傀儡师。</p>
+<p>teamd 的详细命令行参数见 <em>man 8 teamd</em>。</p>
+<p>teamd 负责 teamdev 的创建与删除。teamdev 在 teamd 启动的时候创建，在 teamd 退出前删除。teamdev 的名字（比如 team0）通过配置文件指定。</p>
+<p>Teamd 主要负责：</p>
+<ul>
+<li>配置文件解析</li>
+<li>后台 forking 以及诸如 PID 创建、信号处理等相关的事情。在运行 systemd 的系统中不需要，但是  teamd 也需要运行在其他系统。</li>
+<li>Team softdev Linux driver 实例的创建与删除。</li>
+<li>Libteam 库通信初始化</li>
+<li>提供主循环框架，用于 fd 或定时器等的监控与处理。</li>
+<li>初始化事件机</li>
+<li>端口添加、删除事件处理</li>
+<li>初始化链路状态监控器（watcher）</li>
+<li>初始化 runner</li>
+<li>初始化 D-Bus 接口</li>
+<li>添加端口到 teamdev</li>
+</ul>
+<p>teamd 被设计成单进程、单线程应用，目前不需要多线程，这样代码会更简单。所有的运行时工作都在主循环中完成。所以如果 runner 或 watcher 需要做自己的事情（比如定时工作或 socker 数据接收等），则它们必须在主循环的框架中自己实现。</p>
+<h3 id="link-watcher"><a href="#link-watcher" class="headerlink" title="link-watcher"></a>link-watcher</h3><p>Link 监测器实现链路状态检测，可使用不同的方法检测某个端口是否有报文传输能力，即判断端口是否 Up。</p>
+<p>目前实现的方式有：</p>
+<ul>
+<li><em>ethtool</em>，使用 libteam lib 获取端口 ethtool 状态变化</li>
+<li><em>arp_ping</em>，通过某端口发送 ARP 请求，如果有收到 ARP 请求，则认为链路为 up 状态。目标 IP 地址、发送时间间隔和其他选项都可以在 teamd 中配置。</li>
+<li><em>nsna_ping</em>，类似 arp_ping，但是使用 IPv6 邻居请求（NS，neighbor solicitation）和邻居发现机制（NA，neighbor advertisement）。用于纯 IPv6 环境。</li>
+</ul>
+<p>可全局配置，亦可每端口配置 link-watch。用户也可以为一次配置多个 link-watcher，只有当所有的 link-watcher 报告的状态都为 up，链路才是 up。</p>
+<h3 id="runner"><a href="#runner" class="headerlink" title="runner"></a>runner</h3><p>Runner 决定 Team 设备的行为。他们使用想要的内核 team 模式进行操作。Runner 监测端口 link 状态变化（使用所选择的 link-watch 监测结果），并进行相应的操作。Runner 可能还实现其他功能。</p>
+<p>有以下 Runners 可使用（Team softdev Linux 驱动模式见以下括号）：</p>
+<ul>
+<li><em>broadcast</em> (<em>broadcast</em>)，几乎没做啥，只是将 teamdev 的模式置为 broadcast 模式。</li>
+<li><em>roundrobin</em> (<em>roundrobin</em>)，几乎没做啥，只是将 teamdev 的模式置为 roundrobin 模式。</li>
+<li><em>random</em> (<em>random</em>)，几乎没做啥，只是将 teamdev 的模式置为 random 模式。</li>
+<li><em>activebackup</em> (<em>broadcast</em>)，监测链路变化，并选择 active 端口做报文传输。每个端口可配置自己的优先级，以及是否 sticky。sticky 的含义为即使有更高优先级的端口 Link，该端口也不会被停用。</li>
+<li><em>loadbalance</em> (<em>loadbalance</em>)，为了做被动的负载平衡，runner 只设置 BPF 散列函数，它将确定 skb 传输的端口。为了执行主动负载平衡，runner 将不同哈希值映射到不同的以达到完美平衡。<em>lb_hash_stats</em> 数组选项用于获取统计信息。<em>lb_tx_hash_to_port_mapping</em> 数组选项用于将散列映射到 TX 端口。</li>
+<li><em>lacp</em> (<em>loadbalance</em>)，实现 802.3ad LACP 协议。可使用 <em>hash</em> 或 <em>loadbalance</em> runner。</li>
+</ul>
+<h3 id="teamd-control-API"><a href="#teamd-control-API" class="headerlink" title="teamd control API"></a>teamd control API</h3><p>Teamd 提供 control API 供用户控制。通过 D-Bus 和 Unix socket 实现。</p>
+<p>teamd 启动时默认使用 Unix domain socket API，如果有带  <code>-D</code> 选项，则使用 D-Bus API，创建 D-Bus 服务 <em>org.libteam.teamd.[teamdevname]</em>。</p>
+<p>支持以下方法：</p>
+<ul>
+<li><em>ConfigDump()</em>，返回 teamd 所有 JSON 配置。</li>
+<li><em>ConfigDumpActual()</em>，返回所有 teamd JSON 配置，但是只包含在线端口的配置，过滤所有非在线端口。</li>
+<li><em>StateDump()</em>，返回 teamd 的状态以及其 JSON 中的子配置。</li>
+<li><em>PortAdd(String port_devname)</em>，添加端口到 teamdev。</li>
+<li><em>PortRemove</em></li>
+<li><em>PortConfigUpdate</em></li>
+<li><em>PortConfigDump</em></li>
+<li><em>StateItemValueGet(String state_item_path)</em>，在 state 树中查找 state 条目，并返回其值。</li>
+<li><em>StateItemValueSet(String state_item_path, String value)</em></li>
+</ul>
+<p>有计划在将来用更多的方法扩展这个接口。<br>还有一个想法是扩展 API，以便能够将一个 runner 作为一个外部应用程序通过 control API 与 teamd 通信。</p>
+<h3 id="teamdctl"><a href="#teamdctl" class="headerlink" title="teamdctl"></a>teamdctl</h3><p><em>teamdctl</em> 提供 control API 的封装，用来运行时监控和配置 teamd。1:1 封装 API。</p>
+<p><em>teamdctl</em> 命令更详细的描述和命令行参数，详见 manpage （<em>man 8 teamdctl</em>）。</p>
+<h4 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h4><p><em>teamd</em> 使用 JSON 配置文件配置，通过命令行或 .JSON 格式的的文件传递给 <em>teamd</em>。<br>选择 JSON 格式的原因是它可以轻松指定（和解析）分层配置。</p>
+<p><em>teamd</em> 配置样例（<em>teamd1.conf</em>）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">        <span class="attr">"device"</span>:      <span class="string">"team0"</span>,</span><br><span class="line">        <span class="attr">"hwaddr"</span>:      <span class="string">"10:22:33:44:55:66"</span>,</span><br><span class="line">        <span class="attr">"runner"</span>:      &#123;<span class="attr">"name"</span>: <span class="string">"activebackup"</span>&#125;,</span><br><span class="line">        <span class="attr">"link_watch"</span>:  &#123;</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"nsna_ping"</span>,</span><br><span class="line">                <span class="attr">"interval"</span>: <span class="number">200</span>,</span><br><span class="line">                <span class="attr">"missed_max"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"target_host"</span>: <span class="string">"fe80::210:18ff:feaa:bbcc"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"ports"</span>:        &#123;</span><br><span class="line">                <span class="attr">"eth0"</span>: &#123;</span><br><span class="line">                        <span class="attr">"prio"</span>: <span class="number">-10</span>,</span><br><span class="line">                        <span class="attr">"sticky"</span>: <span class="literal">true</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"eth1"</span>: &#123;</span><br><span class="line">                        <span class="attr">"prio"</span>: <span class="number">100</span>,</span><br><span class="line">                        <span class="attr">"link_watch"</span>: &#123;<span class="attr">"name"</span>: <span class="string">"ethtool"</span>&#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"eth2"</span>: &#123;</span><br><span class="line">                        <span class="attr">"link_watch"</span>:  &#123;</span><br><span class="line">                                <span class="attr">"name"</span>: <span class="string">"arp_ping"</span>,</span><br><span class="line">                                <span class="attr">"interval"</span>: <span class="number">100</span>,</span><br><span class="line">                                <span class="attr">"missed_max"</span>: <span class="number">30</span>,</span><br><span class="line">                                <span class="attr">"source_host"</span>: <span class="string">"192.168.23.2"</span>,</span><br><span class="line">                                <span class="attr">"target_host"</span>: <span class="string">"192.168.23.1"</span></span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"eth3"</span>: &#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置几乎不言自明。只有 link_watch 部分可能看起来有点混乱。所以在这个例子中，默认 link-watcher 是 nsna_ping，设置为每 200 毫秒发送 NAs（邻居通告）。丢失答复的最大数量为 15 个。如果丢失更多答复，link 将被视为关闭。 端口 eth1 和 eth2 指定他们自己的 link-watcher。</p>
+<p>另一个 <em>teamd</em> 配置样例（<em>teamd2.conf</em>）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">        <span class="attr">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="attr">"runner"</span>: &#123;</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"lacp"</span>,</span><br><span class="line">                <span class="attr">"active"</span>: <span class="literal">true</span>,</span><br><span class="line">                <span class="attr">"fast_rate"</span>: <span class="literal">true</span>,</span><br><span class="line">                <span class="attr">"tx_hash"</span>: [<span class="string">"eth"</span>, <span class="string">"ipv4"</span>, <span class="string">"ipv6"</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"link_watch"</span>: &#123;<span class="attr">"name"</span>: <span class="string">"ethtool"</span>&#125;,</span><br><span class="line">        <span class="attr">"ports"</span>: &#123;<span class="attr">"eth1"</span>: &#123;&#125;, <span class="attr">"eth2"</span>: &#123;&#125;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个样例中，<em>tx_hash</em> 一节值得一提。它指明使用 skb 哪些部分计算 hash。</p>
+<p>更多详细内容见 manpage（<em>man 8 teamd.conf</em>）。</p>
+<h3 id="样例"><a href="#样例" class="headerlink" title="样例"></a>样例</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ip link</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN mode<span class="built_in"> DEFAULT </span></span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:b2:a7:f1 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">3: eth3: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 00:07:e9:11:22:33 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">4: eth1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:3d:c7:6d brd ff:ff:ff:ff:ff:ff</span><br><span class="line">5: eth2: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:73:15:c2 brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="comment"># ip addr</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">      valid_lft forever preferred_lft forever</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 52:54:00:b2:a7:f1 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.122.182/24 brd 192.168.122.255 scope global eth0</span><br><span class="line">    inet6 fe80::5054:ff:feb2:a7f1/64 scope link </span><br><span class="line">      valid_lft forever preferred_lft forever</span><br><span class="line">3: eth3: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000</span><br><span class="line">    link/ether 00:07:e9:11:22:33 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">4: eth1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000</span><br><span class="line">    link/ether 52:54:00:3d:c7:6d brd ff:ff:ff:ff:ff:ff</span><br><span class="line">5: eth2: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000</span><br><span class="line">    link/ether 52:54:00:73:15:c2 brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="comment"># teamd -f teamd2.conf -d</span></span><br><span class="line"><span class="comment"># ip link</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN mode<span class="built_in"> DEFAULT </span></span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:b2:a7:f1 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">3: eth3: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 00:07:e9:11:22:33 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">4: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master team0 state UP mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether fa:29:06:7a:81:b8 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">5: eth2: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master team0 state UP mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether fa:29:06:7a:81:b8 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">6: team0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span></span><br><span class="line">    link/ether fa:29:06:7a:81:b8 brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="comment"># tail /var/log/messages</span></span><br><span class="line">May 24 10:56:02 test1 kernel: [  36.351762] team0:<span class="built_in"> Port </span>device eth1 added</span><br><span class="line">May 24 10:56:02 test1 kernel: [  36.357303] 8139cp 0000:00:08.0: eth2: link up, 100Mbps, full-duplex, lpa 0x05E1</span><br><span class="line">May 24 10:56:02 test1 kernel: [  36.359975] team0:<span class="built_in"> Port </span>device eth2 added</span><br><span class="line">May 24 10:56:02 test1 teamd[883]: 0.1 sucessfully started.</span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth1: Using link_watch <span class="string">"ethtool"</span>.</span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth1: Changed<span class="built_in"> port </span>state: <span class="string">"disabled"</span> -&gt; <span class="string">"expired"</span></span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth2: Using link_watch <span class="string">"ethtool"</span>.</span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth2: Changed<span class="built_in"> port </span>state: <span class="string">"disabled"</span> -&gt; <span class="string">"expired"</span></span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth1: Changed<span class="built_in"> port </span>state: <span class="string">"expired"</span> -&gt; <span class="string">"current"</span></span><br><span class="line">May 24 10:56:03 test1 teamd[883]: eth2: Changed<span class="built_in"> port </span>state: <span class="string">"expired"</span> -&gt; <span class="string">"current"</span></span><br><span class="line"><span class="comment"># ip addr add 192.168.24.2/24 dev team0 </span></span><br><span class="line"><span class="comment"># ping 192.168.24.1 -c 10 -i0.1</span></span><br><span class="line">PING 192.168.24.1 (192.168.24.1) 56(84) bytes of data.</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=1 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.511 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=2 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.862 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=3 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.927 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=4 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.917 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=5 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.966 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=6 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.829 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=7 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.916 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=8 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.861 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=9 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.866 ms</span><br><span class="line">64 bytes <span class="keyword">from</span> 192.168.24.1: <span class="attribute">icmp_req</span>=10 <span class="attribute">ttl</span>=64 <span class="attribute">time</span>=0.884 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.24.1<span class="built_in"> ping </span>statistics ---</span><br><span class="line">10 packets transmitted, 10 received, 0% packet loss, time 910ms</span><br><span class="line">rtt min/avg/max/mdev = 0.511/0.853/0.966/0.126 ms</span><br><span class="line"><span class="comment"># teamd -f teamd2.conf -k</span></span><br><span class="line"><span class="comment"># ip link</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN mode<span class="built_in"> DEFAULT </span></span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:b2:a7:f1 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">3: eth3: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 00:07:e9:11:22:33 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">4: eth1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc pfifo_fast state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:3d:c7:6d brd ff:ff:ff:ff:ff:ff</span><br><span class="line">5: eth2: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc pfifo_fast state DOWN mode<span class="built_in"> DEFAULT </span>qlen 1000</span><br><span class="line">    link/ether 52:54:00:73:15:c2 brd ff:ff:ff:ff:ff:ff</span><br></pre></td></tr></table></figure>
+<h2 id="Bonding-v-s-team-features"><a href="#Bonding-v-s-team-features" class="headerlink" title="Bonding v.s. team features"></a>Bonding v.s. team features</h2><p>来源： <a href="https://github.com/jpirko/libteam/wiki/Bonding-vs.-Team-features" target="_blank" rel="noopener">https://github.com/jpirko/libteam/wiki/Bonding-vs.-Team-features</a><br>Feature    Bonding    Team<br>broadcast TX policy<br>Yes<br>Yes<br>round-robin TX policy<br>Yes<br>Yes<br>active-backup TX policy<br>Yes<br>Yes<br>LACP (802.3ad) support<br>Yes<br>Yes<br>Hash-based TX policy<br>Yes<br>Yes<br>Highly customizable hash function setup    No<br>Yes<br>TX load-balancing support (TLB)<br>Yes<br>Yes<br>RX load-balancing support (ALB)<br>Yes<br>Planned<br>RX load-balancing support (ALB) in bridge or openvswitch    No    Planned<br>LACP hash port select<br>Yes<br>Yes<br>load-balancing for LACP support    No<br>Yes<br>Ethtool link monitoring<br>Yes<br>Yes<br>ARP link monitoring<br>Yes<br>Yes<br>NS/NA (IPV6) link monitoring    No<br>Yes<br>ports up/down delays<br>Yes<br>Yes<br>port priorities and stickiness (“primary” option enhancement)    No<br>Yes<br>separate per-port link monitoring setup    No<br>Yes<br>multiple link monitoring setup    Limited<br>Yes<br>lockless TX/RX path    No(rwlock)<br>Yes<br>(RCU)<br>VLAN support<br>Yes<br>Yes<br>user-space runtime control    Limited    Full<br>Logic in user-space    No<br>Yes<br>Extensibility    Hard    Easy<br>Modular design    No<br>Yes<br>Performance overhead    Low    Very Low<br>D-Bus interface    No<br>Yes<br>ØMQ interface    No<br>Yes<br>multiple device stacking<br>Yes<br>Yes<br>zero config using LLDP    No    Planned</p>
+<h2 id="man"><a href="#man" class="headerlink" title="man"></a>man</h2><h3 id="man-teamd"><a href="#man-teamd" class="headerlink" title="man teamd"></a>man teamd</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">js@js-vbox:~/sonic-buildimage/src/sonic-swss$ man teamd</span><br><span class="line">TEAMD(8)                                                                                    Team daemon                                                                                    TEAMD(8)</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line">      teamd — team network device control daemon</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">      teamd -k [-p pid_file] [-g]</span><br><span class="line">      teamd -e [-p pid_file] [-g]</span><br><span class="line">      teamd -c config_text [-p pid_file] [-gdrD] [-Z address]</span><br><span class="line">      teamd -f config_file [-p pid_file] [-gdrD] [-Z address]</span><br><span class="line">      teamd -h|-V</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">      teamd  is a daemon to control a given team network device, during runtime, as a puppeteer controls a puppet. It uses libteam to communicate <span class="keyword">with</span> the kernel team device <span class="keyword">instance</span> via Netlink</span><br><span class="line">      sockets. The behaviour depends <span class="keyword">on</span> the selected runner <span class="keyword">and</span> its configuration. This daemon <span class="keyword">is</span> part <span class="keyword">of</span> the libteam project.</span><br><span class="line"></span><br><span class="line">OPTIONS</span><br><span class="line">      -h, <span class="comment">--help</span></span><br><span class="line">              Print <span class="keyword">help</span> <span class="built_in">text</span> <span class="keyword">to</span> console <span class="keyword">and</span> exit.</span><br><span class="line"></span><br><span class="line">      -V, <span class="comment">--version</span></span><br><span class="line">              Print <span class="keyword">version</span> information <span class="keyword">to</span> console <span class="keyword">and</span> exit.</span><br><span class="line"></span><br><span class="line">      -d, <span class="comment">--daemonize</span></span><br><span class="line">              Daemonize <span class="keyword">after</span> startup.</span><br><span class="line"></span><br><span class="line">      -k, <span class="comment">--kill</span></span><br><span class="line">              <span class="keyword">Kill</span> running daemon instance.</span><br><span class="line"></span><br><span class="line">      -e, <span class="comment">--check</span></span><br><span class="line">              <span class="keyword">Return</span> <span class="number">0</span> <span class="keyword">if</span> a daemon <span class="keyword">is</span> already running.</span><br><span class="line"></span><br><span class="line">      -f filename, <span class="comment">--config-file filename</span></span><br><span class="line">              <span class="keyword">Load</span> the specified configuration file.</span><br><span class="line"></span><br><span class="line">      -c <span class="built_in">text</span>, <span class="comment">--config text</span></span><br><span class="line">              <span class="keyword">Use</span> given <span class="keyword">JSON</span> <span class="keyword">format</span> configuration string. <span class="keyword">If</span> this <span class="keyword">option</span> <span class="keyword">is</span> <span class="keyword">present</span> <span class="keyword">then</span> -f <span class="keyword">option</span> will be ignored.</span><br><span class="line"></span><br><span class="line">      -p filename, <span class="comment">--pid-file filename</span></span><br><span class="line">              <span class="keyword">Use</span> the specified PID file.</span><br><span class="line"></span><br><span class="line">      -g, <span class="comment">--debug</span></span><br><span class="line">              Turns <span class="keyword">on</span> debugging messages. Repeating the <span class="keyword">option</span> increases verbosity.</span><br><span class="line"></span><br><span class="line">      -r, <span class="comment">--force-recreate</span></span><br><span class="line">              <span class="keyword">Force</span> team device recreation <span class="keyword">in</span> <span class="keyword">case</span> it already exists.</span><br><span class="line"></span><br><span class="line">      -o, <span class="comment">--take-over</span></span><br><span class="line">              Take <span class="keyword">over</span> the device <span class="keyword">if</span> it already exists.</span><br><span class="line"></span><br><span class="line">      -N, <span class="comment">--no-quit-destroy</span></span><br><span class="line">              This <span class="keyword">option</span> also ensures that the team device <span class="keyword">is</span> <span class="keyword">not</span> removed <span class="keyword">after</span> teamd finishes.</span><br><span class="line"></span><br><span class="line">      -t devicename, <span class="comment">--team-dev devicename</span></span><br><span class="line">              <span class="keyword">Use</span> the specified team device <span class="keyword">name</span> (overrides <span class="string">"device"</span> <span class="keyword">key</span> <span class="keyword">in</span> the configuration).</span><br><span class="line"></span><br><span class="line">      -n, <span class="comment">--no-ports</span></span><br><span class="line">              <span class="keyword">Start</span> <span class="keyword">without</span> ports, even <span class="keyword">if</span> they <span class="keyword">are</span> listed <span class="keyword">in</span> the configuration.</span><br><span class="line"></span><br><span class="line">      -D, <span class="comment">--dbus-enable</span></span><br><span class="line">              <span class="keyword">Enable</span> D-Bus interface.</span><br><span class="line"></span><br><span class="line">      -Z address, <span class="comment">--zmq-enable address</span></span><br><span class="line">              <span class="keyword">Enable</span> ZMQ interface. Possible address formats <span class="keyword">are</span> <span class="string">"tcp://ip:port"</span>, <span class="string">"ipc://path"</span> <span class="keyword">and</span> others. Detailed description <span class="keyword">of</span> ZMQ <span class="keyword">library</span> <span class="keyword">is</span> <span class="keyword">in</span> page <span class="keyword">http</span>://zguide.zeromq.org/page:all.</span><br><span class="line"></span><br><span class="line">      -U, <span class="comment">--usock-enable</span></span><br><span class="line">              <span class="keyword">Enable</span> UNIX <span class="keyword">domain</span> socket interface. This <span class="keyword">is</span> enabled <span class="keyword">by</span> default.</span><br><span class="line"></span><br><span class="line">      -u, <span class="comment">--usock-disable</span></span><br><span class="line">              <span class="keyword">Disable</span> UNIX <span class="keyword">domain</span> socket interface.</span><br><span class="line"></span><br><span class="line">SEE ALSO</span><br><span class="line">      teamdctl(<span class="number">8</span>), teamd.conf(<span class="number">5</span>), teamnl(<span class="number">8</span>), bond2team(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">AUTHOR</span><br><span class="line">      Jiri Pirko <span class="keyword">is</span> the original author <span class="keyword">and</span> <span class="keyword">current</span> maintainer <span class="keyword">of</span> libteam.</span><br><span class="line"></span><br><span class="line">libteam                                                                                      <span class="number">2013</span><span class="number">-07</span><span class="number">-10</span>                                                                                    TEAMD(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="man-teamd-conf"><a href="#man-teamd-conf" class="headerlink" title="man teamd.conf"></a>man teamd.conf</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br></pre></td><td class="code"><pre><span class="line">js@js-vbox:~/sonic-buildimage/src/sonic-swss$ man teamd.conf</span><br><span class="line">TEAMD.CONF(5)                                                                        Team daemon configuration                                                                        TEAMD.CONF(5)</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line">      teamd.conf — libteam daemon configuration file</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">      teamd uses JSON format configuration.</span><br><span class="line"></span><br><span class="line">OPTIONS</span><br><span class="line">      device (string)</span><br><span class="line">              Desired name of new team device.</span><br><span class="line"></span><br><span class="line">      debug_level (int)</span><br><span class="line">              Level of <span class="builtin-name">debug</span> messages. The higher it is the more <span class="builtin-name">debug</span> messages will be printed. It is the same as adding <span class="string">"-g"</span> command line options.</span><br><span class="line"></span><br><span class="line">              Default: 0 (disabled)</span><br><span class="line"></span><br><span class="line">      hwaddr (string)</span><br><span class="line">              Desired<span class="built_in"> hardware address </span>of new team device. Usual MAC<span class="built_in"> address </span>format is accepted.</span><br><span class="line"></span><br><span class="line">      runner.name (string)</span><br><span class="line">              Name of team device. The following runners are available:</span><br><span class="line"></span><br><span class="line">              broadcast —<span class="built_in"> Simple </span>runner which directs the team device <span class="keyword">to</span> transmit packets via all ports.</span><br><span class="line"></span><br><span class="line">              roundrobin —<span class="built_in"> Simple </span>runner which directs the team device <span class="keyword">to</span> transmits packets <span class="keyword">in</span> a round-robin fashion.</span><br><span class="line"></span><br><span class="line">              activebackup — Watches <span class="keyword">for</span> link changes <span class="keyword">and</span> selects active<span class="built_in"> port </span><span class="keyword">to</span> be used <span class="keyword">for</span> data transfers.</span><br><span class="line"></span><br><span class="line">              loadbalance  —  <span class="keyword">To</span>  <span class="keyword">do</span>  passive load balancing, runner only sets up BPF hash function which will determine<span class="built_in"> port </span><span class="keyword">for</span> packet transmit. <span class="keyword">To</span> <span class="keyword">do</span> active load balancing, runner moves hashes</span><br><span class="line">              among available ports trying <span class="keyword">to</span> reach perfect balance.</span><br><span class="line"></span><br><span class="line">              lacp — Implements 802.3ad LACP protocol. Can use same Tx<span class="built_in"> port </span>selection possibilities as loadbalance runner.</span><br><span class="line"></span><br><span class="line">      notify_peers.count (int)</span><br><span class="line">              Number of bursts of unsolicited NAs <span class="keyword">and</span> gratuitous ARP packets sent after<span class="built_in"> port </span>is enabled <span class="keyword">or</span> disabled.</span><br><span class="line"></span><br><span class="line">              Default: 0 (disabled)</span><br><span class="line"></span><br><span class="line">             <span class="built_in"> Default </span><span class="keyword">for</span> activebackup runner: 1</span><br><span class="line"></span><br><span class="line">      notify_peers.interval (int)</span><br><span class="line">              Value is positive number <span class="keyword">in</span> milliseconds. Specifies an interval between bursts of notify-peer packets.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      mcast_rejoin.count (int)</span><br><span class="line">              Number of bursts of multicast<span class="built_in"> group </span>rejoin requests sent after<span class="built_in"> port </span>is enabled <span class="keyword">or</span> disabled.</span><br><span class="line"></span><br><span class="line">              Default: 0 (disabled)</span><br><span class="line"></span><br><span class="line">             <span class="built_in"> Default </span><span class="keyword">for</span> activebackup runner: 1</span><br><span class="line"></span><br><span class="line">      mcast_rejoin.interval (int)</span><br><span class="line">              Value is positive number <span class="keyword">in</span> milliseconds. Specifies an interval between bursts of multicast<span class="built_in"> group </span>rejoin requests.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      link_watch.name | ports.PORTIFNAME.link_watch.name (string)</span><br><span class="line">              Name of link watcher <span class="keyword">to</span> be used. The following link watchers are available:</span><br><span class="line"></span><br><span class="line">              ethtool — Uses Libteam lib <span class="keyword">to</span> <span class="builtin-name">get</span><span class="built_in"> port </span>ethtool state changes.</span><br><span class="line"></span><br><span class="line">              arp_ping — ARP requests are sent through a port. <span class="keyword">If</span> an ARP reply is received, the link is considered <span class="keyword">to</span> be up.</span><br><span class="line"></span><br><span class="line">              nsna_ping — Similar <span class="keyword">to</span> the previous, except that it uses<span class="built_in"> IPv6 Neighbor </span>Solicitation /<span class="built_in"> Neighbor </span>Advertisement mechanism. This is an alternative <span class="keyword">to</span> arp_ping <span class="keyword">and</span> becomes handy <span class="keyword">in</span> pure-</span><br><span class="line">             <span class="built_in"> IPv6 </span>environments.</span><br><span class="line"></span><br><span class="line">              ports (object)</span><br><span class="line">                    List of ports,<span class="built_in"> network </span>devices, <span class="keyword">to</span> be used <span class="keyword">in</span> a team device.</span><br><span class="line"></span><br><span class="line">              See examples <span class="keyword">for</span> more information.</span><br><span class="line"></span><br><span class="line">      ports.PORTIFNAME.queue_id (int)</span><br><span class="line">              ID of<span class="built_in"> queue </span>which this<span class="built_in"> port </span>should be mapped <span class="keyword">to</span>.</span><br><span class="line"></span><br><span class="line">              Default: None</span><br><span class="line"></span><br><span class="line">ACTIVE-BACKUP RUNNER SPECIFIC OPTIONS</span><br><span class="line">      runner.hwaddr_policy (string)</span><br><span class="line">              This defines the<span class="built_in"> policy </span>of how<span class="built_in"> hardware </span>addresses of team device <span class="keyword">and</span><span class="built_in"> port </span>devices should be <span class="builtin-name">set</span> during the team lifetime. The following are available:</span><br><span class="line"></span><br><span class="line">              same_all — All ports will always have the same<span class="built_in"> hardware address </span>as the associated team device.</span><br><span class="line"></span><br><span class="line">              by_active — Team device adopts the<span class="built_in"> hardware address </span>of the currently active port. This is useful when the<span class="built_in"> port </span>device is <span class="keyword">not</span> able <span class="keyword">to</span> change its<span class="built_in"> hardware </span>address.</span><br><span class="line"></span><br><span class="line">              only_active — Only the active<span class="built_in"> port </span>adopts the<span class="built_in"> hardware address </span>of the team device. The others have their own.</span><br><span class="line"></span><br><span class="line">              Default: same_all</span><br><span class="line"></span><br><span class="line">      ports.PORTIFNAME.prio (int)</span><br><span class="line">             <span class="built_in"> Port </span>priority. The higher number means higher priority.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      ports.PORTIFNAME.sticky (bool)</span><br><span class="line">              Flag which indicates <span class="keyword">if</span> the<span class="built_in"> port </span>is sticky. <span class="keyword">If</span> set, it means the<span class="built_in"> port </span>does <span class="keyword">not</span> <span class="builtin-name">get</span> unselected <span class="keyword">if</span> another<span class="built_in"> port </span>with higher priority <span class="keyword">or</span> better parameters becomes available.</span><br><span class="line"></span><br><span class="line">              Default: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">LOAD BALANCE RUNNER SPECIFIC OPTIONS</span><br><span class="line">      runner.tx_hash (array)</span><br><span class="line">              List of fragment types (strings) which should be used <span class="keyword">for</span> packet Tx hash computation. The following are available:</span><br><span class="line"></span><br><span class="line">              eth — Uses source <span class="keyword">and</span> destination MAC addresses.</span><br><span class="line"></span><br><span class="line">             <span class="built_in"> vlan </span>— Uses<span class="built_in"> VLAN </span>id.</span><br><span class="line"></span><br><span class="line">              ipv4 — Uses source <span class="keyword">and</span> destination IPv4 addresses.</span><br><span class="line"></span><br><span class="line">             <span class="built_in"> ipv6 </span>— Uses source <span class="keyword">and</span> destination<span class="built_in"> IPv6 </span>addresses.</span><br><span class="line"></span><br><span class="line">             <span class="built_in"> ip </span>— Uses source <span class="keyword">and</span> destination IPv4 <span class="keyword">and</span><span class="built_in"> IPv6 </span>addresses.</span><br><span class="line"></span><br><span class="line">              l3 — Uses source <span class="keyword">and</span> destination IPv4 <span class="keyword">and</span><span class="built_in"> IPv6 </span>addresses.</span><br><span class="line"></span><br><span class="line">              tcp — Uses source <span class="keyword">and</span> destination TCP ports.</span><br><span class="line"></span><br><span class="line">              udp — Uses source <span class="keyword">and</span> destination UDP ports.</span><br><span class="line"></span><br><span class="line">              sctp — Uses source <span class="keyword">and</span> destination SCTP ports.</span><br><span class="line"></span><br><span class="line">              l4 — Uses source <span class="keyword">and</span> destination TCP <span class="keyword">and</span> UDP <span class="keyword">and</span> SCTP ports.</span><br><span class="line"></span><br><span class="line">      runner.tx_balancer.name (string)</span><br><span class="line">              Name of active Tx balancer. Active Tx balancing is disabled by default. The only value available is basic.</span><br><span class="line"></span><br><span class="line">              Default: None</span><br><span class="line"></span><br><span class="line">      runner.tx_balancer.balancing_interval (int)</span><br><span class="line">              <span class="keyword">In</span> tenths of a second. Periodic interval between rebalancing.</span><br><span class="line"></span><br><span class="line">              Default: 50</span><br><span class="line"></span><br><span class="line">LACP RUNNER SPECIFIC OPTIONS</span><br><span class="line">      runner.active (bool)</span><br><span class="line">              <span class="keyword">If</span> active is <span class="literal">true</span> LACPDU frames are sent along the configured links periodically. <span class="keyword">If</span> <span class="keyword">not</span>, it acts as <span class="string">"speak when spoken to"</span>.</span><br><span class="line"></span><br><span class="line">              Default: <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">      runner.fast_rate (bool)</span><br><span class="line">              Option specifies the rate at which our link partner is asked <span class="keyword">to</span> transmit LACPDU packets. <span class="keyword">If</span> this is <span class="literal">true</span> then packets will be sent once per second. Otherwise they will be sent every</span><br><span class="line">              30 seconds.</span><br><span class="line"></span><br><span class="line">      runner.tx_hash (array)</span><br><span class="line">              Same as <span class="keyword">for</span> load balance runner.</span><br><span class="line"></span><br><span class="line">      runner.tx_balancer.name (string)</span><br><span class="line">              Same as <span class="keyword">for</span> load balance runner.</span><br><span class="line"></span><br><span class="line">      runner.tx_balancer.balancing_interval (int)</span><br><span class="line">              Same as <span class="keyword">for</span> load balance runner.</span><br><span class="line"></span><br><span class="line">      runner.sys_prio (int)</span><br><span class="line">             <span class="built_in"> System </span>priority, value can be 0 – 65535.</span><br><span class="line"></span><br><span class="line">              Default: 255</span><br><span class="line"></span><br><span class="line">      runner.min_ports (int) </span><br><span class="line">              Specifies the minimum number of ports that must be active before asserting carrier <span class="keyword">in</span> the master interface, value can be 1 – 255. 成员口大于等于此值时，LACP 才会 Up，否则 Carrier down。</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      runner.agg_select_policy (string)</span><br><span class="line">              This selects the<span class="built_in"> policy </span>of how the aggregators will be selected. The following are available:</span><br><span class="line"></span><br><span class="line">              lacp_prio — Aggregator with highest priority according <span class="keyword">to</span> LACP standard will be selected. Aggregator priority is affected by per-port option lacp_prio.</span><br><span class="line"></span><br><span class="line">              lacp_prio_stable — Same as previous one, except <span class="keyword">do</span> <span class="keyword">not</span> replace selected aggregator <span class="keyword">if</span> it is still usable.</span><br><span class="line"></span><br><span class="line">              bandwidth — Select aggregator with highest total bandwidth.</span><br><span class="line"></span><br><span class="line">              count — Select aggregator with highest number of ports.</span><br><span class="line"></span><br><span class="line">              port_options — Aggregator with highest priority according <span class="keyword">to</span> per-port options prio <span class="keyword">and</span> sticky will be selected. This means that the aggregator containing the<span class="built_in"> port </span>with  the  highest</span><br><span class="line">              priority will be selected unless at least one of the ports <span class="keyword">in</span> the currently selected aggregator is sticky.</span><br><span class="line"></span><br><span class="line">              Default: lacp_prio</span><br><span class="line"></span><br><span class="line">      ports.PORTIFNAME.lacp_prio (int)</span><br><span class="line">             <span class="built_in"> Port </span>priority according <span class="keyword">to</span> LACP standard. The lower number means higher priority.</span><br><span class="line"></span><br><span class="line">      ports.PORTIFNAME.lacp_key (int)</span><br><span class="line">             <span class="built_in"> Port </span>key according <span class="keyword">to</span> LACP standard. It is only possible <span class="keyword">to</span> aggregate ports with the same key.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">ETHTOOL LINK WATCH SPECIFIC OPTIONS</span><br><span class="line">      link_watch.delay_up | ports.PORTIFNAME.link_watch.delay_up (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the delay between the link coming up <span class="keyword">and</span> the runner being notified about it.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      link_watch.delay_down | ports.PORTIFNAME.link_watch.delay_down (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the delay between the link going down <span class="keyword">and</span> the runner being notified about it.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">ARP<span class="built_in"> PING </span>LINK WATCH SPECIFIC OPTIONS</span><br><span class="line">      link_watch.interval | ports.PORTIFNAME.link_watch.interval (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the interval between ARP requests being sent.</span><br><span class="line"></span><br><span class="line">      link_watch.init_wait | ports.PORTIFNAME.link_watch.init_wait (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the delay between link watch initialization <span class="keyword">and</span> the first ARP request being sent.</span><br><span class="line"></span><br><span class="line">              Default: 0</span><br><span class="line"></span><br><span class="line">      link_watch.missed_max | ports.PORTIFNAME.link_watch.missed_max (int)</span><br><span class="line">              Maximum number of missed ARP replies. <span class="keyword">If</span> this number is exceeded, link is reported as down.</span><br><span class="line"></span><br><span class="line">              Default: 3</span><br><span class="line"></span><br><span class="line">      link_watch.source_host | ports.PORTIFNAME.link_watch.source_host (hostname)</span><br><span class="line">              Hostname <span class="keyword">to</span> be converted <span class="keyword">to</span><span class="built_in"> IP address </span>which will be filled into ARP request as source address.</span><br><span class="line"></span><br><span class="line">              Default: 0.0.0.0</span><br><span class="line"></span><br><span class="line">      link_watch.target_host | ports.PORTIFNAME.link_watch.target_host (hostname)</span><br><span class="line">              Hostname <span class="keyword">to</span> be converted <span class="keyword">to</span><span class="built_in"> IP address </span>which will be filled into ARP request as destination address.</span><br><span class="line"></span><br><span class="line">      link_watch.validate_active | ports.PORTIFNAME.link_watch.validate_active (bool)</span><br><span class="line">              Validate received ARP packets on active ports. <span class="keyword">If</span> this is <span class="keyword">not</span> set, all<span class="built_in"> incoming </span>ARP packets will be considered as a good reply.</span><br><span class="line"></span><br><span class="line">              Default: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">      link_watch.validate_inactive | ports.PORTIFNAME.link_watch.validate_inactive (bool)</span><br><span class="line">              Validate received ARP packets on inactive ports. <span class="keyword">If</span> this is <span class="keyword">not</span> set, all<span class="built_in"> incoming </span>ARP packets will be considered as a good reply.</span><br><span class="line"></span><br><span class="line">              Default: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">      link_watch.send_always | ports.PORTIFNAME.link_watch.send_always (bool)</span><br><span class="line">              By default, ARP requests are sent on active ports only. This option allows sending even on inactive ports.</span><br><span class="line"></span><br><span class="line">      Default: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">NS/NA<span class="built_in"> PING </span>LINK WATCH SPECIFIC OPTIONS</span><br><span class="line">      link_watch.interval | ports.PORTIFNAME.link_watch.interval (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the interval between sending NS packets.</span><br><span class="line"></span><br><span class="line">      link_watch.init_wait | ports.PORTIFNAME.link_watch.init_wait (int)</span><br><span class="line">              Value is a positive number <span class="keyword">in</span> milliseconds. It is the delay between link watch initialization <span class="keyword">and</span> the first NS packet being sent.</span><br><span class="line"></span><br><span class="line">      link_watch.missed_max | ports.PORTIFNAME.link_watch.missed_max (int)</span><br><span class="line">              Maximum number of missed NA reply packets. <span class="keyword">If</span> this number is exceeded, link is reported as down.</span><br><span class="line"></span><br><span class="line">              Default: 3</span><br><span class="line"></span><br><span class="line">      link_watch.target_host | ports.PORTIFNAME.link_watch.target_host (hostname)</span><br><span class="line">              Hostname <span class="keyword">to</span> be converted <span class="keyword">to</span><span class="built_in"> IPv6 address </span>which will be filled into NS packet as target address.</span><br><span class="line"></span><br><span class="line">EXAMPLES</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;<span class="string">"name"</span>: <span class="string">"roundrobin"</span>&#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;<span class="string">"eth1"</span>: &#123;&#125;, <span class="string">"eth2"</span>: &#123;&#125;&#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Very basic configuration.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;<span class="string">"name"</span>: <span class="string">"activebackup"</span>&#125;,</span><br><span class="line">        <span class="string">"link_watch"</span>: &#123;<span class="string">"name"</span>: <span class="string">"ethtool"</span>&#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;</span><br><span class="line">          <span class="string">"eth1"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: -10,</span><br><span class="line">            <span class="string">"sticky"</span>: <span class="literal">true</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"eth2"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: 100</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      This  configuration  uses  active-backup runner with ethtool link watcher.<span class="built_in"> Port </span>eth2 has higher priority, but the sticky flag ensures that <span class="keyword">if</span> eth1 becomes active, it stays active <span class="keyword">while</span> the</span><br><span class="line">      link remains up.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;<span class="string">"name"</span>: <span class="string">"activebackup"</span>&#125;,</span><br><span class="line">        <span class="string">"link_watch"</span>: &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"ethtool"</span>,</span><br><span class="line">          <span class="string">"delay_up"</span>: 2500,</span><br><span class="line">          <span class="string">"delay_down"</span>: 1000</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;</span><br><span class="line">          <span class="string">"eth1"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: -10,</span><br><span class="line">            <span class="string">"sticky"</span>: <span class="literal">true</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"eth2"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: 100</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Similar <span class="keyword">to</span> the previous one. Only difference is that link changes are <span class="keyword">not</span> propagated <span class="keyword">to</span> the runner immediately, but delays are applied.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;<span class="string">"name"</span>: <span class="string">"activebackup"</span>&#125;,</span><br><span class="line">        <span class="string">"link_watch"</span>:    &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"arp_ping"</span>,</span><br><span class="line">          <span class="string">"interval"</span>: 100,</span><br><span class="line">          <span class="string">"missed_max"</span>: 30,</span><br><span class="line">          <span class="string">"target_host"</span>: <span class="string">"192.168.23.1"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;</span><br><span class="line">          <span class="string">"eth1"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: -10,</span><br><span class="line">            <span class="string">"sticky"</span>: <span class="literal">true</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"eth2"</span>: &#123;</span><br><span class="line">            <span class="string">"prio"</span>: 100</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      This configuration uses ARP<span class="built_in"> ping </span>link watch.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">      <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">      <span class="string">"runner"</span>: &#123;<span class="string">"name"</span>: <span class="string">"activebackup"</span>&#125;,</span><br><span class="line">      <span class="string">"link_watch"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"arp_ping"</span>,</span><br><span class="line">          <span class="string">"interval"</span>: 100,</span><br><span class="line">          <span class="string">"missed_max"</span>: 30,</span><br><span class="line">          <span class="string">"target_host"</span>: <span class="string">"192.168.23.1"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"arp_ping"</span>,</span><br><span class="line">          <span class="string">"interval"</span>: 50,</span><br><span class="line">          <span class="string">"missed_max"</span>: 20,</span><br><span class="line">          <span class="string">"target_host"</span>: <span class="string">"192.168.24.1"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"ports"</span>: &#123;</span><br><span class="line">        <span class="string">"eth1"</span>: &#123;</span><br><span class="line">          <span class="string">"prio"</span>: -10,</span><br><span class="line">          <span class="string">"sticky"</span>: <span class="literal">true</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"eth2"</span>: &#123;</span><br><span class="line">          <span class="string">"prio"</span>: 100</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Similar <span class="keyword">to</span> the previous one, only this time two link watchers are used at the same time.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"loadbalance"</span>,</span><br><span class="line">          <span class="string">"tx_hash"</span>: [<span class="string">"eth"</span>, <span class="string">"ipv4"</span>, <span class="string">"ipv6"</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;<span class="string">"eth1"</span>: &#123;&#125;, <span class="string">"eth2"</span>: &#123;&#125;&#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Configuration <span class="keyword">for</span> hash-based passive Tx load balancing.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"loadbalance"</span>,</span><br><span class="line">          <span class="string">"tx_hash"</span>: [<span class="string">"eth"</span>, <span class="string">"ipv4"</span>, <span class="string">"ipv6"</span>],</span><br><span class="line">          <span class="string">"tx_balancer"</span>: &#123;</span><br><span class="line">            <span class="string">"name"</span>: <span class="string">"basic"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;<span class="string">"eth1"</span>: &#123;&#125;, <span class="string">"eth2"</span>: &#123;&#125;&#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Configuration <span class="keyword">for</span> active Tx load balancing using basic load balancer.</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"device"</span>: <span class="string">"team0"</span>,</span><br><span class="line">        <span class="string">"runner"</span>: &#123;</span><br><span class="line">          <span class="string">"name"</span>: <span class="string">"lacp"</span>,</span><br><span class="line">          <span class="string">"active"</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="string">"fast_rate"</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="string">"tx_hash"</span>: [<span class="string">"eth"</span>, <span class="string">"ipv4"</span>, <span class="string">"ipv6"</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"link_watch"</span>: &#123;<span class="string">"name"</span>: <span class="string">"ethtool"</span>&#125;,</span><br><span class="line">        <span class="string">"ports"</span>: &#123;<span class="string">"eth1"</span>: &#123;&#125;, <span class="string">"eth2"</span>: &#123;&#125;&#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      Configuration <span class="keyword">for</span><span class="built_in"> connection </span><span class="keyword">to</span> LACP capable counterpart.</span><br><span class="line"></span><br><span class="line">SEE ALSO</span><br><span class="line">      teamd(8), teamdctl(8), teamnl(8), bond2team(1)</span><br><span class="line"></span><br><span class="line">AUTHOR</span><br><span class="line">      Jiri Pirko is the original author <span class="keyword">and</span> current maintainer of libteam.</span><br><span class="line"></span><br><span class="line">libteam                                                                                      2013-07-09                                                                              TEAMD.CONF(5)</span><br></pre></td></tr></table></figure>
+<h3 id="man-teamdctl"><a href="#man-teamdctl" class="headerlink" title="man teamdctl"></a>man teamdctl</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">js@js-vbox:~/sonic-buildimage/src/sonic-swss$ man teamdctl</span><br><span class="line">TEAMDCTL(8)                                                                                teamd control                                                                                TEAMDCTL(8)</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line">      teamdctl — team daemon control tool</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">      teamdctl [options] team_device command [command_args...]</span><br><span class="line">      teamdctl -h</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">      teamdctl  is  a  tool that allows a user to interact <span class="keyword">with</span> a running teamd instance.  It <span class="keyword">defaults</span> <span class="keyword">to</span> <span class="keyword">using</span> Unix <span class="keyword">Domain</span> Sockets, but will fall back <span class="keyword">to</span> <span class="keyword">using</span> the D-Bus API, <span class="keyword">to</span> ensure reliable</span><br><span class="line">      operation <span class="keyword">in</span> <span class="keyword">all</span> environments.</span><br><span class="line"></span><br><span class="line">OPTIONS</span><br><span class="line">      -h, <span class="comment">--help</span></span><br><span class="line">              Print <span class="keyword">help</span> <span class="built_in">text</span> <span class="keyword">to</span> console <span class="keyword">and</span> exit.</span><br><span class="line"></span><br><span class="line">      -v, <span class="comment">--verbosity</span></span><br><span class="line">              Increase <span class="keyword">output</span> verbosity.</span><br><span class="line"></span><br><span class="line">      -o, <span class="comment">--oneline</span></span><br><span class="line">              <span class="keyword">Force</span> <span class="keyword">output</span> <span class="keyword">to</span> one line <span class="keyword">if</span> possible.</span><br><span class="line"></span><br><span class="line">      -D, <span class="comment">--force-dbus</span></span><br><span class="line">              <span class="keyword">Force</span> <span class="keyword">to</span> <span class="keyword">use</span> D-Bus interface.</span><br><span class="line"></span><br><span class="line">      -Z address, <span class="comment">--force-zmq address</span></span><br><span class="line">              <span class="keyword">Force</span> <span class="keyword">to</span> <span class="keyword">use</span> ZMQ interface. Possible address formats <span class="keyword">are</span> <span class="string">"tcp://ip:port"</span>, <span class="string">"ipc://path"</span> <span class="keyword">and</span> others. Detailed description <span class="keyword">of</span> ZMQ <span class="keyword">library</span> <span class="keyword">is</span> <span class="keyword">in</span> page <span class="keyword">http</span>://zguide.zeromq.org/page:all.</span><br><span class="line"></span><br><span class="line">      -U, <span class="comment">--force-usock</span></span><br><span class="line">              <span class="keyword">Force</span> <span class="keyword">to</span> <span class="keyword">use</span> UNIX <span class="keyword">domain</span> socket interface. This <span class="keyword">is</span> the <span class="keyword">default</span> behavior.</span><br><span class="line"></span><br><span class="line">COMMAND</span><br><span class="line">      config dump</span><br><span class="line">              Dumps teamd <span class="keyword">JSON</span> config.</span><br><span class="line"></span><br><span class="line">      config dump noports</span><br><span class="line">              Dumps teamd <span class="keyword">JSON</span> configuration <span class="keyword">without</span> <span class="string">"ports"</span> <span class="keyword">section</span> included.</span><br><span class="line"></span><br><span class="line">      config dump actual</span><br><span class="line">              Dumps teamd actual <span class="keyword">JSON</span> configuration. It includes ports which <span class="keyword">are</span> currently present.</span><br><span class="line"></span><br><span class="line">      state dump | state</span><br><span class="line">              Dumps teamd <span class="keyword">JSON</span> state document.</span><br><span class="line"></span><br><span class="line">      state <span class="keyword">view</span></span><br><span class="line">              Prints <span class="keyword">out</span> state <span class="keyword">of</span> teamd parsed <span class="keyword">from</span> <span class="keyword">JSON</span> state document.</span><br><span class="line"></span><br><span class="line">      state item <span class="keyword">get</span> state_item_path</span><br><span class="line">              Finds state item <span class="keyword">in</span> <span class="keyword">JSON</span> state <span class="keyword">document</span> <span class="keyword">and</span> <span class="keyword">returns</span> its value.</span><br><span class="line"></span><br><span class="line">      state item <span class="keyword">set</span> state_item_path <span class="keyword">value</span></span><br><span class="line">              Finds state item <span class="keyword">in</span> <span class="keyword">JSON</span> state <span class="keyword">document</span> <span class="keyword">and</span> <span class="keyword">sets</span> its <span class="keyword">value</span> <span class="keyword">by</span> <span class="keyword">value</span> parameter. This <span class="keyword">is</span> available <span class="keyword">only</span> <span class="keyword">for</span> a limited <span class="built_in">number</span> <span class="keyword">of</span> paths:</span><br><span class="line"></span><br><span class="line">              setup.debug_level — <span class="keyword">User</span> can <span class="keyword">set</span> debug level. Higher <span class="keyword">level</span> <span class="keyword">is</span> more verbose.</span><br><span class="line"></span><br><span class="line">              ports.PORTIFNAME.runner.aggregator.selected — This <span class="keyword">is</span> available <span class="keyword">for</span> lacp runner. <span class="keyword">User</span> can manually <span class="keyword">select</span> the aggregator.</span><br><span class="line"></span><br><span class="line">              runner.active_port — This <span class="keyword">is</span> available <span class="keyword">for</span> activebackup runner. <span class="keyword">User</span> can manually <span class="keyword">select</span> the active port.</span><br><span class="line"></span><br><span class="line">      port <span class="keyword">add</span> portdev</span><br><span class="line">              Takes port device <span class="keyword">name</span> <span class="keyword">as</span> argument. Adds port device <span class="keyword">into</span> team.</span><br><span class="line"></span><br><span class="line">      port remove portdev</span><br><span class="line">              Takes port device <span class="keyword">name</span> <span class="keyword">as</span> argument. Removes port device <span class="keyword">from</span> team.</span><br><span class="line"></span><br><span class="line">      port <span class="keyword">present</span> portdev</span><br><span class="line">              Takes port device <span class="keyword">name</span> <span class="keyword">as</span> argument. Checks <span class="keyword">if</span> the port device <span class="keyword">is</span> <span class="keyword">present</span> <span class="keyword">in</span> team.</span><br><span class="line"></span><br><span class="line">      port config <span class="keyword">update</span> portdev portconfig-<span class="keyword">string</span></span><br><span class="line">              Takes port device <span class="keyword">name</span> <span class="keyword">as</span> the <span class="keyword">first</span> argument <span class="keyword">and</span> <span class="keyword">JSON</span> <span class="keyword">format</span> configuration <span class="keyword">string</span> <span class="keyword">as</span> the <span class="keyword">second</span> argument. Updates port device configuration.</span><br><span class="line"></span><br><span class="line">      port config dump portdev</span><br><span class="line">              Takes port device <span class="keyword">name</span> <span class="keyword">as</span> the <span class="keyword">first</span> argument. Dumps port device <span class="keyword">JSON</span> configuration <span class="keyword">to</span> standard output.</span><br><span class="line"></span><br><span class="line">SEE ALSO</span><br><span class="line">      teamd(<span class="number">8</span>), teamnl(<span class="number">8</span>), teamd.conf(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">AUTHOR</span><br><span class="line">      Jiri Pirko <span class="keyword">is</span> the original author <span class="keyword">and</span> <span class="keyword">current</span> maintainer <span class="keyword">of</span> libteam.</span><br><span class="line"></span><br><span class="line">libteam                                                                                      <span class="number">2013</span><span class="number">-05</span><span class="number">-24</span>                                                                                TEAMDCTL(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/libteam/" rel="tag"># libteam</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201802/linux/deb_without_network.html" rel="next" title="无网络下安装常用 deb 包">
+                <i class="fa fa-chevron-left"></i> 无网络下安装常用 deb 包
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201802/linux/debian_debug_package.html" rel="prev" title="deb debug package">
+                deb debug package <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构"><span class="nav-number">1.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#teamdev-driver"><span class="nav-number">1.1.</span> <span class="nav-text">teamdev driver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libteam-lib"><span class="nav-number">1.2.</span> <span class="nav-text">libteam lib</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libteam-teamd"><span class="nav-number">1.3.</span> <span class="nav-text">libteam teamd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Team-Netlink"><span class="nav-number">1.4.</span> <span class="nav-text">Team Netlink</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Driver"><span class="nav-number">2.</span> <span class="nav-text">Driver</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Options"><span class="nav-number">2.1.</span> <span class="nav-text">Options</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Modes"><span class="nav-number">2.2.</span> <span class="nav-text">Modes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#teamd"><span class="nav-number">3.</span> <span class="nav-text">teamd</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#link-watcher"><span class="nav-number">3.1.</span> <span class="nav-text">link-watcher</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#runner"><span class="nav-number">3.2.</span> <span class="nav-text">runner</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#teamd-control-API"><span class="nav-number">3.3.</span> <span class="nav-text">teamd control API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#teamdctl"><span class="nav-number">3.4.</span> <span class="nav-text">teamdctl</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Config"><span class="nav-number">3.4.1.</span> <span class="nav-text">Config</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#样例"><span class="nav-number">3.5.</span> <span class="nav-text">样例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bonding-v-s-team-features"><span class="nav-number">4.</span> <span class="nav-text">Bonding v.s. team features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#man"><span class="nav-number">5.</span> <span class="nav-text">man</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#man-teamd"><span class="nav-number">5.1.</span> <span class="nav-text">man teamd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#man-teamd-conf"><span class="nav-number">5.2.</span> <span class="nav-text">man teamd.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#man-teamdctl"><span class="nav-number">5.3.</span> <span class="nav-text">man teamdctl</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201802/programmer/linux/libteam.html";
+    this.page.identifier = "201802/programmer/linux/libteam.html";
+    this.page.title = 'linux 聚合口 team & libteam 简介';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

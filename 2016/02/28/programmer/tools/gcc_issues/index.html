@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>GCC 问题记录 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Linux c gcc 使用问题记录。">
+<meta name="keywords" content="linux,gcc,compile,编译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCC 问题记录">
+<meta property="og:url" content="http://yoursite.com/2016/02/28/programmer/tools/gcc_issues/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linux c gcc 使用问题记录。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.084Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCC 问题记录">
+<meta name="twitter:description" content="Linux c gcc 使用问题记录。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-programmer/tools/gcc_issues" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/28/programmer/tools/gcc_issues/" class="article-date">
+  <time datetime="2016-02-28T06:13:20.000Z" itemprop="datePublished">2016-02-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/programmer/">programmer</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      GCC 问题记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="errors"><a href="#errors" class="headerlink" title="errors"></a>errors</h2><h3 id="error-dereferencing-pointer-to-incomplete-type"><a href="#error-dereferencing-pointer-to-incomplete-type" class="headerlink" title="error: dereferencing pointer to incomplete type"></a>error: dereferencing pointer to incomplete type</h3><p>原因：使用 <code>typedef struct {} xxx_t</code> 定义类型 <code>xxx_t</code>，定义变量时，使用 <code>struct xxx_t</code> ，应为 <code>xxx_t</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">typedef struct xxx_s &#123;</span><br><span class="line">    int a;</span><br><span class="line">    int b;</span><br><span class="line">&#125; xxx_t;</span><br><span class="line"></span><br><span class="line">int func(void)</span><br><span class="line">&#123;</span><br><span class="line">   struct xxx_t st;</span><br><span class="line">   </span><br><span class="line">   st.a = 1; // &lt;---- 这里会报错。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="找不到-libz-so-1"><a href="#找不到-libz-so-1" class="headerlink" title="找不到 libz.so.1"></a>找不到 libz.so.1</h3><p>交叉编译时，找不到 libz.so.1，但是 sudo apt-get install zlib1g 相关的所有包都已安装。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/sunyongfeng/workshop/rgosm-build/.toolchain-arm-cortex_a9/arm-cortex_a9/arm-cortex_a9-linux-gnueabi/bin/../lib/gcc/arm-cortex_a9-linux-gnueabi/4.4.6/../../../../arm-cortex_a9-linux-gnueabi/bin/as: error while loading shared libraries: libz.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+<p>原因：交叉编译 target 为 arm 32 bit，host 为 x64。<br>解决：<a href="http://stackoverflow.com/questions/21256866/libz-so-1-cannot-open-shared-object-file" target="_blank" rel="noopener">来自 stackoverflow</a>，安装 zlib1g:386 版本，<code>sudo apt-get install zlib1g:i386</code></p>
+<h3 id="快速解决-Werror-选项出错"><a href="#快速解决-Werror-选项出错" class="headerlink" title="快速解决 -Werror 选项出错"></a>快速解决 -Werror 选项出错</h3><p>带 <code>-Werror</code> 选项，一有 warning 就出错，有时不同架构间移值代码很容易出现。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cc1: warnings being treated as errors</span><br></pre></td></tr></table></figure></p>
+<p>快速解决的方法：添加选项 <code>-Wno-error</code>。</p>
+<h3 id="Werror-选项不生效"><a href="#Werror-选项不生效" class="headerlink" title="-Werror 选项不生效"></a>-Werror 选项不生效</h3><p><code>-Wno-error</code> 一定要在 <code>-Werror</code> 之后，从实际运行看，放在后面的 option 生效。<br>源代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/test$ cat abc.c</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;sv\n&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>正常编译：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/test$ gcc -o abc abc.c</span><br><span class="line">abc.c: In function ‘main’:</span><br><span class="line">abc.c:3:5: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]</span><br><span class="line">     printf(&quot;sv\n&quot;);</span><br><span class="line">     ^</span><br><span class="line">abc.c:3:5: warning: incompatible implicit declaration of built-in function ‘printf’</span><br><span class="line">abc.c:3:5: note: include ‘&lt;stdio.h&gt;’ or provide a declaration of ‘printf’</span><br></pre></td></tr></table></figure></p>
+<p>如果 <code>-Werror</code> 在 <code>-Wno-errno</code> 之后，则 warning 还是当 error。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/test$ gcc -o abc abc.c -Wno-error  -Werror</span><br><span class="line">abc.c: In function ‘main’:</span><br><span class="line">abc.c:3:5: error: implicit declaration of function ‘printf’ [-Werror=implicit-function-declaration]</span><br><span class="line">     printf(&quot;sv\n&quot;);</span><br><span class="line">     ^</span><br><span class="line">abc.c:3:5: error: incompatible implicit declaration of built-in function ‘printf’ [-Werror]</span><br><span class="line">abc.c:3:5: note: include ‘&lt;stdio.h&gt;’ or provide a declaration of ‘printf’</span><br><span class="line">cc1: all warnings being treated as errors</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/test$ gcc -o abc abc.c -Wno-error  -Werror -Wno-error</span><br><span class="line">abc.c: In function ‘main’:</span><br><span class="line">abc.c:3:5: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]</span><br><span class="line">     printf(&quot;sv\n&quot;);</span><br><span class="line">     ^</span><br><span class="line">abc.c:3:5: warning: incompatible implicit declaration of built-in function ‘printf’</span><br><span class="line">abc.c:3:5: note: include ‘&lt;stdio.h&gt;’ or provide a declaration of ‘printf’</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/workshop/test$</span><br></pre></td></tr></table></figure></p>
+<h3 id="库可以被找到，但是编译时还是提示-undefined-reference-to-39-Py-Initialize-39"><a href="#库可以被找到，但是编译时还是提示-undefined-reference-to-39-Py-Initialize-39" class="headerlink" title="库可以被找到，但是编译时还是提示 undefined reference to &#39;Py_Initialize&#39;"></a>库可以被找到，但是编译时还是提示 <code>undefined reference to &#39;Py_Initialize&#39;</code></h3><p><a href="http://stackoverflow.com/questions/13951166/undefined-reference-despite-lib-being-found-by-linker" target="_blank" rel="noopener">stackoverflow 链接</a>。</p>
+<ul>
+<li>问题：编译 <code>gcc -lpython2.7 $(BUILD_CFLAGS) -o $(ELF) $^ -lxxx</code>，libxxx.a 使用 libpython2.7.so，编译时提示找不到 python 的 symbol。</li>
+<li>原因：-lxxx 写在 -lpython2.7 之后。</li>
+</ul>
+<blockquote>
+<p>the linker doesn’t yet know that Py_Initialize is a required symbol when it loads libpython2.7.a, so it tosses it away. And then it gets to p.o and throws a fit about the missing symbol. Ordering it this way will let the linker look for the missing symbol in subsequent inputs.</p>
+<p>See: <a href="http://gcc.gnu.org/onlinedocs/gcc/Link-Options.html" target="_blank" rel="noopener">http://gcc.gnu.org/onlinedocs/gcc/Link-Options.html</a></p>
+<p>It makes a difference where in the command you write this option; the linker searches and processes libraries and object files in the order they are specified. Thus, foo.o -lz bar.o’ searches libraryz’ after file foo.o but before bar.o. If bar.o refers to functions in `z’, those functions may not be loaded.</p>
+</blockquote>
+<ul>
+<li>解决：把 -lpython2.7 写在 -lxxx 之后。像这种库中依赖库的地方需要注意。</li>
+</ul>
+<h3 id="relocation-R-X86-64-32-against-xxx’-can-not-be-used-when-making-a-shared-object-recompile-with-fPIC-sub-o-could-not-read-symbols-Bad-value"><a href="#relocation-R-X86-64-32-against-xxx’-can-not-be-used-when-making-a-shared-object-recompile-with-fPIC-sub-o-could-not-read-symbols-Bad-value" class="headerlink" title="relocation R_X86_64_32 against `xxx’ can not be used when making a shared object; recompile with -fPIC sub.o: could not read symbols: Bad value"></a>relocation R_X86_64_32 against `xxx’ can not be used when making a shared object; recompile with -fPIC sub.o: could not read symbols: Bad value</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">x86_64-unknown-linux-gnu-gcc -fPIC -shared -D_LITTLE_ENDIAN -g  -Wno-error=deprecated-declarations  -Wall -D_GNU_SOURCE -lpthread</span><br><span class="line">/home/sunyongfeng/workshop/../build/sub.o /home/sunyongfeng/workshop/../build/undef.o /home/sunyongfeng/workshop/../build/libxy.so</span><br><span class="line">/home/sunyongfeng/workshop/toolchain/toolchain-x86_64/x86_64/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.2.4/../../../../x86_64-unknown-linux-gnu/bin/ld: /home/sunyongfeng/workshop/../build/libproxy/policy/sub.o: relocation R_X86_64_32 against `g_lock&apos; can not be used when making a shared object; recompile with -fPIC</span><br><span class="line">/home/sunyongfeng/workshop/../build/libproxy/policy/sub.o: could not read symbols: Bad value</span><br><span class="line">collect2: ld returned 1 exit status</span><br><span class="line">makefile:69: recipe for target &apos;build&apos; failed</span><br></pre></td></tr></table></figure>
+<p>源代码编译也添加 <code>-fPIC</code> 选项，在 ARM / MIPS 平台都没此问题，在 x86 才有。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/02/28/programmer/tools/gcc_issues/" data-id="cjz95gt4u00hyw5r9dnhv1ior" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/02/28/tools/shadowsocks/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          shadowsocks 记录
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/02/18/tools/git_issues/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">git 问题记录</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

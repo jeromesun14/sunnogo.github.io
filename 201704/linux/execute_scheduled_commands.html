@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="通过 cron 定时执行备份任务。">
+<meta name="keywords" content="ubuntu,cron,定期执行,任务,scheduled,task,commands,备份,backup,dokuwiki,EDITOR,vim,nano">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 定时执行备份任务">
+<meta property="og:url" content="http://sunyongfeng.com/201704/linux/execute_scheduled_commands.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="通过 cron 定时执行备份任务。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux 定时执行备份任务">
+<meta name="twitter:description" content="通过 cron 定时执行备份任务。">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/linux/execute_scheduled_commands">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux 定时执行备份任务 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/linux/execute_scheduled_commands.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux 定时执行备份任务
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-25 14:18:00" itemprop="dateCreated datePublished" datetime="2017-04-25T14:18:00+08:00">2017-04-25</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/linux/execute_scheduled_commands.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/linux/execute_scheduled_commands.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">通过 cron 定时执行备份任务。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本地搭建一个 dokuwiki 服务器，考虑备份需求，每天备份服务器内容到另一台设备。</p>
+<ul>
+<li>服务器 IP：172.168.111.192</li>
+<li>备份设备 IP：192.168.204.168</li>
+</ul>
+<p>通过 cron 命令进行定时任务执行。</p>
+<h2 id="前期工作"><a href="#前期工作" class="headerlink" title="前期工作"></a>前期工作</h2><p>见本博客另一篇文章 <a href="sunyongfeng.com/201704/linux/scp_ssh_without_password.html">如何让 scp / ssh 不需要密码</a>。</p>
+<h2 id="实现备份的脚本"><a href="#实现备份的脚本" class="headerlink" title="实现备份的脚本"></a>实现备份的脚本</h2><p>在服务器 172.168.111.192 上实现备份脚本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:~<span class="comment"># cat dokuwiki.backup.sh </span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">backpath=/var/www/backup</span><br><span class="line">date=`date +%y%m%d`</span><br><span class="line">site=<span class="string">'dokuwiki'</span></span><br><span class="line">tar zcf <span class="variable">$&#123;backpath&#125;</span><span class="variable">$&#123;site&#125;</span><span class="string">"-"</span><span class="variable">$&#123;date&#125;</span>.tar.gz /var/www/<span class="variable">$&#123;site&#125;</span></span><br><span class="line">scp <span class="variable">$&#123;backpath&#125;</span><span class="variable">$&#123;site&#125;</span><span class="string">"-"</span><span class="variable">$&#123;date&#125;</span>.tar.gz sunyongfeng@192.168.204.168:/home/sunyongfeng/backup/<span class="variable">$&#123;site&#125;</span><span class="string">"-"</span><span class="variable">$&#123;date&#125;</span>.tar.gz</span><br><span class="line">root@ubuntu:~<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<h2 id="cron-配置"><a href="#cron-配置" class="headerlink" title="cron 配置"></a>cron 配置</h2><p>在服务器 172.168.111192 上每天 4:30 执行备份脚本。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">root<span class="variable">@ubuntu</span><span class="symbol">:~</span><span class="comment"># export EDITOR=vim </span></span><br><span class="line">root<span class="variable">@ubuntu</span><span class="symbol">:~</span><span class="comment"># crontab -e       </span></span><br><span class="line">no crontab <span class="keyword">for</span> root - using an empty one</span><br><span class="line"><span class="comment"># Edit this file to introduce tasks to be run by cron.</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># Each task to run has to be defined through a single line</span></span><br><span class="line"><span class="comment"># indicating with different fields when the task will be run</span></span><br><span class="line"><span class="comment"># and what command to run for the task</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># To define the time you can provide concrete values for</span></span><br><span class="line"><span class="comment"># minute (m), hour (h), day of month (dom), month (mon),</span></span><br><span class="line"><span class="comment"># and day of week (dow) or use '*' in these fields (for 'any').# </span></span><br><span class="line"><span class="comment"># Notice that tasks will be started based on the cron's system</span></span><br><span class="line"><span class="comment"># daemon's notion of time and timezones.</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># Output of the crontab jobs (including errors) is sent through</span></span><br><span class="line"><span class="comment"># email to the user the crontab file belongs to (unless redirected).</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># For example, you can run a backup of all your user accounts</span></span><br><span class="line"><span class="comment"># at 5 a.m every week with:</span></span><br><span class="line"><span class="comment"># 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># For more information see the manual pages of crontab(5) and cron(8)</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># m h  dom mon dow   command</span></span><br><span class="line"><span class="number">30</span> <span class="number">04</span> * * * <span class="regexp">/root/dokuwiki</span>.backup.sh</span><br></pre></td></tr></table></figure>
+<p>首次选择 cron 编辑器不小心选择了 nano，不懂怎么用。通过 <code>export EDITOR=vim</code> 将编辑器切成 vim。</p>
+<p>online cron 表达式生成器: <a href="https://crontab-generator.org/" target="_blank" rel="noopener">https://crontab-generator.org/</a></p>
+<p>注意，每 30 分钟执行一次的写法：</p>
+<ul>
+<li><code>*/30 * * * * ls &gt;/dev/null 2&gt;&amp;1</code></li>
+<li></li>
+</ul>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>备份机器 192.168.204.168 上的效果：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@openswitch-OptiPlex-380:~/backup$ ls -al</span><br><span class="line">total 8759824</span><br><span class="line">drwxrwxrwx  <span class="number"> 7 </span>sunyongfeng sunyongfeng      <span class="number"> 4096 </span>5月 <span class="number"> 31 </span>04:30 .</span><br><span class="line">drwxr-xr-x <span class="number"> 44 </span>sunyongfeng sunyongfeng      <span class="number"> 4096 </span>5月 <span class="number"> 31 </span>09:24 ..</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30790523 </span>4月 <span class="number"> 18 </span>20:26 dokuwiki-170418.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30829080 </span>4月 <span class="number"> 25 </span>14:14 dokuwiki-170425.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30829128 </span>4月 <span class="number"> 26 </span>04:31 dokuwiki-170426.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30840695 </span>4月 <span class="number"> 27 </span>04:31 dokuwiki-170427.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30878801 </span>4月 <span class="number"> 28 </span>04:31 dokuwiki-170428.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30878561 </span>4月 <span class="number"> 29 </span>04:31 dokuwiki-170429.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30878561 </span>4月 <span class="number"> 30 </span>04:31 dokuwiki-170430.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30878561 </span>5月  <span class="number"> 1 </span>04:31 dokuwiki-170501.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30878561 </span>5月  <span class="number"> 2 </span>04:31 dokuwiki-170502.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 30925192 </span>5月  <span class="number"> 3 </span>04:31 dokuwiki-170503.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31827534 </span>5月  <span class="number"> 4 </span>04:31 dokuwiki-170504.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31830576 </span>5月  <span class="number"> 5 </span>04:31 dokuwiki-170505.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31830576 </span>5月  <span class="number"> 6 </span>04:31 dokuwiki-170506.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31830576 </span>5月  <span class="number"> 7 </span>04:32 dokuwiki-170507.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31830576 </span>5月  <span class="number"> 8 </span>04:31 dokuwiki-170508.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832468 </span>5月  <span class="number"> 9 </span>04:31 dokuwiki-170509.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832468 </span>5月 <span class="number"> 10 </span>04:31 dokuwiki-170510.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833486 </span>5月 <span class="number"> 11 </span>04:31 dokuwiki-170511.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31834472 </span>5月 <span class="number"> 12 </span>04:31 dokuwiki-170512.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833802 </span>5月 <span class="number"> 13 </span>04:31 dokuwiki-170513.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833802 </span>5月 <span class="number"> 14 </span>04:31 dokuwiki-170514.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31835188 </span>5月 <span class="number"> 15 </span>04:31 dokuwiki-170515.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31835398 </span>5月 <span class="number"> 16 </span>04:30 dokuwiki-170516.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31834919 </span>5月 <span class="number"> 17 </span>04:30 dokuwiki-170517.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31834919 </span>5月 <span class="number"> 18 </span>04:30 dokuwiki-170518.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 19 </span>04:30 dokuwiki-170519.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 20 </span>04:30 dokuwiki-170520.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 21 </span>04:30 dokuwiki-170521.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 22 </span>04:30 dokuwiki-170522.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 23 </span>04:30 dokuwiki-170523.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31832950 </span>5月 <span class="number"> 24 </span>04:30 dokuwiki-170524.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833337 </span>5月 <span class="number"> 25 </span>04:30 dokuwiki-170525.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833232 </span>5月 <span class="number"> 26 </span>04:30 dokuwiki-170526.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833446 </span>5月 <span class="number"> 27 </span>04:30 dokuwiki-170527.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31833446 </span>5月 <span class="number"> 28 </span>04:30 dokuwiki-170528.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31835384 </span>5月 <span class="number"> 29 </span>04:30 dokuwiki-170529.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31835403 </span>5月 <span class="number"> 30 </span>04:30 dokuwiki-170530.tar.gz</span><br><span class="line">-rw-r--r--  <span class="number"> 1 </span>sunyongfeng sunyongfeng  <span class="number"> 31835403 </span>5月 <span class="number"> 31 </span>04:30 dokuwiki-170531.tar.gz</span><br></pre></td></tr></table></figure>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><ul>
+<li>cron 的默认工作目录，<code>$HOME</code></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/linux/scp_ssh_without_password.html" rel="next" title="如何让 scp / ssh 不需要密码">
+                <i class="fa fa-chevron-left"></i> 如何让 scp / ssh 不需要密码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201705/programmer/tools/scrt_config.html" rel="prev" title="SecureCRT 配置使用记录">
+                SecureCRT 配置使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前期工作"><span class="nav-number">1.</span> <span class="nav-text">前期工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现备份的脚本"><span class="nav-number">2.</span> <span class="nav-text">实现备份的脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cron-配置"><span class="nav-number">3.</span> <span class="nav-text">cron 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效果"><span class="nav-number">4.</span> <span class="nav-text">效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#misc"><span class="nav-number">5.</span> <span class="nav-text">misc</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/linux/execute_scheduled_commands.html";
+    this.page.identifier = "201704/linux/execute_scheduled_commands.html";
+    this.page.title = 'Linux 定时执行备份任务';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

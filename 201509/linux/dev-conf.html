@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+<meta name="keywords" content="ubuntu,remmina,freerdp,serialport,kermit,samba,tftp,windows,远程登陆,samba 密码错误,拷贝粘贴,失败,串口,lrz,wine,共享,ser2net,comfoolery,linux,启机进入命令行,startup to command line">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux开发环境配置记录">
+<meta property="og:url" content="http://sunyongfeng.com/201509/linux/dev-conf.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.061Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux开发环境配置记录">
+<meta name="twitter:description" content="Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。">
+  <link rel="canonical" href="http://sunyongfeng.com/201509/linux/dev-conf">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux开发环境配置记录 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201509/linux/dev-conf.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux开发环境配置记录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-09-10 21:13:24" itemprop="dateCreated datePublished" datetime="2015-09-10T21:13:24+08:00">2015-09-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201509/linux/dev-conf.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201509/linux/dev-conf.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Linux开发环境常用配置记录，含远程登录、文件共享、串口访问与共享、交叉编译器、终端等内容。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="远程登录windows"><a href="#远程登录windows" class="headerlink" title="远程登录windows"></a>远程登录windows</h2><h3 id="remmina"><a href="#remmina" class="headerlink" title="remmina"></a>remmina</h3><p>安装包：</p>
+<ul>
+<li><code>remmina</code></li>
+<li><code>remmina-plugin-rdp</code></li>
+</ul>
+<p>配置：</p>
+<ol>
+<li>Protocol，选择“RDP - Remote Desktop Protocol”</li>
+<li>Basic标签<ul>
+<li>Server，windows的IP</li>
+<li>User name</li>
+<li>Password</li>
+</ul>
+</li>
+<li>Advanced标签<ul>
+<li>Security，选择“Negotiate”</li>
+</ul>
+</li>
+<li>SSH标签<ul>
+<li>去掉Enable SSH tunnel</li>
+</ul>
+</li>
+</ol>
+<a id="more"></a>
+<h3 id="freerdp"><a href="#freerdp" class="headerlink" title="freerdp"></a>freerdp</h3><p>本人倾向使用freerdp，简单易用。</p>
+<p>安装包：<code>freerdp</code>。<br>命令：（将username / password / 1.1.1.1替换成自己的内容）<br><code>xfreerdp -u username -p &quot;password&quot; -g 1024x768 -x l --plugin cliprdr --plugin rdpsnd 1.1.1.1</code></p>
+<p>因为版本不同，可能命令参数不一样：<br><code>xfreerdp --sec rdp -u username -p &quot;password&quot; -g 1440x790 -x l --plugin cliprdr --plugin rdpsnd 1.1.1.1</code></p>
+<h4 id="跨系统拷贝粘贴失败问题"><a href="#跨系统拷贝粘贴失败问题" class="headerlink" title="跨系统拷贝粘贴失败问题"></a>跨系统拷贝粘贴失败问题</h4><p>注意，windows 7有bug，导致clipboard有问题。即windows与Linux的copy、paste无法共用。解决方法见<a href="https://social.technet.microsoft.com/Forums/windows/zh-CN/5bbc11e8-ca2d-41ac-b640-d66ce971f58f/copy-paste-clipboard-issues-not-working" target="_blank" rel="noopener">链接</a>，其中mike 1504的做法，通过任务管理器杀掉rdpclip.exe再重启rdpclip.exe进程规避本问题。</p>
+<blockquote>
+<p>This is an old problem.  It has been around since pre2004, and microsoft is well aware of it.  The cause is tied to MS Office as well as the OS.  It usually occurs during Remote desktop sessions, and the problem is on the remote machine.  The best solution I have found is to pull up task man, end the process rdpclip.exe, and then restart it by first changing focus from task manager to another program and back to task manager, choose file&gt;new task (run) and then typing in rdpclip.exe and hit enter.  The remote clip service will restart, and usually the copy you wanted to paste immediately becomes available.<br>If you fail to change focus from Task Manager to another program and back you may find the remote session locks up.  If so, don’t panic, simply end the remote session and begin a new one.</p>
+<p>In case you don’t know how to access task manager on the remote machine (CTRL ALT DELETE is always to the local machine), simply right click on the task bar and choose it from the context menu.<br>I would have thought by win7 this would have been fixed, but I am running Win7 enterprise trial right now and having the problem there.</p>
+</blockquote>
+<h3 id="ssh远程登录Linux"><a href="#ssh远程登录Linux" class="headerlink" title="ssh远程登录Linux"></a>ssh远程登录Linux</h3><p>安装包：<code>openssh-server</code><br>客户端登录：<code>ssh username@hostIP</code></p>
+<h2 id="串口"><a href="#串口" class="headerlink" title="串口"></a>串口</h2><h3 id="PAC-Manager"><a href="#PAC-Manager" class="headerlink" title="PAC Manager"></a>PAC Manager</h3><p>安装包：</p>
+<ul>
+<li>PAC Manager，不在Ubuntu仓库中，Sourceforge<a href="http://sourceforge.net/projects/pacmanager/" target="_blank" rel="noopener">链接</a>。</li>
+<li><code>cu</code></li>
+</ul>
+<p>需要把/dev/ttyUSB0的用户切换成cu的uucp才能被cu使用。<br>使用cu时需要用sudo<br>还没有明白remote-tty怎么用。</p>
+<h3 id="kermit"><a href="#kermit" class="headerlink" title="kermit"></a>kermit</h3><p>安装包：</p>
+<ul>
+<li><code>ckermit</code></li>
+<li><code>lrzsz</code>，用于xmodem传输</li>
+</ul>
+<p>不改权限的话，只有用超级用户才能正常用kermit访问串口。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo kermit</span><br><span class="line">set line /dev/ttyUSB0</span><br><span class="line">set speed 115200</span><br><span class="line">set carrier-watch off</span><br><span class="line">set handshake none</span><br><span class="line">set flow-control none</span><br><span class="line">robust </span><br><span class="line"></span><br><span class="line">set receive packet-length 9024</span><br><span class="line">set send packekt-length 9024</span><br><span class="line"></span><br><span class="line">set protocol xmodem</span><br></pre></td></tr></table></figure></p>
+<p>在ckermit命令提示符下：</p>
+<ul>
+<li>connect，连接串口；</li>
+<li>?，查看所有命令，前面的配置命令在此都可以看到；</li>
+<li>send /path/to/file，传输文件，支持相对路径；</li>
+<li>在串口控制台下，通过ctrl + \，再敲c，返回ckermit控制台。</li>
+</ul>
+<h3 id="Ser2net"><a href="#Ser2net" class="headerlink" title="Ser2net"></a>Ser2net</h3><p>共享串口（SerialPort），提供telnet服务。</p>
+<p>配置文件<code>/etc/ser2net.conf</code>，类似下面的配置依葫芦画瓢就可以了。</p>
+<ul>
+<li>2001，端口号</li>
+<li>telnet，用telnet访问串口</li>
+<li>/dev/ttyUSB1，表示实际串口</li>
+<li>9600，波特率</li>
+<li>8DATABITS NONE 1STOPBIT，常见的8N1</li>
+<li>600，port timeout，如果在超时时间间隔内没有对串口进行任何操作，ser2net会自动退出。</li>
+</ul>
+<p>可以将所有的波特率的配置都添加进去，注意使用不同的端口号。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2001</span><span class="symbol">:telnet</span><span class="symbol">:</span><span class="number">600</span><span class="symbol">:/dev/ttyUSB1</span><span class="symbol">:</span><span class="number">9600</span> <span class="number">8</span>DATABITS NONE <span class="number">1</span>STOPBIT -XONXOFF -RTSCTS banner </span><br><span class="line"><span class="number">3001</span><span class="symbol">:telnet</span><span class="symbol">:</span><span class="number">600</span><span class="symbol">:/dev/ttyUSB1</span><span class="symbol">:</span><span class="number">115200</span> <span class="number">8</span>DATABITS NONE <span class="number">1</span>STOPBIT -XONXOFF -RTSCTS banner</span><br></pre></td></tr></table></figure>
+<p>Windows下，可使用<a href="https://github.com/sunnogo/comfoolery" target="_blank" rel="noopener"><code>Comfoolery</code></a>共享串口，功能更加强大。</p>
+<h3 id="wine连接不上串口"><a href="#wine连接不上串口" class="headerlink" title="wine连接不上串口"></a>wine连接不上串口</h3><p>来源<a href="http://goodgreyhound.com/usb-serial-port-converter-for-wine/" target="_blank" rel="noopener">链接</a>。<br>步骤：</p>
+<ul>
+<li>映射/dev/ttyUSB0成windows中的概念com1</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s <span class="regexp">/dev/</span>ttyUSB0 ~<span class="regexp">/.wine/</span>dosdevices<span class="regexp">/com1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看/dev/ttyUSB0的用户组，如下，用户组为dialout</li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ls</span> -l <span class="string">/dev/ttyUSB0</span></span><br><span class="line">crw-rw<span class="params">---T</span> 1 root dialout 4, 6 Nov 18 20<span class="function">:34</span> ttyUSB0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将当前用户加入用户组dialout</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/group</span><br><span class="line"></span><br><span class="line">修改</span><br><span class="line">dialout:x:20:</span><br><span class="line">为</span><br><span class="line">dialout:x:20:your_user_name</span><br></pre></td></tr></table></figure>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><h3 id="samba"><a href="#samba" class="headerlink" title="samba"></a>samba</h3><p>安装包：<code>samba</code></p>
+<p>配置：</p>
+<ul>
+<li>修改配置文件<code>/etc/samba/smb.conf</code>，确认要共享的目录。<code>sudo service samba restart</code>生效。配置样例如下。</li>
+<li>创建samba用户：<code>sudo smbpasswd -a user_name</code>，user_name填成自己想要的名称。</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[linuxMint]</span><br><span class="line">    comment = linux</span><br><span class="line">    path = /home/sunyongfeng/</span><br><span class="line">    writeable = <span class="literal">yes</span></span><br><span class="line">    valid<span class="built_in"> users </span>= sunyongfeng</span><br></pre></td></tr></table></figure>
+<p>其中，linuxMint是共享目录显示给使用者的名称。path是实际共享的目录，valid users是合法的用户。</p>
+<h4 id="windows-7-如何清除自动登录的凭据"><a href="#windows-7-如何清除自动登录的凭据" class="headerlink" title="windows 7 如何清除自动登录的凭据"></a>windows 7 如何清除自动登录的凭据</h4><p><code>控制面板</code> -&gt; <code>用户账户</code> -&gt; <code>管理您的凭据</code>，然后单击要清除的那个凭据，点击<code>从保管库中删除</code>，重启生效。</p>
+<p>解决Ubuntu用户名变动后，无法从win7 登录 samba。</p>
+<h3 id="Linux-访问-Windows-共享目录"><a href="#Linux-访问-Windows-共享目录" class="headerlink" title="Linux 访问 Windows 共享目录"></a>Linux 访问 Windows 共享目录</h3><ol>
+<li>在 windows 设置好共享目录；</li>
+<li>使用 <code>smbclient</code> 访问共享目录（可测试共享目录是否可用）： <code>smbclient //IP/share_dir -U your_username</code> ；</li>
+<li>挂载共享目录到 linux： <code>sudo mount -t cifs -o username=your_username,password=your_passwd //IP/share_dir /mnt</code></li>
+<li>亦可直接在文件管理器中直接输入<code>smb://IP</code>，按提示输入用户名密码，即可从 Linux 文件管理器中直接查看 windows 的共享目录。</li>
+</ol>
+<ul>
+<li><code>smbclient</code> 访问 log：</li>
+</ul>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@sunnogo:~$ smbclient //IP/share_dir -U your_name</span><br><span class="line">Enter oa's password:</span><br><span class="line">Domain=[sunnogo] OS=[Windows<span class="number"> 7 </span>Ultimate<span class="number"> 7601 </span>Service Pack 1] Server=[Windows<span class="number"> 7 </span>Ultimate 6.1]</span><br><span class="line">smb: \&gt; ls</span><br><span class="line">  .                                   D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>19:24:05 2016</span><br><span class="line">  ..                                  D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>19:24:05 2016</span><br><span class="line">  asic                                D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>18:58:41 2016</span><br><span class="line">  linux                               D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>18:58:43 2016</span><br><span class="line">  python                              D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>18:59:04 2016</span><br><span class="line">  工具                              D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>19:06:10 2016</span><br><span class="line">  项目                              D       <span class="number"> 0 </span> Thu Mar<span class="number"> 10 </span>20:08:25 2016</span><br><span class="line"></span><br><span class="line">               <span class="number"> 40960 </span>blocks of size 4194304.<span class="number"> 33262 </span>blocks available</span><br><span class="line">smb: \&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>mount</code>挂载 log：<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@sunnogo:~$ sudo mount -t cifs -o username=your_username,password=your_passwd //IP/share_dir /mnt</span><br><span class="line">sunyongfeng@sunnogo:~$ ls -al /mnt/</span><br><span class="line">总用量 3244</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>root root   <span class="number"> 4096 </span> 3月<span class="number"> 10 </span>19:24 .</span><br><span class="line">drwxr-xr-x<span class="number"> 3 </span>root root   <span class="number"> 4096 </span> 3月<span class="number"> 11 </span>09:35 ..</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>root root      <span class="number"> 0 </span> 3月<span class="number"> 10 </span>18:58 linux</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>root root      <span class="number"> 0 </span> 3月<span class="number"> 10 </span>18:59 python</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>root root      <span class="number"> 0 </span> 3月<span class="number"> 10 </span>19:06 工具</span><br><span class="line">drwxr-xr-x<span class="number"> 2 </span>root root      <span class="number"> 0 </span> 3月<span class="number"> 10 </span>20:08 项目</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="tftp"><a href="#tftp" class="headerlink" title="tftp"></a>tftp</h3><p>安装包：<code>tftpd-hpa</code></p>
+<p>配置：</p>
+<ul>
+<li>修改配置文件<code>/etc/default/tftpd-hpa</code>，样例如下。</li>
+<li>需要<code>chmod 777 /home/sunyongfeng/tftpboot</code>，否则可能出现权限问题，<code>TFTP error: &#39;Permission denied&#39; (0)</code>。tftpboot为tftp共享的主目录。</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/default/tftpd-hpa  </span></span><br><span class="line"></span><br><span class="line"><span class="attr">TFTP_USERNAME</span>=<span class="string">"tftp"</span></span><br><span class="line"><span class="comment">#TFTP_DIRECTORY="/var/lib/tftpboot"</span></span><br><span class="line"><span class="attr">TFTP_DIRECTORY</span>=<span class="string">"/home/sunyongfeng/tftpboot"</span></span><br><span class="line"><span class="attr">TFTP_ADDRESS</span>=<span class="string">"[::]:69"</span></span><br><span class="line"><span class="comment">#TFTP_OPTIONS="--secure"                                                                            </span></span><br><span class="line"><span class="attr">TFTP_OPTIONS</span>=<span class="string">"-l -c -s"</span></span><br></pre></td></tr></table></figure>
+<p><strong>异常</strong>：</p>
+<ul>
+<li>如果一直timeout，可能是网卡出问题了，<code>sudo service networking restart</code>，或者重启电脑。</li>
+<li>有时不清楚为何启机之后，tftpd-hpa在，但是tftp无法下载。<code>sudo service tftpd-hpa restart</code>可解决此问题。没有看系统log细究原因。</li>
+</ul>
+<h3 id="atftpd"><a href="#atftpd" class="headerlink" title="atftpd"></a>atftpd</h3><p>另一款tftp服务器。</p>
+<p>安装包：<code>atftpd</code><br>配置：</p>
+<ul>
+<li>修改<code>/etc/default/atftpd</code>，样例如下。</li>
+<li>把<code>/etc/inet.conf</code>中的tftp注释掉，不然会出现“atftpd: cannot bind port: 69/udp”。</li>
+</ul>
+<p><strong>限制</strong>：最大文件有限制，32M。</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#/etc/default/atftpd</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">USE_INETD=false</span>    </span><br><span class="line"><span class="comment">OPTIONS="</span><span class="literal">-</span><span class="literal">-</span><span class="comment">tftpd</span><span class="literal">-</span><span class="comment">timeout</span> <span class="comment">300</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">retry</span><span class="literal">-</span><span class="comment">timeout</span> <span class="comment">5</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">mcast</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">1758</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">mcast</span><span class="literal">-</span><span class="comment">addr</span> <span class="comment">239</span><span class="string">.</span><span class="comment">239</span><span class="string">.</span><span class="comment">239</span><span class="string">.</span><span class="comment">0</span><span class="literal">-</span><span class="comment">255</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">mcast</span><span class="literal">-</span><span class="comment">ttl</span> <span class="comment">1</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">maxthread</span> <span class="comment">100</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">verbose=7</span> <span class="comment">/home/sunyongfeng/tftpboot"</span></span><br></pre></td></tr></table></figure>
+<h2 id="安装linaro-gcc交叉编译器"><a href="#安装linaro-gcc交叉编译器" class="headerlink" title="安装linaro gcc交叉编译器"></a>安装linaro gcc交叉编译器</h2><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo<span class="built_in"> add-apt-repository </span>ppa:linaro-maintainers/toolchain</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install gcc-arm-linux-gnueabi</span><br></pre></td></tr></table></figure>
+<h2 id="终端（Terminal）"><a href="#终端（Terminal）" class="headerlink" title="终端（Terminal）"></a>终端（Terminal）</h2><h3 id="guake"><a href="#guake" class="headerlink" title="guake"></a>guake</h3><h3 id="fbterm"><a href="#fbterm" class="headerlink" title="fbterm"></a>fbterm</h3><h3 id="screen"><a href="#screen" class="headerlink" title="screen"></a>screen</h3><ul>
+<li>screen -S sessionName，为 screen 会话取名字</li>
+<li>screen -list，查看当前有哪些会话</li>
+<li>screen -r sessionName，Reattach 到 sessionName 会话</li>
+<li>ctrl + a + d，detach 当前会话</li>
+</ul>
+<h3 id="script"><a href="#script" class="headerlink" title="script"></a>script</h3><h2 id="启机进入命令行"><a href="#启机进入命令行" class="headerlink" title="启机进入命令行"></a>启机进入命令行</h2><blockquote>
+<p><code>/etc/default/grub</code>, change this line<br><code>RUB_CMDLINE_LINUX_DEFAULT=&quot;splash quiet&quot;</code> to<br><code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;text&quot;</code><br>Run <code>sudo update-grub</code> when done. This is easily reversed too if you need to change back.</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/远程登录/" rel="tag"># 远程登录</a>
+          
+            <a href="/tags/串口/" rel="tag"># 串口</a>
+          
+            <a href="/tags/文件共享/" rel="tag"># 文件共享</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201509/linux/personal-faq.html" rel="next" title="Linux使用记录">
+                <i class="fa fa-chevron-left"></i> Linux使用记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201509/networks/Scapy.html" rel="prev" title="Scapy简述">
+                Scapy简述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#远程登录windows"><span class="nav-number">1.</span> <span class="nav-text">远程登录windows</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#remmina"><span class="nav-number">1.1.</span> <span class="nav-text">remmina</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#freerdp"><span class="nav-number">1.2.</span> <span class="nav-text">freerdp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#跨系统拷贝粘贴失败问题"><span class="nav-number">1.2.1.</span> <span class="nav-text">跨系统拷贝粘贴失败问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh远程登录Linux"><span class="nav-number">1.3.</span> <span class="nav-text">ssh远程登录Linux</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#串口"><span class="nav-number">2.</span> <span class="nav-text">串口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PAC-Manager"><span class="nav-number">2.1.</span> <span class="nav-text">PAC Manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kermit"><span class="nav-number">2.2.</span> <span class="nav-text">kermit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ser2net"><span class="nav-number">2.3.</span> <span class="nav-text">Ser2net</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wine连接不上串口"><span class="nav-number">2.4.</span> <span class="nav-text">wine连接不上串口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件共享"><span class="nav-number">3.</span> <span class="nav-text">文件共享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#samba"><span class="nav-number">3.1.</span> <span class="nav-text">samba</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#windows-7-如何清除自动登录的凭据"><span class="nav-number">3.1.1.</span> <span class="nav-text">windows 7 如何清除自动登录的凭据</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-访问-Windows-共享目录"><span class="nav-number">3.2.</span> <span class="nav-text">Linux 访问 Windows 共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tftp"><span class="nav-number">3.3.</span> <span class="nav-text">tftp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#atftpd"><span class="nav-number">3.4.</span> <span class="nav-text">atftpd</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装linaro-gcc交叉编译器"><span class="nav-number">4.</span> <span class="nav-text">安装linaro gcc交叉编译器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#终端（Terminal）"><span class="nav-number">5.</span> <span class="nav-text">终端（Terminal）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#guake"><span class="nav-number">5.1.</span> <span class="nav-text">guake</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fbterm"><span class="nav-number">5.2.</span> <span class="nav-text">fbterm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#screen"><span class="nav-number">5.3.</span> <span class="nav-text">screen</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#script"><span class="nav-number">5.4.</span> <span class="nav-text">script</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启机进入命令行"><span class="nav-number">6.</span> <span class="nav-text">启机进入命令行</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201509/linux/dev-conf.html";
+    this.page.identifier = "201509/linux/dev-conf.html";
+    this.page.title = 'Linux开发环境配置记录';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

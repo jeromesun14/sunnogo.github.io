@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Linux使用记录 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+<meta name="keywords" content="ubuntu,apt,网络配置,中文支持,fcitx,grub,Linux,静态IP配置,DNS配置,引导修复,大写提示,禁用触摸板,root密码,log,默认密码,添加用户,sudo 用户,network configuration,强制使用IPv4,配置源,中文支持,输入法,引导失败,ssh,慢">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux使用记录">
+<meta property="og:url" content="http://yoursite.com/2015/09/02/linux/personal-faq/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux使用记录">
+<meta name="twitter:description" content="Linux装机后的常用配置、软件说明，及使用问题记录。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/personal-faq" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/09/02/linux/personal-faq/" class="article-date">
+  <time datetime="2015-09-02T12:03:22.000Z" itemprop="datePublished">2015-09-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux使用记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="善用-var-log"><a href="#善用-var-log" class="headerlink" title="善用/var/log"></a>善用/var/log</h2><p>该目录存放系统日志，很多异常，比如进不了GUI、服务器连不上等问题，都可通过此目录内的log排查。</p>
+<p>比如samba连不上，可通过<code>cat /var/log/auth.log | grep samba</code>查看samba失败的原因。</p>
+<h2 id="服务重启"><a href="#服务重启" class="headerlink" title="服务重启"></a>服务重启</h2><p>很多服务如samba、tftp如果配置文件改了之后，需要通过<code>sudo service smbd/tftp restart</code>来重启服务。</p>
+<a id="more"></a>
+<h2 id="硬件相关"><a href="#硬件相关" class="headerlink" title="硬件相关"></a>硬件相关</h2><h3 id="网卡相关"><a href="#网卡相关" class="headerlink" title="网卡相关"></a>网卡相关</h3><p>以Ubuntu server 14.04为例。</p>
+<h4 id="没有-ifconfig-命令"><a href="#没有-ifconfig-命令" class="headerlink" title="没有 ifconfig 命令"></a>没有 ifconfig 命令</h4><p><code>sudo apt-get install net-tools</code></p>
+<h4 id="静态IP配置"><a href="#静态IP配置" class="headerlink" title="静态IP配置"></a>静态IP配置</h4><p>配置文件：<code>/etc/network/interfaces</code>，如eth0的配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sunnogo@sunyongfeng:~/Downloads$ cat /etc/network/interfaces</span><br><span class="line"># This file describes the network interfaces available on your system</span><br><span class="line"># and how to activate them. For more information, see interfaces(5).</span><br><span class="line"></span><br><span class="line"># The loopback network interface</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line"># eth0, Realtek Fast Ethernet NIC</span><br><span class="line">auto eth0</span><br><span class="line">iface eth0 inet static </span><br><span class="line">address 192.168.204.148</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.204.1</span><br></pre></td></tr></table></figure>
+<p>以上配置相当于命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ifconfig eth0 192.168.204.148 netmask 255.255.255.0</span><br><span class="line">route add default gw 192.168.204.1</span><br></pre></td></tr></table></figure></p>
+<h4 id="DNS配置"><a href="#DNS配置" class="headerlink" title="DNS配置"></a>DNS配置</h4><p>配置文件：<code>/etc/resolvconf/resolv.conf.d/base</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sunnogo@sunyongfeng:~/Downloads$ cat /etc/resolvconf/resolv.conf.d/base </span><br><span class="line">nameserver 8.8.8.8</span><br><span class="line">nameserver 114.114.114.114</span><br></pre></td></tr></table></figure>
+<h4 id="禁用IPv6"><a href="#禁用IPv6" class="headerlink" title="禁用IPv6"></a>禁用IPv6</h4><p>禁用的原因：ubuntu源默认使用IPv6，详见<a href="http://linux.cn/article-3373-1.html" target="_blank" rel="noopener">链接</a>。</p>
+<p>修订文件<code>/etc/sysctl.conf</code>，在该文件最后加上：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># IPv6 disabled</span><br><span class="line">net.ipv6.conf.all.disable_ipv6 = 1</span><br><span class="line">net.ipv6.conf.default.disable_ipv6 = 1</span><br><span class="line">net.ipv6.conf.lo.disable_ipv6 = 1</span><br></pre></td></tr></table></figure></p>
+<p>保存关闭，并执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo sysctl -p</span><br></pre></td></tr></table></figure></p>
+<p>即时生效，可通过ifconfig检查。重启有效。</p>
+<h3 id="显示相关"><a href="#显示相关" class="headerlink" title="显示相关"></a>显示相关</h3><h4 id="屏幕分辨率问题"><a href="#屏幕分辨率问题" class="headerlink" title="屏幕分辨率问题"></a>屏幕分辨率问题</h4><p>处理elementary OS时的操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo xrandr --newmode &quot;1440x900&quot; 106.50 1440 1528 1672 1904 900 903 909 934 -hsync +vsync</span><br><span class="line">sudo xrandr --addmode VGA1 1440x900</span><br><span class="line">sudo xrandr --output VGA1 --mode 1440x900</span><br></pre></td></tr></table></figure>
+<h2 id="日常使用"><a href="#日常使用" class="headerlink" title="日常使用"></a>日常使用</h2><h3 id="apt"><a href="#apt" class="headerlink" title="apt"></a>apt</h3><h4 id="配置源"><a href="#配置源" class="headerlink" title="配置源"></a>配置源</h4><ul>
+<li>安装ubuntu的图形工具<code>update-manager</code>，通过<code>Software &amp; Updates</code>，在“Ubuntu Software”标签页，点“Download from:”旁边的复选框，选择<code>http://mirrors.yun-idc.com/ubuntu</code>，这个源在福州的速度不错。</li>
+<li>亦可通过更改<code>/etc/apt/source.list</code>的内容实现源配置。</li>
+<li>debian可以通过<code>apt-spy</code>实现类似功能。</li>
+</ul>
+<h4 id="更新cache"><a href="#更新cache" class="headerlink" title="更新cache"></a>更新cache</h4><p><code>apt-get update</code></p>
+<h4 id="以关键字查找包"><a href="#以关键字查找包" class="headerlink" title="以关键字查找包"></a>以关键字查找包</h4><p><code>apt-cache search your-keyword</code></p>
+<h4 id="强制使用IPv4更新"><a href="#强制使用IPv4更新" class="headerlink" title="强制使用IPv4更新"></a>强制使用IPv4更新</h4><p>默认使用IPv6源更新，不过国内目前还未全力推广IPv6。通过<code>Software &amp; Updates</code>图形界面配置中文源后，无此问题。</p>
+<p>强制使用IPv4更新的方法，说明详见<a href="http://unix.stackexchange.com/questions/9940/convince-apt-get-not-to-use-ipv6-method" target="_blank" rel="noopener">链接</a>。</p>
+<ul>
+<li>使用<code>apt-get install</code>时，加入选项 <code>-o Acquire::ForceIPv4=true</code>。</li>
+<li>添加一个配置文件<code>/etc/apt/apt.conf.d/99force-ipv4</code>，在配置文件中写入<code>Acquire::ForceIPv4 &quot;true&quot;;</code>。</li>
+</ul>
+<h4 id="安装失败"><a href="#安装失败" class="headerlink" title="安装失败"></a>安装失败</h4><p>出现如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@R04220 ~/smoking/ci $ sudo apt-get install npm</span><br><span class="line">[sudo] password for sunyongfeng: </span><br><span class="line">	正在读取软件包列表... 有错误！</span><br><span class="line">	E: Encountered a section with no Package: header</span><br><span class="line">E: Problem with MergeList /var/lib/apt/lists/packages.linuxmint.com_dists_rebecca_import_i18n_Translation-en</span><br><span class="line">	E: 无法解析或打开软件包的列表或是状态文件。</span><br></pre></td></tr></table></figure>
+<p>解决，简单粗暴地删除cache，再更新一下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo rm /var/lib/apt/lists/* -vf</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure></p>
+<h3 id="中文支持"><a href="#中文支持" class="headerlink" title="中文支持"></a>中文支持</h3><h4 id="Ubuntu-server-14-04中文支持"><a href="#Ubuntu-server-14-04中文支持" class="headerlink" title="Ubuntu server 14.04中文支持"></a>Ubuntu server 14.04中文支持</h4><p>默认使用English，之后装gdm，想在英文环境中显示中文。</p>
+<p>安装的包：</p>
+<ul>
+<li>中文支持<br> gnome中文支持包：<ul>
+<li><code>language-pack-zh-han*</code></li>
+<li><code>language-pack-gnome-zh-han*</code></li>
+</ul>
+</li>
+<li>中文字体<ul>
+<li><code>ttf-wqy-microhei</code></li>
+<li><code>ttf-wqy-zenhei</code></li>
+<li><code>ttf-ubuntu-font-family</code>，这个不是中文字体，只是装一下而已。</li>
+<li><code>fonts-arphic-uming</code>，个人很喜欢的一个中文字体，不过其英文显示有点难看。 </li>
+</ul>
+</li>
+</ul>
+<h3 id="输入法"><a href="#输入法" class="headerlink" title="输入法"></a>输入法</h3><p>使用经典的<code>fcitx</code>。</p>
+<h4 id="Ubuntu-server-14-04-fcitx"><a href="#Ubuntu-server-14-04-fcitx" class="headerlink" title="Ubuntu server 14.04 fcitx"></a>Ubuntu server 14.04 fcitx</h4><ul>
+<li>安装的包<ul>
+<li><code>fcitx</code></li>
+<li><code>fcitx-config-gtk2</code>，图形配置工具</li>
+<li><code>fcitx-table-wbpy</code>，五笔拼音输出法</li>
+<li><code>fcitx-module-*</code>，有<code>dbus</code>、<code>kimpanel</code>等</li>
+<li><code>fcitx-frontend-*</code>，在gdm中，不需要装这个。为<code>fbterm</code>准备。</li>
+</ul>
+</li>
+<li>配置<ul>
+<li>卸载ibus，<code>apt-get remove ibus</code>，5M多；原理不明。</li>
+<li>通过<code>fcitx-config-gtk2</code>，点击“Input Method”标签页左下方的“+”号，搜索出WubiPinyin，添加即可。</li>
+</ul>
+</li>
+</ul>
+<h4 id="fcitx旧安装方式记录"><a href="#fcitx旧安装方式记录" class="headerlink" title="fcitx旧安装方式记录"></a>fcitx旧安装方式记录</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install fcitx fcitx-frontend-qt5 fcitx-table-wbpy fcitx-ui-classic fcitx-config-gtk3</span><br><span class="line">sudo apt-get remove ibus</span><br><span class="line">ps -e | grep ibus, kill掉带ibus_daemon的那条进程</span><br><span class="line">sudo apt-get install im-switch</span><br><span class="line">in-switch -s fcitx</span><br></pre></td></tr></table></figure>
+<p>fcitx-table-xxx，这里用的wbpy是五笔拼音，其他输入法如拼音由使用者自己选择。<br>执行：fcitx-autostart可开机自启动打开fcitx。</p>
+<h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>安装的包：（安装完后，默认的中文字体意外地显示得很好<code>AR PL UMing CN</code>和<code>Monospace</code>）</p>
+<ul>
+<li><code>chromium-browser</code></li>
+<li><code>pepperflashplugin-nonfree</code></li>
+</ul>
+<h3 id="文件管理器（File-Manager）"><a href="#文件管理器（File-Manager）" class="headerlink" title="文件管理器（File Manager）"></a>文件管理器（File Manager）</h3><p>注意与窗口管理器（Window Manager）的概念不一样。</p>
+<p>安装包：</p>
+<ul>
+<li>gnome，<code>nautilus</code></li>
+<li>kde，<code>dolphin</code></li>
+</ul>
+<h3 id="文本编辑器"><a href="#文本编辑器" class="headerlink" title="文本编辑器"></a>文本编辑器</h3><p>安装包：</p>
+<ul>
+<li>gnome，<code>gdeit</code></li>
+<li>kde，<code>kate</code></li>
+</ul>
+<h3 id="引导失败"><a href="#引导失败" class="headerlink" title="引导失败"></a>引导失败</h3><p>一般是先装Linux再装Windows出现。解决方法：</p>
+<ul>
+<li>用<code>Docker</code>吧，不用再装Windows了。</li>
+<li>通过Linux USB启动盘进入U盘中的Linux，通过grub一般都能修复，然后替换掉windows的引导，先通过grub引导。<ul>
+<li><code>update-grub</code>或<code>update-grub2</code></li>
+<li><code>grub-install</code></li>
+</ul>
+</li>
+<li>通过<code>EasyBCD</code>配置，重启后进入Linux，然后再进行grub修复。</li>
+</ul>
+<h3 id="键鼠"><a href="#键鼠" class="headerlink" title="键鼠"></a>键鼠</h3><h4 id="提示CapsLock键"><a href="#提示CapsLock键" class="headerlink" title="提示CapsLock键"></a>提示CapsLock键</h4><p>大写提示工具：<code>indicators-keylock</code>，先导入源，再安装。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:tsbarnes/indicator-keylock &amp;&amp; sudo apt-get update</span><br><span class="line">sudo apt-get install indicator-keylock</span><br></pre></td></tr></table></figure>
+<h4 id="禁用触摸板"><a href="#禁用触摸板" class="headerlink" title="禁用触摸板"></a>禁用触摸板</h4><p>Ubuntu配置禁用触摸板<a href="http://wiki.ubuntu.org.cn/%E8%A7%A6%E6%91%B8%E6%9D%BF" target="_blank" rel="noopener">wiki</a>。</p>
+<p>命令：<code>synclient touchpadoff=1</code>。</p>
+<p>可以使用工具<code>GPointingDeviceSettings</code>。</p>
+<h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><h4 id="Add-user-and-add-to-sudoers-group"><a href="#Add-user-and-add-to-sudoers-group" class="headerlink" title="Add user and add to sudoers group"></a>Add user and add to sudoers group</h4><p>From <a href="http://askubuntu.com/questions/7477/how-can-i-add-a-new-user-as-sudoer-using-the-command-line" target="_blank" rel="noopener">How can I add a new user as sudoer using the command line?</a>, ændrük’s answer.<br>From <a href="https://help.ubuntu.com/community/RootSudo#Allowing_other_users_to_run_sudo" target="_blank" rel="noopener">RootSudo#Allowing_other_users_to_run_sudo</a>:</p>
+<blockquote>
+<p>Allowing other users to run sudo</p>
+<p>To add a new user to sudo, open the <strong>Users and Groups</strong> tool from <strong>System-&gt;Administration</strong> menu. First click <strong>Unlock</strong>, then you can select a user from the list and hit <strong>Properties</strong>. Choose the <strong>User Privileges</strong> tab and check <strong>Administer the system</strong>.</p>
+<p>In the terminal (for Precise Pangolin, 12.04), this would be:</p>
+<p><code>sudo adduser &lt;username&gt; sudo</code></p>
+<p>where you replace <username> with the name of the user (without the &lt;&gt;).</username></p>
+<p>In previous version of Ubuntu</p>
+<p><code>sudo adduser &lt;username&gt; admin</code></p>
+<p>would have been appropriate, but the admin group has been deprecated and no longer exists in Ubuntu 12.04.</p>
+</blockquote>
+<h4 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h4><p>命令：</p>
+<ul>
+<li><code>useradd</code>, 如果想类似 adduser 那样默认创建用户 home 目录，命令样例为 <code>useradd -m -d /home/newuser -p yourPaSsWoRd newuser</code>，又如 <code>useradd -G sudo,docker jeromesun -m -s /bin/bash</code></li>
+<li><code>usermod</code></li>
+<li><code>userdel</code></li>
+<li><code>adduser</code>, user adduser can default add a /home/username directory.</li>
+</ul>
+<p>批量创建大量用户：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">GRP=(</span><br><span class="line"><span class="string">"aaa"</span></span><br><span class="line"><span class="string">"bbb"</span></span><br><span class="line"><span class="string">"ccc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$&#123;GRP[@]&#125;</span> ; </span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    short=<span class="variable">$&#123;i:0:2&#125;</span></span><br><span class="line">    pass=<span class="string">"XX.<span class="variable">$&#123;short&#125;</span>.123"</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"add <span class="variable">$i</span> passwd <span class="variable">$&#123;pass&#125;</span>"</span></span><br><span class="line">    <span class="comment"># centos wheel group has sudo permission</span></span><br><span class="line">    useradd -G wheel <span class="variable">$&#123;i&#125;</span> -m -s /bin/bash -p `openssl passwd -1 <span class="variable">$&#123;pass&#125;</span>`</span><br><span class="line">    <span class="comment">#userdel $&#123;i&#125;</span></span><br><span class="line">    <span class="comment">#rm -rf /home/$&#123;i&#125;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h4 id="修改密码"><a href="#修改密码" class="headerlink" title="修改密码"></a>修改密码</h4><p>命令：<code>passwd username</code></p>
+<h5 id="修改root密码"><a href="#修改root密码" class="headerlink" title="修改root密码"></a>修改root密码</h5><p>ubuntu的默认root密码随机，通过<code>sudo passwd root</code>修改</p>
+<h4 id="添加sudo用户"><a href="#添加sudo用户" class="headerlink" title="添加sudo用户"></a>添加sudo用户</h4><p>如果用户不是sudo用户，且使用sudo命令，则会提示“xxx is not in the sudoers file. This incident will be reported”。解决方法：</p>
+<ul>
+<li>拿到root权限，添加文件<code>/etc/sudoers</code>读权限</li>
+<li>修改<code>/etc/sudoers</code>，在<code>User privilege specification</code>下，类似root那样，添加一行<code>usernamexxxx    ALL=(ALL:ALL) ALL</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># User privilege specification</span><br><span class="line">root	ALL=(ALL:ALL) ALL</span><br><span class="line">usernamexxxx	ALL=(ALL:ALL) ALL</span><br></pre></td></tr></table></figure>
+<h4 id="添加-sudo-用户的另一种简易方法"><a href="#添加-sudo-用户的另一种简易方法" class="headerlink" title="添加 sudo 用户的另一种简易方法"></a>添加 sudo 用户的另一种简易方法</h4><p>详见：<a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart" target="_blank" rel="noopener">How To Create a Sudo User on Ubuntu [Quickstart]</a>。</p>
+<ul>
+<li>以 root 用户登陆你的设备</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh root@server_ip_address</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 adduser 命令创建新用户。<br>以下内容请替换 username 为你想创建的用户名。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adduser username</span><br></pre></td></tr></table></figure>
+<p>设置和确认新用户的密码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Set password prompts:</span><br><span class="line">Enter new UNIX password:</span><br><span class="line">Retype new UNIX password:</span><br><span class="line">passwd: password updated successfully</span><br></pre></td></tr></table></figure>
+<p>接下来提示设置用户信息，可以全部不填，直接敲回车键。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">User information prompts:</span><br><span class="line">Changing the user information for username</span><br><span class="line">Enter the new value, or press ENTER for the default</span><br><span class="line">    Full Name []:</span><br><span class="line">    Room Number []:</span><br><span class="line">    Work Phone []:</span><br><span class="line">    Home Phone []:</span><br><span class="line">    Other []:</span><br><span class="line">Is the information correct? [Y/n]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 usermod 命令添加用户到 sudo 组。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -aG sudo username</span><br></pre></td></tr></table></figure>
+<p>Ubuntu 上 sudo 组的成员默认拥有 sudo 权限。</p>
+<ul>
+<li>测试新用户账号的 sudo 权限。<br>使用 su 命令切换到新用户。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - username</span><br></pre></td></tr></table></figure>
+<p>在你的命令前加 sudo 尝试新用户权限：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo command_to_run</span><br></pre></td></tr></table></figure>
+<p>例如，查看 /root 目录的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls -la /root</span><br></pre></td></tr></table></figure>
+<p>如果是本会话中第一次使用 sudo，将系统会提示你输入密码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ sudo ls -al /root</span><br><span class="line">[sudo] password for sunyongfeng: </span><br><span class="line">total 3308</span><br><span class="line">drwx------  4 root root    4096 Nov 28 14:22 .</span><br><span class="line">drwxr-xr-x 22 root root    4096 Nov  4 14:52 ..</span><br><span class="line">-rw-------  1 root root      92 Nov 28 10:01 .bash_history</span><br><span class="line">-rw-r--r--  1 root root    3106 Feb 20  2014 .bashrc</span><br><span class="line">drwx------  2 root root    4096 Nov  4 15:25 .cache</span><br><span class="line">-rw-r--r--  1 root root     140 Feb 20  2014 .profile</span><br><span class="line">-rw-------  1 root root    2024 Nov 28 14:22 .viminfo</span><br></pre></td></tr></table></figure>
+<h3 id="配置字体"><a href="#配置字体" class="headerlink" title="配置字体"></a>配置字体</h3><ul>
+<li>拷贝字体</li>
+<li>配置字体</li>
+<li>刷新字体</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo cp -a msfonts /usr/share/fonts/msfonts</span><br><span class="line">sudo fc-cache -f -v</span><br><span class="line">fc-cache -f -s -v</span><br></pre></td></tr></table></figure>
+<h3 id="ssh"><a href="#ssh" class="headerlink" title="ssh"></a>ssh</h3><h4 id="ssh-远程登陆后很久才提示输入密码"><a href="#ssh-远程登陆后很久才提示输入密码" class="headerlink" title="ssh 远程登陆后很久才提示输入密码"></a>ssh 远程登陆后很久才提示输入密码</h4><p>原因：配置 <code>GSSAPIAuthentication</code> 为 <code>yes</code> 了。默认情况下该配置并未开启，详见 <code>/etc/ssh/sshd_config</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># GSSAPI options</span><br><span class="line">#GSSAPIAuthentication no</span><br><span class="line">#GSSAPICleanupCredentials yes</span><br></pre></td></tr></table></figure>
+<p>详见 <a href="http://jaminzhang.github.io/linux/GSSAPI-related-options-in-ssh-configuration/" target="_blank" rel="noopener">SSH 中的 GSSAPI 相关选项</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/09/02/linux/personal-faq/" data-id="cjz95gt3j00dpw5r9wnrsxc8k" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/apt/">apt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/09/10/linux/dev-conf/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Linux开发环境配置记录
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/07/02/windows/Vmplayer-ubuntu-install-vmtools/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">【解决】Win7虚拟机ubuntu安装vm-tools的问题</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

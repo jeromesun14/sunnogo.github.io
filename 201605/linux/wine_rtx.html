@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Ubuntu 16.04 下 wine rtx 2015，字体正常，截图正常。">
+<meta name="keywords" content="Linux,Ubuntu,16.04,wine,RTX,2015，字体，截图">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 下使用 RTX">
+<meta property="og:url" content="http://sunyongfeng.com/201605/linux/wine_rtx.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="Ubuntu 16.04 下 wine rtx 2015，字体正常，截图正常。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-ecb5c0dfe925f593.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-d468b7346f145b4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-e2b5f52aa789ad4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-2824058a45efc334.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-ab956668a2a322c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-3cbcd477fb304510.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-cca92cdb6b1fdb40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-5b65965e120748be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-7ef1bdc47f9012cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/74971-d53055a7e3c18cf1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.065Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux 下使用 RTX">
+<meta name="twitter:description" content="Ubuntu 16.04 下 wine rtx 2015，字体正常，截图正常。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/74971-ecb5c0dfe925f593.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  <link rel="canonical" href="http://sunyongfeng.com/201605/linux/wine_rtx">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux 下使用 RTX | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201605/linux/wine_rtx.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux 下使用 RTX
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-05-22 12:30:24" itemprop="dateCreated datePublished" datetime="2016-05-22T12:30:24+08:00">2016-05-22</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201605/linux/wine_rtx.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201605/linux/wine_rtx.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">Ubuntu 16.04 下 wine rtx 2015，字体正常，截图正常。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文记录 Ubuntu 16.04 64 位下 wine RTX 的过程。最终验证 wine 后的 RTX 字体 OK 无方块，截图正常，可发送截图、文件。</p>
+<h2 id="什么是-RTX"><a href="#什么是-RTX" class="headerlink" title="什么是 RTX"></a>什么是 RTX</h2><p>简单的，RTX 是 QQ 的企业版，亦有人称之为 BQQ。如果没有听过这个名称，这篇文章亦可做为 Linux 下 Wine 其他 windows 工具的参考。</p>
+<blockquote>
+<p><a href="http://rtx.tencent.com/rtx/index.shtml" target="_blank" rel="noopener">腾讯通 RTX</a>（Real Time eXchange）是腾讯公司推出的企业级即时通信平台。企业员工可以轻松地通过服务器所配置的组织架构查找需要进行通讯的人员，并采用丰富的沟通方式进行实时沟通。文本消息、文件传输、直接语音会话或者视频的形式满足不同办公环境下的沟通需求。</p>
+</blockquote>
+<h2 id="安装最新版-wine"><a href="#安装最新版-wine" class="headerlink" title="安装最新版 wine"></a>安装最新版 wine</h2><p>详见 <a href="https://wiki.ubuntu.org.cn/Wine" target="_blank" rel="noopener">Ubuntu wine wiki</a>。</p>
+<p>ubuntu 官方有自带 wine ，但是推荐用 winehq 官方提供的最新版本 wine ，新版本解决很多以前旧版本的问题。</p>
+<p>PPA地址：<a href="https://launchpad.net/~wine/+archive/ubuntu/wine-builds" target="_blank" rel="noopener">https://launchpad.net/~wine/+archive/ubuntu/wine-builds</a></p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo<span class="built_in"> add-apt-repository </span>ppa:wine/wine-builds</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install wine-devel</span><br></pre></td></tr></table></figure>
+<p>要注意，若 <code>apt-get install wine</code> 安装的是稳定版（版本一般比较旧）；若 <code>apt-get install wine-devel</code> 则安装的是较新的开发版本  ，开发版本经常有不少优化和修正。</p>
+<p>如果愿意安装比 devel 稍微更 devel 的 staging 版本的话，可试试 wine-staging。</p>
+<h2 id="下载最新-winetricks"><a href="#下载最新-winetricks" class="headerlink" title="下载最新 winetricks"></a>下载最新 winetricks</h2><p>最新的 winetricks 解决许多下载失败等问题，直接从 github 上下载。<a href="https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks" target="_blank" rel="noopener">链接</a>。</p>
+<p>winetricks 下载慢或则失败，可按 winetricks 脚本中写的文件名到 google 搜索、寻找其他下载源。若出现下载的程序版本与 winetricks 要求的版本不一致导致 sha 检测不通过，可通过改 winetricks 中的检测值解决。</p>
+<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><p>为防止 32 位、64 位可能出现不兼容，执行命令的时候配置 <code>WINEARCH</code> 为 win32。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">WINEARCH</span>=win32 <span class="attribute">WINEPREFIX</span>=~/.wine winetricks msxml3 gdiplus riched20 riched30 ie6 vcrun6 vcrun2005sp1 allfonts</span><br></pre></td></tr></table></figure>
+<h2 id="安装-rtx2015"><a href="#安装-rtx2015" class="headerlink" title="安装 rtx2015"></a>安装 rtx2015</h2><p><a href="http://rtx.tencent.com/rtx/download/index.shtml" target="_blank" rel="noopener">rtx 官方下载页面</a>。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">WINEARCH</span>=win32 <span class="attribute">WINEPREFIX</span>=~/.wine wine Downloads/rtxclient2015formal.exe</span><br></pre></td></tr></table></figure>
+<p>安装完后，直接可用。字体、截图及发送、文件发送皆正常。不会出现离线后再上线就登不上的问题。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ul>
+<li>为防止字体的方块问题，建议将系统的默认语言调整为汉语。如果默认为英语，则某些地方的汉字会显示成方块；</li>
+<li>不清楚是 WINE 的问题还是 RTX 窗口开太多，RTX 的 CPU 常维持在 20% 左右；</li>
+<li>RTX 可能出现假死，即导致整个 Unity 界面挂住，过一小会儿后才 OK。据说在 Xfce 界面中也会出现此问题。</li>
+<li>RTX 运行久了之后，可能出现系统状态栏的图标点不了。</li>
+<li>RTX 可能在运行过程中出现中文输入法无法调出。本文用的输入法是 fcitx。</li>
+</ul>
+<h2 id="截图"><a href="#截图" class="headerlink" title="截图"></a>截图</h2><ul>
+<li>RTX 界面与菜单</li>
+</ul>
+<p>界面：<br><img src="http://upload-images.jianshu.io/upload_images/74971-ecb5c0dfe925f593.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="界面.png"></p>
+<p>菜单：<br><img src="http://upload-images.jianshu.io/upload_images/74971-d468b7346f145b4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="菜单.png"></p>
+<ul>
+<li>聊天界面</li>
+</ul>
+<p>界面1：<br><img src="http://upload-images.jianshu.io/upload_images/74971-e2b5f52aa789ad4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="界面1.png"></p>
+<p>界面2：（含图片发送）<br><img src="http://upload-images.jianshu.io/upload_images/74971-2824058a45efc334.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="界面2.png"></p>
+<ul>
+<li>消息管理器之会话消息</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-ab956668a2a322c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="消息管理器之会话消息.png"></p>
+<ul>
+<li>消息管理器之多人会话（含图片）</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-3cbcd477fb304510.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="消息管理器之多人会话（含图片）.png"></p>
+<ul>
+<li>消息管理器之文件接收</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-cca92cdb6b1fdb40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="消息管理器之文件接收.png"></p>
+<ul>
+<li>消息管理器之导出会话<br>将会话导出为 RTF 文件，以下为在 word 中打开的 RTF 文件截图。</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-5b65965e120748be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="消息管理器之导出会话.png"></p>
+<ul>
+<li>RTX 设置</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-7ef1bdc47f9012cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RTX 设置.png"></p>
+<ul>
+<li>RTX 退出界面<br>注意，如果系统默认语言不是中文，退出界面将的中文显示为方块。</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/74971-d53055a7e3c18cf1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RTX 退出界面.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/wine/" rel="tag"># wine</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201605/programmer/python/cross_compile.html" rel="next" title="交叉编译 python">
+                <i class="fa fa-chevron-left"></i> 交叉编译 python
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201605/programmer/tools/vimrc.html" rel="prev" title="VIM 配置文件">
+                VIM 配置文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-RTX"><span class="nav-number">1.</span> <span class="nav-text">什么是 RTX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装最新版-wine"><span class="nav-number">2.</span> <span class="nav-text">安装最新版 wine</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载最新-winetricks"><span class="nav-number">3.</span> <span class="nav-text">下载最新 winetricks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装依赖"><span class="nav-number">4.</span> <span class="nav-text">安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-rtx2015"><span class="nav-number">5.</span> <span class="nav-text">安装 rtx2015</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">6.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#截图"><span class="nav-number">7.</span> <span class="nav-text">截图</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201605/linux/wine_rtx.html";
+    this.page.identifier = "201605/linux/wine_rtx.html";
+    this.page.title = 'Linux 下使用 RTX';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

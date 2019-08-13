@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>shadowsocks 记录 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="到外面的世界看看。">
+<meta name="keywords" content="shadowsocks,linux,chrome,switchyOmega,proxychains">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shadowsocks 记录">
+<meta property="og:url" content="http://yoursite.com/2016/02/28/tools/shadowsocks/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="到外面的世界看看。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.095Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="shadowsocks 记录">
+<meta name="twitter:description" content="到外面的世界看看。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-tools/shadowsocks" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/28/tools/shadowsocks/" class="article-date">
+  <time datetime="2016-02-28T12:48:18.000Z" itemprop="datePublished">2016-02-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/tools-administrator/">tools, administrator</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      shadowsocks 记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="shadowsocks-in-linux"><a href="#shadowsocks-in-linux" class="headerlink" title="shadowsocks in linux"></a>shadowsocks in linux</h2><ul>
+<li>install, <code>pip install shadowsocks</code></li>
+<li>start shadowsocks, <code>sslocal -d start -p server_port -k your_password -s server_url(or server_ip) -m aes-256-cfb -l local_port</code></li>
+</ul>
+<h2 id="proxychains"><a href="#proxychains" class="headerlink" title="proxychains"></a>proxychains</h2><ul>
+<li>install, <code>sudo apt-get install proxychains</code></li>
+<li>configure, <code>sudo vi /etc/proxychains.conf</code>, add line <code>socks5  127.0.0.1 1080</code> to tail</li>
+<li>use proxy for app, <code>sudo proxychains your_app</code></li>
+</ul>
+<p>chromium 无法使用 proxychains，有个 <a href="https://github.com/rofl0r/proxychains-ng/issues/45" target="_blank" rel="noopener">issue</a>。</p>
+<h2 id="switchyOmega"><a href="#switchyOmega" class="headerlink" title="switchyOmega"></a>switchyOmega</h2><p>可在 Profiles 下的 auto switch 以 rule list 的形式加入自动切换的列表，在 <code>Rule List Config</code> 下填入 rule list 的链接即可。<br>这是一个 <a href="https://github.com/calfzhou/autoproxy-gfwlist" target="_blank" rel="noopener">gfwlist</a>。</p>
+<h2 id="socks5-转-http-代理"><a href="#socks5-转-http-代理" class="headerlink" title="socks5 转 http 代理"></a>socks5 转 http 代理</h2><p>详见 <a href="http://xuhehuan.com/2119.html。" target="_blank" rel="noopener">http://xuhehuan.com/2119.html。</a></p>
+<p>使用 <code>polipo</code>，用 <code>apt-get</code> 可安装，配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># This file only needs to list configuration variables that deviate</span><br><span class="line"># from the default values.  See /usr/share/doc/polipo/examples/config.sample</span><br><span class="line"># and &quot;polipo -v&quot; for variables you can tweak and further information.</span><br><span class="line">logSyslog = false</span><br><span class="line">logFile = &quot;/var/log/polipo/polipo.log&quot;</span><br><span class="line"></span><br><span class="line">socksParentProxy = &quot;127.0.0.1:1080&quot;</span><br><span class="line">socksProxyType = socks5</span><br><span class="line"></span><br><span class="line">chunkHighMark = 50331648</span><br><span class="line">objectHighMark = 16384</span><br><span class="line"></span><br><span class="line">serverMaxSlots = 64</span><br><span class="line">serverSlots = 16</span><br><span class="line">serverSlots1 = 32</span><br><span class="line"></span><br><span class="line">proxyAddress = &quot;0.0.0.0&quot;</span><br><span class="line">proxyPort = 8123</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>重启 polipo，<code>sudo service polipo restart</code></li>
+<li>验证 sock5 转 http 是否 ok：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy=&quot;http://127.0.0.1:8123/&quot;</span><br><span class="line">curl www.google.com</span><br></pre></td></tr></table></figure>
+<p>ok 的话返回网页抓取结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">~$ curl www.google.com.hk                    </span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;</span><br><span class="line">&lt;html&gt;&lt;head&gt;</span><br><span class="line">&lt;title&gt;Proxy error: 502 Read from server failed: Connection reset by peer.&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">&lt;h1&gt;502 Read from server failed: Connection reset by peer&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;The following error occurred while trying to access &lt;strong&gt;http://www.google.com.hk/&lt;/strong&gt;:&lt;br&gt;&lt;br&gt;</span><br><span class="line">&lt;strong&gt;502 Read from server failed: Connection reset by peer&lt;/strong&gt;&lt;/p&gt;</span><br><span class="line">&lt;hr&gt;Generated Tue, 08 Nov 2016 15:53:18 CST by Polipo on &lt;em&gt;openswitch-OptiPlex-380:10080&lt;/em&gt;.</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ curl www.google.com.hk</span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;</span><br><span class="line">&lt;html&gt;&lt;head&gt;</span><br><span class="line">&lt;title&gt;Proxy error: 502 Read from server failed: Connection reset by peer.&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">&lt;h1&gt;502 Read from server failed: Connection reset by peer&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;The following error occurred while trying to access &lt;strong&gt;http://www.google.com.hk/&lt;/strong&gt;:&lt;br&gt;&lt;br&gt;</span><br><span class="line">&lt;strong&gt;502 Read from server failed: Connection reset by peer&lt;/strong&gt;&lt;/p&gt;</span><br><span class="line">&lt;hr&gt;Generated Tue, 08 Nov 2016 15:55:03 CST by Polipo on &lt;em&gt;openswitch-OptiPlex-380:10080&lt;/em&gt;.</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ curl www.google.com.hk</span><br><span class="line">&lt;!doctype html&gt;&lt;html itemscope=&quot;&quot; itemtype=&quot;http://schema.org/WebPage&quot; lang=&quot;zh-HK&quot;&gt;&lt;head&gt;&lt;meta content=&quot;text/html; charset=UTF-8&quot; http-equiv=&quot;Content-Type&quot;&gt;&lt;meta content=&quot;/images/branding/googleg/1x/googleg_standard_color_128dp.png&quot; itemprop=&quot;image&quot;&gt;&lt;title&gt;Google&lt;/title&gt;&lt;script&gt;(function()&#123;window.google=&#123;kEI:&apos;PoUhWJLcI4nW0gLCrrCoCQ&apos;,kEXPI:&apos;750722,1351828,1351903,1352148,3700062,3700245,4026241,4028875,4029815,4031109,4032677,4036527,4038012,4039268,4043491,4045841,4048347,4065786,4067860,4068550,4069839,4069841,4071842,4072289,4072364,4072602,4072705,4072775,4073405,4073415,4073486,4073498,4073959,4074684,4076095,4076542,4076931,4076999,4078241,4078407,4078430,4078438,4078454,4078456,4078607,4079105,4079553,4079624,4079870,4080115,4080161,4080165,4080815,4081037,4081038,4081128,4081263,4081278,4081497,4082112,4082219,4082290,4082310,4082441,4082618,4082638,4082778,4083064,4083115,4083281,4083353,4084066,4084258,4084259,4084277,4084325,4084343,4084366,4084402,4084676,4084691,4084956,4085014,4085057,4085066,4085181,4085628,4085917,8300272,8502184,8503585,8504846,8504935,8505150,8505152,8505259,8506255,8506340,8506477,8506615,8507098,8507361,8507381,8507842,8507846,8508176,8508241,8508317,10200083&apos;,authuser:0,kscs:&apos;c9c918f0_24&apos;&#125;;google.kHL=&apos;zh-HK&apos;;&#125;)();(function()&#123;google.lc=[];google.li=0;google.getEI=function(a)&#123;for(var b;a&amp;&amp;(!a.getAttribute||!(b=a.getAttribute(&quot;eid&quot;)));)a=a.parentNode;return b||google.kEI&#125;;google.getLEI=function(a)&#123;for(var b=null;a&amp;&amp;(!a.getAttribute||!(b=a.getAttribute(&quot;leid&quot;)));)a=a.parentNode;return b&#125;;google.https=function()&#123;return&quot;https:&quot;==window.location.protocol&#125;;google.ml=function()&#123;return null&#125;;google.wl=function(a,b)&#123;try&#123;google.ml(Error(a),!1,b)&#125;catch(c)&#123;&#125;&#125;;google.time=function()&#123;return(new Date).getTime()&#125;;google.log=function(a,b,c,e,g)&#123;a=google.logUrl(a,b,c,e,g);if(&quot;&quot;!=a)&#123;b=new Image;var d=google.lc,f=google.li;d[f]=b;b.onerror=b.onload=b.onabort=function()&#123;delete d[f]&#125;;window.google&amp;&amp;window.google.vel&amp;&amp;window.google.vel.lu&amp;&amp;window.google.vel.lu(a);b.src=a;google.li=f+1&#125;&#125;;google.logUrl=function(a,b,c,e,g)&#123;var d=&quot;&quot;,f=google.ls||&quot;&quot;;if(!c&amp;&amp;-1==b.search(&quot;&amp;ei=&quot;))&#123;var h=google.getEI(e),d=&quot;&amp;ei=&quot;+h;-1==b.search(&quot;&amp;lei=&quot;)&amp;&amp;((e=google.getLEI(e))?d+=&quot;&amp;lei=&quot;+e:h!=google.kEI&amp;&amp;(d+=&quot;&amp;lei=&quot;+google.kEI))&#125;a=c||&quot;/&quot;+(g||&quot;gen_204&quot;)+&quot;?atyp=i&amp;ct=&quot;+a+&quot;&amp;cad=&quot;+b+d+f+&quot;&amp;zx=&quot;+google.time();/^http:/i.test(a)&amp;&amp;google.https()&amp;&amp;(google.ml(Error(&quot;a&quot;),!1,&#123;src:a,glmm:1&#125;),a=&quot;&quot;);return a&#125;;google.y=&#123;&#125;;google.x=function(a,b)&#123;google.y[a.id]=[a,b];return!1&#125;;google.lq=[];google.load=function(a,b,c)&#123;google.lq.push([[a],b,c])&#125;;google.loadAll=function(a,b)&#123;google.lq.push([a,b])&#125;;&#125;)();var a=window.location,b=a.href.indexOf(&quot;#&quot;);if(0&lt;=b)&#123;var c=a.href.substring(b+1);/(^|&amp;)q=/.test(c)&amp;&amp;-1==c.indexOf(&quot;#&quot;)&amp;&amp;a.replace(&quot;/search?&quot;+c.replace(/(^|&amp;)fp=[^&amp;]*/g,&quot;&quot;)+&quot;&amp;cad=h&quot;)&#125;;&lt;/script&gt;&lt;style&gt;#gbar,#guser&#123;font-size:13px;padding-top:1px !important;&#125;#gbar&#123;height:22px&#125;#guser&#123;padding-bottom:7px !important;text-align:right&#125;.gbh,.gbd&#123;border-top:1px solid #c9d7f1;font-size:1px&#125;.gbh&#123;height:0;position:absolute;top:24px;width:100%&#125;@media all&#123;.gb1&#123;height:22px;margin-right:.5em;vertical-align:top&#125;#gbar&#123;float:left&#125;&#125;a.gb1,a.gb4&#123;text-decoration:underline !important&#125;a.gb1,a.gb4&#123;color:#00c !important&#125;.gbi .gb4&#123;color:#dd8e27 !important&#125;.gbf .gb4&#123;color:#900 !important&#125;</span><br><span class="line">&lt;/style&gt;&lt;style&gt;body,td,a,p,.h&#123;font-family:arial,sans-serif&#125;body&#123;margin:0;overflow-y:scroll&#125;#gog&#123;padding:3px 8px 0&#125;td&#123;line-height:.8em&#125;.gac_m td&#123;line-height:17px&#125;form&#123;margin-bottom:20px&#125;.h&#123;color:#36c&#125;.q&#123;color:#00c&#125;.ts td&#123;padding:0&#125;.ts&#123;border-collapse:collapse&#125;em&#123;color:#c03;font-style:normal;font-weight:normal&#125;a em&#123;text-decoration:underline&#125;.lst&#123;height:25px;width:496px&#125;.gsfi,.lst&#123;font:18px arial,sans-serif&#125;.gsfs&#123;font:17px arial,sans-serif&#125;.ds&#123;display:inline-box;display:inline-block;margin:3px 0 4px;margin-left:4px&#125;input&#123;font-family:inherit&#125;a.gb1,a.gb2,a.gb3,a.gb4&#123;color:#11c !important&#125;body&#123;background:#fff;color:black&#125;a&#123;color:#11c;text-decoration:none&#125;a:hover,a:active&#123;text-decoration:underline&#125;.fl a&#123;color:#36c&#125;a:visited&#123;color:#551a8b&#125;a.gb1,a.gb4&#123;text-decoration:underline&#125;a.gb3:hover&#123;text-decoration:none&#125;#ghead a.gb2:hover&#123;color:#fff !important&#125;.sblc&#123;padding-top:5px&#125;.sblc a&#123;display:block;margin:2px 0;margin-left:13px;font-size:11px&#125;.lsbb&#123;background:#eee;border:solid 1px;border-color:#ccc #999 #999 #ccc;height:30px&#125;.lsbb&#123;display:block&#125;.ftl,#fll a&#123;display:inline-block;margin:0 12px&#125;.lsb&#123;background:url(/images/nav_logo229.png) 0 -261px repeat-x;border:none;color:#000;cursor:pointer;height:30px;margin:0;outline:0;font:15px arial,sans-serif;vertical-align:top&#125;.lsb:active&#123;background:#ccc&#125;.lst:focus&#123;outline:none&#125;&lt;/style&gt;&lt;script&gt;&lt;/script&gt;&lt;link href=&quot;/images/branding/product/ico/googleg_lodp.ico&quot; rel=&quot;shortcut icon&quot;&gt;&lt;/head&gt;&lt;body bgcolor=&quot;#fff&quot;&gt;&lt;script&gt;(function()&#123;var src=&apos;/images/nav_logo229.png&apos;;var iesg=false;document.body.onload = function()&#123;window.n &amp;&amp; window.n();if (document.images)&#123;new Image().src=src;&#125;</span><br><span class="line">if (!iesg)&#123;document.f&amp;&amp;document.f.q.focus();document.gbqf&amp;&amp;document.gbqf.q.focus();&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;)();&lt;/script&gt;&lt;div id=&quot;mngb&quot;&gt; &lt;div id=gbar&gt;&lt;nobr&gt;&lt;b class=gb1&gt;&lt;/b&gt; &lt;a class=gb1 href=&quot;http://www.google.com.hk/imghp?hl=zh-TW&amp;tab=wi&quot;&gt;&lt;/a&gt; &lt;a class=gb1 href=&quot;http://maps.google.com.hk/maps?hl=zh-TW&amp;tab=wl&quot;&gt;&lt;/a&gt; &lt;a class=gb1 href=&quot;https://play.google.com/?hl=zh-TW&amp;tab=w8&quot;&gt;Play&lt;/a&gt; &lt;a class=gb1 href=&quot;http://www.youtube.com/?gl=HK&amp;tab=w1&quot;&gt;YouTube&lt;/a&gt; &lt;a class=gb1 href=&quot;http://news.google.com.hk/nwshp?hl=zh-TW&amp;tab=wn&quot;&gt;&lt;/a&gt; &lt;a class=gb1 href=&quot;https://mail.google.com/mail/?tab=wm&quot;&gt;Gmail&lt;/a&gt; &lt;a class=gb1 href=&quot;https://drive.google.com/?tab=wo&quot;&gt;&lt;/a&gt; &lt;a class=gb1 style=&quot;text-decoration:none&quot; href=&quot;https://www.google.com.hk/intl/zh-TW/options/&quot;&gt;&lt;u&gt;&lt;/u&gt; &amp;raquo;&lt;/a&gt;&lt;/nobr&gt;&lt;/div&gt;&lt;div id=guser width=100%&gt;&lt;nobr&gt;&lt;span id=gbn class=gbi&gt;&lt;/span&gt;&lt;span id=gbf class=gbf&gt;&lt;/span&gt;&lt;span id=gbe&gt;&lt;/span&gt;&lt;a href=&quot;http://www.google.com.hk/history/optout?hl=zh-TW&quot; class=gb4&gt;&lt;/a&gt; | &lt;a  href=&quot;/preferences?hl=zh-TW&quot; class=gb4&gt;&lt;/a&gt; | &lt;a target=_top id=gb_70 href=&quot;https://accounts.google.com/ServiceLogin?hl=zh-TW&amp;passive=true&amp;continue=http://www.google.com.hk/&quot; class=gb4&gt;&lt;/a&gt;&lt;/nobr&gt;&lt;/div&gt;&lt;div class=gbh style=left:0&gt;&lt;/div&gt;&lt;div class=gbh style=right:0&gt;&lt;/div&gt; &lt;/div&gt;&lt;center&gt;&lt;br clear=&quot;all&quot; id=&quot;lgpd&quot;&gt;&lt;div id=&quot;lga&quot;&gt;&lt;div style=&quot;padding:28px 0 3px&quot;&gt;&lt;div style=&quot;height:110px;width:276px;background:url(/images/branding/googlelogo/1x/googlelogo_white_background_color_272x92dp.png) no-repeat&quot; title=&quot;Google&quot; align=&quot;left&quot; id=&quot;hplogo&quot; onload=&quot;window.lol&amp;&amp;lol()&quot;&gt;&lt;div style=&quot;color:#777;font-size:16px;font-weight:bold;position:relative;top:70px;left:218px&quot; nowrap=&quot;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;&lt;/div&gt;&lt;form action=&quot;/search&quot; name=&quot;f&quot;&gt;&lt;table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot;&gt;&lt;tr valign=&quot;top&quot;&gt;&lt;td width=&quot;25%&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;td align=&quot;center&quot; nowrap=&quot;&quot;&gt;&lt;input name=&quot;ie&quot; value=&quot;Big5&quot; type=&quot;hidden&quot;&gt;&lt;input value=&quot;zh-HK&quot; name=&quot;hl&quot; type=&quot;hidden&quot;&gt;&lt;input name=&quot;source&quot; type=&quot;hidden&quot; value=&quot;hp&quot;&gt;&lt;input name=&quot;biw&quot; type=&quot;hidden&quot;&gt;&lt;input name=&quot;bih&quot; type=&quot;hidden&quot;&gt;&lt;div class=&quot;ds&quot; style=&quot;height:32px;margin:4px 0&quot;&gt;&lt;input style=&quot;color:#000;margin:0;padding:5px 8px 0 6px;vertical-align:top&quot; autocomplete=&quot;off&quot; class=&quot;lst&quot; value=&quot;&quot; title=&quot;Google &quot; maxlength=&quot;2048&quot; name=&quot;q&quot; size=&quot;57&quot;&gt;&lt;/div&gt;&lt;br style=&quot;line-height:0&quot;&gt;&lt;span class=&quot;ds&quot;&gt;&lt;span class=&quot;lsbb&quot;&gt;&lt;input class=&quot;lsb&quot; value=&quot;Google &quot; name=&quot;btnG&quot; type=&quot;submit&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;ds&quot;&gt;&lt;span class=&quot;lsbb&quot;&gt;&lt;input class=&quot;lsb&quot; value=&quot;name=&quot;btnI&quot; onclick=&quot;if(this.form.q.value)this.checked=1; else top.location=&apos;/doodles/&apos;&quot; type=&quot;submit&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;fl sblc&quot; align=&quot;left&quot; nowrap=&quot;&quot; width=&quot;25%&quot;&gt;&lt;a href=&quot;/advanced_search?hl=zh-HK&amp;amp;authuser=0&quot;&gt;&lt;/a&gt;&lt;a href=&quot;/language_tools?hl=zh-HK&amp;amp;authuser=0&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;input id=&quot;gbv&quot; name=&quot;gbv&quot; type=&quot;hidden&quot; value=&quot;1&quot;&gt;&lt;/form&gt;&lt;div id=&quot;gac_scont&quot;&gt;&lt;/div&gt;&lt;div style=&quot;font-size:83%;min-height:3.5em&quot;&gt;&lt;br&gt;&lt;div id=&quot;als&quot;&gt;&lt;style&gt;#als&#123;font-size:small;margin-bottom:24px&#125;#_eEe&#123;display:inline-block;line-height:28px;&#125;#_eEe a&#123;padding:0 3px;&#125;._lEe&#123;display:inline-block;margin:0 2px;white-space:nowrap&#125;._PEe&#123;display:inline-block;margin:0 2px&#125;&lt;/style&gt;&lt;div id=&quot;_eEe&quot;&gt;Google.com.hk &lt;a href=&quot;http://www.google.com.hk/setprefs?sig=0_rRVcKKfvrZgCB_A43UF1XQ9TPmw%3D&amp;amp;hl=zh-CN&amp;amp;source=homepage&quot; data-ved=&quot;0ahUKEwiS85jb15jQAhUJq1QKHUIXDJUQ2ZgBCAU&quot;&gt;(&amp;#31616;/a&gt;  &lt;a href=&quot;http://www.google.com.hk/setprefs?sig=0_rRVcKKfvrZgCB_A43UF1XQ9TPmw%3D&amp;amp;hl=en&amp;amp;source=homepage&quot; data-ved=&quot;0ahUKEwiS85jb15jQAhUJq1QKHUIXDJUQ2ZgBCAY&quot;&gt;English&lt;/a&gt; &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span id=&quot;footer&quot;&gt;&lt;div style=&quot;font-size:10pt&quot;&gt;&lt;div style=&quot;margin:19px auto;text-align:center&quot; id=&quot;fll&quot;&gt;&lt;a href=&quot;/intl/zh-TW/ads/&quot;&gt;&lt;/a&gt;&lt;a href=&quot;/intl/zh-TW/about.html&quot;&gt;Google &lt;/a&gt;&lt;a href=&quot;http://www.google.com.hk/setprefdomain?prefdom=US&amp;amp;sig=__A6fXbQceC3SkqMu_FRt85xzWjWI%3D&quot; id=&quot;fehl&quot;&gt;Google.com&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;p style=&quot;color:#767676;font-size:8pt&quot;&gt;&amp;copy; 2016 - &lt;a href=&quot;/intl/zh-TW/policies/privacy/&quot;&gt;a&gt; - &lt;a href=&quot;/intl/zh-TW/policies/terms/&quot;&gt;&lt;/a&gt;&lt;/p&gt;&lt;/span&gt;&lt;/center&gt;&lt;script&gt;(function()&#123;window.google.cdo=&#123;height:0,width:0&#125;;(function()&#123;var a=window.innerWidth,b=window.innerHeight;if(!a||!b)var c=window.document,d=&quot;CSS1Compat&quot;==c.compatMode?c.documentElement:c.body,a=d.clientWidth,b=d.clientHeight;a&amp;&amp;b&amp;&amp;(a!=google.cdo.width||b!=google.cdo.height)&amp;&amp;google.log(&quot;&quot;,&quot;&quot;,&quot;/client_204?&amp;atyp=i&amp;biw=&quot;+a+&quot;&amp;bih=&quot;+b+&quot;&amp;ei=&quot;+google.kEI);&#125;)();&#125;)();&lt;/script&gt;&lt;div id=&quot;xjsd&quot;&gt;&lt;/div&gt;&lt;div id=&quot;xjsi&quot;&gt;&lt;script&gt;(function()&#123;function c(b)&#123;window.setTimeout(function()&#123;var a=document.createElement(&quot;script&quot;);a.src=b;document.getElementById(&quot;xjsd&quot;).appendChild(a)&#125;,0)&#125;google.dljp=function(b,a)&#123;google.xjsu=b;c(a)&#125;;google.dlj=c;&#125;)();(function()&#123;window.google.xjsrm=[];&#125;)();if(google.y)google.y.first=[];if(!google.xjs)&#123;window._=window._||&#123;&#125;;window._._DumpException=function(e)&#123;throw e&#125;;if(google.timers&amp;&amp;google.timers.load.t)&#123;google.timers.load.t.xjsls=new Date().getTime();&#125;google.dljp(&apos;/xjs/_/js/k\x3dxjs.hp.en_US.HHTiPh8WO1g.O/m\x3dsb_he,d/rt\x3dj/d\x3d1/t\x3dzcms/rs\x3dACT90oFyHK2p3Cq9BefJNT1WLwsFHb2Nvg&apos;,&apos;/xjs/_/js/k\x3dxjs.hp.en_US.HHTiPh8WO1g.O/m\x3dsb_he,d/rt\x3dj/d\x3d1/t\x3dzcms/rs\x3dACT90oFyHK2p3Cq9BefJNT1WLwsFHb2Nvg&apos;);google.xjs=1;&#125;google.pmc=&#123;&quot;sb_he&quot;:&#123;&quot;agen&quot;:true,&quot;cgen&quot;:true,&quot;client&quot;:&quot;heirloom-hp&quot;,&quot;dh&quot;:true,&quot;dhqt&quot;:true,&quot;ds&quot;:&quot;&quot;,&quot;fl&quot;:true,&quot;host&quot;:&quot;google.com.hk&quot;,&quot;isbh&quot;:28,&quot;jam&quot;:0,&quot;msgs&quot;:&#123;&quot;cibl&quot;:&quot;&quot;,&quot;dym&quot;:&quot;&quot;lcky&quot;:&quot;&quot;lml&quot;:&quot;&quot;,&quot;oskt&quot;:&quot;&quot;,&quot;psrc&quot;:&quot;003Ca href=\&quot;/history\&quot;\u003E\u003C/a\u003E&quot;,&quot;psrl&quot;:&quot;&quot;,&quot;sbit&quot;:&quot;&quot;,&quot;srch&quot;:&quot;Google &quot;&#125;,&quot;nds&quot;:true,&quot;ovr&quot;:&#123;&#125;,&quot;pq&quot;:&quot;&quot;,&quot;refpd&quot;:true,&quot;refspre&quot;:true,&quot;rfs&quot;:[],&quot;scd&quot;:10,&quot;sce&quot;:5,&quot;stok&quot;:&quot;ahSc6O6Rc51lCmCOKZYjJdw8hyI&quot;&#125;,&quot;d&quot;:&#123;&#125;&#125;;google.y.first.push(function()&#123;if(google.med)&#123;google.med(&apos;init&apos;);google.initHistory();google.med(&apos;history&apos;);&#125;&#125;);if(google.j&amp;&amp;google.j.en&amp;&amp;google.j.xi)&#123;window.setTimeout(google.j.xi,0);&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/02/28/tools/shadowsocks/" data-id="cjz95gt3o00e8w5r9i0wht88k" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/administrator/">administrator</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/外面的世界/">外面的世界</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/03/10/tools/app/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          常用软件备忘
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/02/28/programmer/tools/gcc_issues/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">GCC 问题记录</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

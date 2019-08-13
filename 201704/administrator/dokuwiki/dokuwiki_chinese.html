@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="记录 dokuwiki 中文相关支持">
+<meta name="keywords" content="administrator,dokuwiki,中文乱码,Url rewrite,URL 重写">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dokuwiki 中文支持">
+<meta property="og:url" content="http://sunyongfeng.com/201704/administrator/dokuwiki/dokuwiki_chinese.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="记录 dokuwiki 中文相关支持">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dokuwiki 中文支持">
+<meta name="twitter:description" content="记录 dokuwiki 中文相关支持">
+  <link rel="canonical" href="http://sunyongfeng.com/201704/administrator/dokuwiki/dokuwiki_chinese">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>dokuwiki 中文支持 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201704/administrator/dokuwiki/dokuwiki_chinese.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">dokuwiki 中文支持
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-04-01 22:25:30" itemprop="dateCreated datePublished" datetime="2017-04-01T22:25:30+08:00">2017-04-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/dokuwiki/" itemprop="url" rel="index"><span itemprop="name">dokuwiki</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201704/administrator/dokuwiki/dokuwiki_chinese.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201704/administrator/dokuwiki/dokuwiki_chinese.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">记录 dokuwiki 中文相关支持</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="中文名-page-被转为-url-保存到磁盘"><a href="#中文名-page-被转为-url-保存到磁盘" class="headerlink" title="中文名 page 被转为 url 保存到磁盘"></a>中文名 page 被转为 url 保存到磁盘</h1><p><strong>注意：</strong> 每次升級 dokuwiki 都必须做“问题解决”一节中第2步操作。</p>
+<p>元凶：URL rewrite。</p>
+<h2 id="bug-现象"><a href="#bug-现象" class="headerlink" title="bug 现象"></a>bug 现象</h2><p>页面 <code>public:linux工具箱</code> 在磁盘中被保存为：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dokuwiki/data/pages/public/linux<span class="symbol">%E5</span><span class="symbol">%B7</span><span class="symbol">%A5</span><span class="symbol">%E5</span><span class="symbol">%85</span><span class="symbol">%B7</span><span class="symbol">%E7</span><span class="symbol">%AE</span><span class="symbol">%B1</span>/</span><br></pre></td></tr></table></figure>
+<p>处理后：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dokuwiki<span class="regexp">/data/</span>pages<span class="regexp">/public/</span>linux工具箱<span class="regexp">/</span></span><br></pre></td></tr></table></figure>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>参考文献：</p>
+<ul>
+<li><a href="https://blog.klniu.com/post/tag/dokuwiki/" target="_blank" rel="noopener">勿慢牛 blog</a></li>
+<li><a href="https://www.dokuwiki.org/start?id=zh:pagename" target="_blank" rel="noopener">页面名和命名空间</a></li>
+</ul>
+<p>修订记录：</p>
+<p>1.修改文件 <code>dokuwiki/conf/local.php</code>，在末尾增加</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$conf[<span class="string">'fnencode'</span>] = <span class="string">'gbk'</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>2.修改文件 <code>dokuwiki/inc/pageutils.php</code>，删除掉文件名转 url 的操作。</p>
+<p>处理完这一步，可验证一下。添加个中文 page，到 data 目录查看是否保存为中文名。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">utf8_encodeFN</span><span class="params">($file,$safe=true)</span></span>&#123;</span><br><span class="line">    <span class="keyword">global</span> $conf;</span><br><span class="line">    <span class="keyword">if</span>($conf[<span class="string">'fnencode'</span>] == <span class="string">'utf-8'</span>) <span class="keyword">return</span> $file;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>($safe &amp;&amp; preg_match(<span class="string">'#^[a-zA-Z0-9/_\-\.%]+$#'</span>,$file))&#123;</span><br><span class="line">        <span class="keyword">return</span> $file;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>($conf[<span class="string">'fnencode'</span>] == <span class="string">'safe'</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> SafeFN::encode($file);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注释这里</span></span><br><span class="line">    <span class="comment">//$file = urlencode($file);</span></span><br><span class="line">    <span class="comment">//$file = str_replace('%2F','/',$file);</span></span><br><span class="line">    <span class="keyword">return</span> $file;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Decode a filename back to UTF-8</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Uses the 'fnencode' option to determine encoding</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Andreas Gohr &lt;andi<span class="doctag">@splitbrain</span>.org&gt;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span>    urldecode</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> string $file file name</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> string</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">utf8_decodeFN</span><span class="params">($file)</span></span>&#123;</span><br><span class="line">    <span class="keyword">global</span> $conf;</span><br><span class="line">    <span class="keyword">if</span>($conf[<span class="string">'fnencode'</span>] == <span class="string">'utf-8'</span>) <span class="keyword">return</span> $file;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>($conf[<span class="string">'fnencode'</span>] == <span class="string">'safe'</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> SafeFN::decode($file);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注释这里</span></span><br><span class="line">    <span class="comment">// return urldecode($file);</span></span><br><span class="line">    <span class="keyword">return</span> $file;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.恢复原先以 url 格式保存的文件名为中文名<br>以 python3 运行如下脚本，注意修改 wikipath 为 dokuwiki 路径。实测在 linux 下可用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">dokuwiki转码程序。（请将本程序保存为utf8文本）</span></span><br><span class="line"><span class="string">作用：将dokuwiki默认的编码方式编码生成的目录名、文件名，统一转换为可识别的中文。</span></span><br><span class="line"><span class="string">要求python版本大于等于3.4</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> unquote</span><br><span class="line"> </span><br><span class="line">wikipath = <span class="string">'d:/lzweb/wiki'</span> <span class="comment"># 请在这里设置好dokuwiki的安装目录</span></span><br><span class="line"> </span><br><span class="line">rootpath = Path(wikipath)</span><br><span class="line">rootpath = rootpath / <span class="string">'data'</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pathRename</span><span class="params">(path)</span>:</span> <span class="comment"># 对path进行转码</span></span><br><span class="line">    newname = path.parent / unquote(path.name)</span><br><span class="line">    path.rename(newname)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dealpath</span><span class="params">(path)</span>:</span> <span class="comment"># 对path下的全部文件和目录进行递归编码转换</span></span><br><span class="line">    allpath = path.glob(<span class="string">'*'</span>) <span class="comment"># 遍历path下的第一层目录</span></span><br><span class="line">    <span class="keyword">for</span> p <span class="keyword">in</span> allpath:</span><br><span class="line">        <span class="keyword">if</span> p.is_file(): pathRename(p)</span><br><span class="line">        <span class="keyword">elif</span> p.is_dir(): <span class="comment"># 如果是目录</span></span><br><span class="line">            dealpath(p) <span class="comment"># 先对目录下的所有内容改名</span></span><br><span class="line">            pathRename(p) <span class="comment"># 再对该目录改名</span></span><br><span class="line"> </span><br><span class="line">print(<span class="string">'转码开始，请耐心等候...'</span>)</span><br><span class="line">dealpath(rootpath)</span><br><span class="line">print(<span class="string">'完成全部转换。'</span>)</span><br></pre></td></tr></table></figure>
+<p>4.解决 sitemap 乱码问题，修改 <code>dokuwiki/inc/common.php</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">wl</span><span class="params">($id = <span class="string">''</span>, $urlParameters = <span class="string">''</span>, $absolute = false, $separator = <span class="string">'&amp;amp;'</span>)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">global</span> $conf;</span><br><span class="line">    <span class="keyword">if</span>(is_array($urlParameters)) &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">isset</span>($urlParameters[<span class="string">'rev'</span>]) &amp;&amp; !$urlParameters[<span class="string">'rev'</span>]) <span class="keyword">unset</span>($urlParameters[<span class="string">'rev'</span>]);</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">isset</span>($urlParameters[<span class="string">'at'</span>]) &amp;&amp; $conf[<span class="string">'date_at_format'</span>]) $urlParameters[<span class="string">'at'</span>] = date($conf[<span class="string">'date_at_format'</span>],$urlParameters[<span class="string">'at'</span>]);</span><br><span class="line">        $urlParameters = buildURLparams($urlParameters, $separator);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $urlParameters = str_replace(<span class="string">','</span>, $separator, $urlParameters);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>($id === <span class="string">''</span>) &#123;</span><br><span class="line">        $id = $conf[<span class="string">'start'</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//注释这里</span></span><br><span class="line">    <span class="comment">//$id = idfilter($id);</span></span><br><span class="line">    <span class="keyword">if</span>($absolute) &#123;</span><br><span class="line">        $xlink = DOKU_URL;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $xlink = DOKU_BASE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>($conf[<span class="string">'userewrite'</span>] == <span class="number">2</span>) &#123;</span><br><span class="line">        $xlink .= DOKU_SCRIPT.<span class="string">'/'</span>.$id;</span><br><span class="line">        <span class="keyword">if</span>($urlParameters) $xlink .= <span class="string">'?'</span>.$urlParameters;</span><br><span class="line">    &#125; <span class="keyword">elseif</span>($conf[<span class="string">'userewrite'</span>]) &#123;</span><br><span class="line">        $xlink .= $id;</span><br><span class="line">        <span class="keyword">if</span>($urlParameters) $xlink .= <span class="string">'?'</span>.$urlParameters;</span><br><span class="line">    &#125; <span class="keyword">elseif</span>($id) &#123;</span><br><span class="line">        $xlink .= DOKU_SCRIPT.<span class="string">'?id='</span>.$id;</span><br><span class="line">        <span class="keyword">if</span>($urlParameters) $xlink .= $separator.$urlParameters;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $xlink .= DOKU_SCRIPT;</span><br><span class="line">        <span class="keyword">if</span>($urlParameters) $xlink .= <span class="string">'?'</span>.$urlParameters;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $xlink;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/administrator/" rel="tag"># administrator</a>
+          
+            <a href="/tags/dokuwiki/" rel="tag"># dokuwiki</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201704/tools/think_on_version_control.html" rel="next" title="版本控制的思考">
+                <i class="fa fa-chevron-left"></i> 版本控制的思考
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201704/programmer/version_number.html" rel="prev" title="软件版本号">
+                软件版本号 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#中文名-page-被转为-url-保存到磁盘"><span class="nav-number">1.</span> <span class="nav-text">中文名 page 被转为 url 保存到磁盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#bug-现象"><span class="nav-number">1.1.</span> <span class="nav-text">bug 现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题解决"><span class="nav-number">1.2.</span> <span class="nav-text">问题解决</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201704/administrator/dokuwiki/dokuwiki_chinese.html";
+    this.page.identifier = "201704/administrator/dokuwiki/dokuwiki_chinese.html";
+    this.page.title = 'dokuwiki 中文支持';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

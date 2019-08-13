@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>交叉编译 python | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+<meta name="keywords" content="ubuntu,python,交叉编译,mips,mips64,arm,ppc,2.7,cross compile,sqlite3,ncurses,readline,ssl,环境变量,PYTHONHOME,PYTHONPATH,not found,裁剪">
+<meta property="og:type" content="article">
+<meta property="og:title" content="交叉编译 python">
+<meta property="og:url" content="http://yoursite.com/2016/05/17/programmer/python/cross_compile/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="交叉编译 python">
+<meta name="twitter:description" content="ubuntu 16.04 下交叉编译 mips64 python 2.7.11">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-programmer/python/cross_compile" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/17/programmer/python/cross_compile/" class="article-date">
+  <time datetime="2016-05-17T04:13:24.000Z" itemprop="datePublished">2016-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/python/">python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      交叉编译 python
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="下载、解压-python-源代码"><a href="#下载、解压-python-源代码" class="headerlink" title="下载、解压 python 源代码"></a>下载、解压 python 源代码</h2><p>从 python.org 下载。</p>
+<h2 id="导入交叉编译-patch"><a href="#导入交叉编译-patch" class="headerlink" title="导入交叉编译 patch"></a>导入交叉编译 patch</h2><p>参考自 <a href="http://code.openhub.net/file?fid=gbEPeGEYo_iBj7isfd9QeVX7N8A&amp;cid=r3Ocm3qAuhY&amp;s=python&amp;fp=520151&amp;mp=&amp;projSelected=true#L0" target="_blank" rel="noopener">python-2.7-001-support-for-build.patch</a>，2.7.11 的修改地方有稍微变化，详见如下 patch。</p>
+<p>Python 虽然使用 <code>autoconf</code>，但是事实上代码中已经包含 <code>configure</code> 文件，因此下文代码给出的是修改 <code>configure.ac</code> 并执行 <code>autoconf</code> 后生成的 <code>configure</code> 文件。</p>
+<p>patch 的使用方法，在 python 源代码根目录下执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">patch -p1 &lt; ../0001-cross-compile.patch</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>python 2.7.11 交叉编译 patch：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/Makefile.pre.in b/Makefile.pre.in</span><br><span class="line">index ee73edd..730db7e 100644</span><br><span class="line">--- a/Makefile.pre.in</span><br><span class="line">+++ b/Makefile.pre.in</span><br><span class="line">@@ -237,7 +237,8 @@ LIBFFI_INCLUDEDIR=	@LIBFFI_INCLUDEDIR@</span><br><span class="line"> </span><br><span class="line"> ##########################################################################</span><br><span class="line"> # Parser</span><br><span class="line">-PGEN=		Parser/pgen$(EXE)</span><br><span class="line">+BUILDPGEN=		Parser/pgen$(EXE)</span><br><span class="line">+PGEN_FOR_BUILD=	@PGEN_FOR_BUILD@</span><br><span class="line"> </span><br><span class="line"> PSRCS=		\</span><br><span class="line"> 		Parser/acceler.c \</span><br><span class="line">@@ -635,14 +636,14 @@ Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule</span><br><span class="line"> </span><br><span class="line"> $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)</span><br><span class="line"> 		@$(MKDIR_P) Include</span><br><span class="line">-		$(MAKE) $(PGEN)</span><br><span class="line">-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)</span><br><span class="line">+		$(MAKE) $(BUILDPGEN)</span><br><span class="line">+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)</span><br><span class="line"> $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)</span><br><span class="line"> 		$(MAKE) $(GRAMMAR_H)</span><br><span class="line"> 		touch $(GRAMMAR_C)</span><br><span class="line"> </span><br><span class="line">-$(PGEN):	$(PGENOBJS)</span><br><span class="line">-		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)</span><br><span class="line">+$(BUILDPGEN):	$(PGENOBJS)</span><br><span class="line">+		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(BUILDPGEN)</span><br><span class="line"> </span><br><span class="line"> Parser/grammar.o:	$(srcdir)/Parser/grammar.c \</span><br><span class="line"> 				$(srcdir)/Include/token.h \</span><br><span class="line">diff --git a/configure b/configure</span><br><span class="line">index 7dab897..bf16c0e 100755</span><br><span class="line">--- a/configure</span><br><span class="line">+++ b/configure</span><br><span class="line">@@ -734,6 +734,7 @@ UNIVERSALSDK</span><br><span class="line"> CONFIG_ARGS</span><br><span class="line"> SOVERSION</span><br><span class="line"> VERSION</span><br><span class="line">+PGEN_FOR_BUILD</span><br><span class="line"> PYTHON_FOR_BUILD</span><br><span class="line"> host_os</span><br><span class="line"> host_vendor</span><br><span class="line">@@ -2911,6 +2912,13 @@ else</span><br><span class="line"> fi</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">+if test &quot;$cross_compiling&quot; = yes; then</span><br><span class="line">+    PGEN_FOR_BUILD=&quot;$&#123;PGEN_FOR_BUILD&#125;&quot;</span><br><span class="line">+else</span><br><span class="line">+    PGEN_FOR_BUILD=&apos;$(BUILDPGEN)&apos;</span><br><span class="line">+fi</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line"> </span><br><span class="line"> if test &quot;$prefix&quot; != &quot;/&quot;; then</span><br><span class="line">     prefix=`echo &quot;$prefix&quot; | sed -e &apos;s/\/$//g&apos;`</span><br><span class="line">@@ -6334,6 +6342,12 @@ fi</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> # Enable PGO flags.</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line">+</span><br><span class="line"> # Extract the first word of &quot;llvm-profdata&quot;, so it can be a program name with args.</span><br><span class="line"> set dummy llvm-profdata; ac_word=$2</span><br><span class="line"> &#123; $as_echo &quot;$as_me:$&#123;as_lineno-$LINENO&#125;: checking for $ac_word&quot; &gt;&amp;5</span><br><span class="line">-- </span><br><span class="line">1.9.1</span><br></pre></td></tr></table></figure>
+<h2 id="创建-build-目录"><a href="#创建-build-目录" class="headerlink" title="创建 build 目录"></a>创建 build 目录</h2><p>在 python 源代码下创建 <code>build-pc</code> 和 <code>build-mips</code> 目录，分别用于编译 PC pgen（交叉编译时用到）与交叉编译 mips python。该目录做 configure、make、make install，编译时用于保存临时生成的文件，保证 python 源代码干净。</p>
+<h2 id="编译本地-Python-与-pgen"><a href="#编译本地-Python-与-pgen" class="headerlink" title="编译本地 Python 与 pgen"></a>编译本地 Python 与 pgen</h2><p>用于生成 grammar 所需要文件用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd build-pc</span><br><span class="line"></span><br><span class="line">../configure CC=gcc CXX=g++ AR=ar RANLIB=ranlib LDFLAGS=&quot;-L/usr/lib -L/usr/lib64 -L/usr/local/lib -L/usr/local/lib64&quot; CFLAGS=&quot;-I/usr/include -I/usr/local/include&quot;</span><br><span class="line"> </span><br><span class="line">make python Parser/pgen</span><br></pre></td></tr></table></figure>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="配置交叉编译环境变量"><a href="#配置交叉编译环境变量" class="headerlink" title="配置交叉编译环境变量"></a>配置交叉编译环境变量</h3><p>比如 CC、CFLAGS、LDFLAGS 等。</p>
+<h3 id="configure-配置"><a href="#configure-配置" class="headerlink" title="configure 配置"></a>configure 配置</h3><p>配置命令如下：<br>configure 的 prefix 只支持绝对路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd build-mips</span><br><span class="line"></span><br><span class="line">../configure --host=mips64-octeon-linux-gnu --build=x86_64-linux-gnu --prefix=/home/sunyongfeng/python-install --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes PGEN_FOR_BUILD=../build-pc/Parse/pgen</span><br></pre></td></tr></table></figure>
+<p>问题：</p>
+<ul>
+<li><code>--enable-FEATURE</code>，不清楚有哪些 features ，怎么配置；</li>
+<li><code>--enable-PACKAGE</code>，不清楚有哪些 package，怎么配置。</li>
+</ul>
+<p>配置完了之后，在 Modules 目录会生成 Setup 文件。x86 的默认编译会编译到必须的模块，而 mips64 的交叉编译很多模块没有编译下，如 socket 等。修改 <code>Modules/Setup</code> 文件，定制想编译的内置模块。以下是基础模块，目前还不清楚如果不想内置的话要如何编译。<br>定制内置模块，参见这篇博文 《<a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a>》，讲述各个内置模块的功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># Modules that should always be present (non UNIX dependent):                                       </span><br><span class="line">                                                                                                    </span><br><span class="line">array arraymodule.c # array objects                                                                 </span><br><span class="line">cmath cmathmodule.c _math.c # -lm # complex math library functions                                  </span><br><span class="line">math mathmodule.c _math.c # -lm # math library functions, e.g. sin()                                </span><br><span class="line">_struct _struct.c   # binary structure packing/unpacking                                            </span><br><span class="line">time timemodule.c # -lm # time operations and variables                                             </span><br><span class="line">operator operator.c # operator.add() and similar goodies                                            </span><br><span class="line">_testcapi _testcapimodule.c    # Python C API test module                                           </span><br><span class="line">_random _randommodule.c # Random number generator                                                   </span><br><span class="line">_collections _collectionsmodule.c # Container types                                                 </span><br><span class="line">_heapq _heapqmodule.c       # Heapq type                                                            </span><br><span class="line">itertools itertoolsmodule.c # Functions creating iterators for efficient looping                    </span><br><span class="line">strop stropmodule.c     # String manipulations                                                      </span><br><span class="line">_functools _functoolsmodule.c   # Tools for working with functions and callable objects             </span><br><span class="line">_elementtree -I$(srcdir)/Modules/expat -DHAVE_EXPAT_CONFIG_H -DUSE_PYEXPAT_CAPI _elementtree.c  # elementtree accelerator</span><br><span class="line">#_pickle _pickle.c  # pickle accelerator                                                            </span><br><span class="line">datetime datetimemodule.c   # date/time type                                                        </span><br><span class="line">_bisect _bisectmodule.c # Bisection algorithms                                                      </span><br><span class="line">                                                                                                    </span><br><span class="line">unicodedata unicodedata.c    # static Unicode character database</span><br></pre></td></tr></table></figure>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>简单的 <code>make</code> 命令即可。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>命令 <code>make install -i</code>，安装 <code>bin</code>、<code>lib</code>、<code>share</code>、<code>man</code> 等目录至 <code>./configure</code> 中配置的 <code>prefix</code> 目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@R04220:~/python-install$ ls</span><br><span class="line">bin  include  lib  share</span><br><span class="line">sunyongfeng@R04220:~/python-install$ ls -al *</span><br><span class="line">bin:</span><br><span class="line">总用量 9612</span><br><span class="line">drwxr-xr-x 2 sunyongfeng sunyongfeng    4096  5月 13 16:51 .</span><br><span class="line">drwxr-xr-x 6 sunyongfeng sunyongfeng    4096  5月 15 10:58 ..</span><br><span class="line">-rwxrwxr-x 1 sunyongfeng sunyongfeng     123  5月 13 16:38 2to3</span><br><span class="line">-rwxrwxr-x 1 sunyongfeng sunyongfeng     121  5月 13 16:38 idle</span><br><span class="line">-rwxrwxr-x 1 sunyongfeng sunyongfeng     106  5月 13 16:38 pydoc</span><br><span class="line">lrwxrwxrwx 1 sunyongfeng sunyongfeng       7  5月 13 16:51 python -&gt; python2</span><br><span class="line">lrwxrwxrwx 1 sunyongfeng sunyongfeng       9  5月 13 16:51 python2 -&gt; python2.7</span><br><span class="line">-rwxr-xr-x 1 sunyongfeng sunyongfeng 9793952  5月 13 16:51 python2.7</span><br><span class="line">-rwxr-xr-x 1 sunyongfeng sunyongfeng    1709  5月 13 16:51 python2.7-config</span><br><span class="line">lrwxrwxrwx 1 sunyongfeng sunyongfeng      16  5月 13 16:51 python2-config -&gt; python2.7-config</span><br><span class="line">lrwxrwxrwx 1 sunyongfeng sunyongfeng      14  5月 13 16:51 python-config -&gt; python2-config</span><br><span class="line">-rwxrwxr-x 1 sunyongfeng sunyongfeng   18569  5月 13 16:38 smtpd.py</span><br><span class="line"></span><br><span class="line">include:</span><br><span class="line">总用量 12</span><br><span class="line">drwxr-xr-x 3 sunyongfeng sunyongfeng 4096  5月 13 16:51 .</span><br><span class="line">drwxr-xr-x 6 sunyongfeng sunyongfeng 4096  5月 15 10:58 ..</span><br><span class="line">drwxr-xr-x 2 sunyongfeng sunyongfeng 4096  5月 13 16:51 python2.7</span><br><span class="line"></span><br><span class="line">lib:</span><br><span class="line">总用量 16312</span><br><span class="line">drwxr-xr-x  4 sunyongfeng sunyongfeng     4096  5月 13 16:51 .</span><br><span class="line">drwxr-xr-x  6 sunyongfeng sunyongfeng     4096  5月 15 10:58 ..</span><br><span class="line">-r-xr-xr-x  1 sunyongfeng sunyongfeng 16670684  5月 13 16:51 libpython2.7.a</span><br><span class="line">drwxr-xr-x  2 sunyongfeng sunyongfeng     4096  5月 13 16:51 pkgconfig</span><br><span class="line">drwxr-xr-x 28 sunyongfeng sunyongfeng    20480  5月 13 16:51 python2.7</span><br><span class="line"></span><br><span class="line">share:</span><br><span class="line">总用量 12</span><br><span class="line">drwxr-xr-x 3 sunyongfeng sunyongfeng 4096  5月 13 16:51 .</span><br><span class="line">drwxr-xr-x 6 sunyongfeng sunyongfeng 4096  5月 15 10:58 ..</span><br><span class="line">drwxr-xr-x 3 sunyongfeng sunyongfeng 4096  5月 13 16:51 man</span><br><span class="line">sunyongfeng@R04220:~/python-install$</span><br></pre></td></tr></table></figure>
+<p>打包放到目标机上，配置目标机的 PATH，加上 python 的 bin 目录。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><h3 id="编译依赖"><a href="#编译依赖" class="headerlink" title="编译依赖"></a>编译依赖</h3><p>交叉编译的时候，如果没有配置好 CFLAGS、LDFLAGS 之类的变量，可能找不到 python 编译所依赖的头文件或库文件。最终体现在编译的结果（此处可能因不同的变量配置而不同）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Python build finished, but the necessary bits to build these modules were not found:</span><br><span class="line">_bsddb             _curses            _curses_panel   </span><br><span class="line">_sqlite3           _ssl               _tkinter        </span><br><span class="line">bsddb185           bz2                dbm             </span><br><span class="line">dl                 gdbm               imageop         </span><br><span class="line">linuxaudiodev      ossaudiodev        readline        </span><br><span class="line">sunaudiodev        zlib                               </span><br><span class="line">To find the necessary bits, look in setup.py in detect_modules() for the module&apos;s name.</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>sqlite3 依赖配置<br>修改 python 源码根目录下的 setup.py 文件，在 <code>detect_modules</code> 函数下，找到 sqlite3 的头文件配置，添加上交叉编译下的 sqlite3 头文件目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sqlite_inc_paths = [ &apos;/usr/include&apos;,                                                        </span><br><span class="line">                     &apos;/usr/include/sqlite&apos;,                                                 </span><br><span class="line">                     &apos;/usr/include/sqlite3&apos;,                                                </span><br><span class="line">                     &apos;/usr/local/include&apos;,                                                  </span><br><span class="line">                     &apos;/usr/local/include/sqlite&apos;,                                           </span><br><span class="line">                     &apos;/usr/local/include/sqlite3&apos;,                                          </span><br><span class="line">                   ]                                                                        </span><br><span class="line">if cross_compiling:                                                                         </span><br><span class="line">    sqlite_inc_paths = [ &apos;/home/sunyongfeng/workshop/prj/images/header/&apos;,</span><br><span class="line">                         &apos;/home/sunyongfeng/workshop/prj/images/header/sqlite&apos;,</span><br><span class="line">                         &apos;/home/sunyongfeng/workshop/prj/images/header/sqlite3&apos;,</span><br><span class="line">                       ]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ssl 依赖配置<br>类似 sqlite3，在 setup.py 文件的 <code>detect_modules</code> 函数下，找到 ssl 相关的头文件与库文件配置，添加上交叉编译下的 ssl 头文件与库文件目录。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># Detect SSL support for the socket module (via _ssl)                                       </span><br><span class="line">search_for_ssl_incs_in = [                                                                  </span><br><span class="line">                      &apos;/usr/local/ssl/include&apos;,                                             </span><br><span class="line">                      &apos;/usr/contrib/ssl/include/&apos;,                                          </span><br><span class="line">                      &apos;/home/sunyongfeng/workshop/prj/images/header/&apos;,</span><br><span class="line">                     ]                                                                      </span><br><span class="line">ssl_incs = find_file(&apos;openssl/ssl.h&apos;, inc_dirs,                                             </span><br><span class="line">                     search_for_ssl_incs_in                                                 </span><br><span class="line">                     )                                                                      </span><br><span class="line">if ssl_incs is not None:                                                                    </span><br><span class="line">    krb5_h = find_file(&apos;krb5.h&apos;, inc_dirs,                                                  </span><br><span class="line">                       [&apos;/usr/kerberos/include&apos;])                                           </span><br><span class="line">    if krb5_h:                                                                              </span><br><span class="line">        ssl_incs += krb5_h                                                                  </span><br><span class="line">ssl_libs = find_library_file(self.compiler, &apos;ssl&apos;,lib_dirs,                                 </span><br><span class="line">                             [&apos;/usr/local/ssl/lib&apos;,                                         </span><br><span class="line">                              &apos;/usr/contrib/ssl/lib/&apos;,                                      </span><br><span class="line">                              &apos;/home/sunyongfeng/workshop/prj/images/rootfs/lib64&apos;</span><br><span class="line">                             ] )</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>ncurses</p>
+<blockquote>
+<p><a href="https://zh.wikipedia.org/wiki/Ncurses" target="_blank" rel="noopener">维基百科</a> ncurses（new curses）是一个程序库，它提供了API，可以允许程序员编写独立于终端的基于文本的用户界面。它是一个虚拟终端中的“类GUI”应用软件工具箱。它还优化了屏幕刷新方法，以减少使用远程shell时遇到的延迟。</p>
+</blockquote>
+</li>
+<li><p>readline<br>如果 readline 模块编译失败，会导致退格键、方向键等不可用。下面错误中”^”位置是退格键。<br>交叉编译 python 前需要先编译好 libreadline ，并将头文件和库文件放到默认可索引到的路径。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; print &quot;abc&quot;</span><br><span class="line">  File &quot;&lt;stdin&gt;&quot;, line 1</span><br><span class="line">    print &quot;abc&quot;</span><br><span class="line">               ^</span><br><span class="line">SyntaxError: invalid syntax</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>目前还不清楚为何 export $PATH 后，运行 python 命令找不到 python lib 库，而且找不到 site 模块。而使用绝对路径访问 python 没有问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/tmp/bin # python</span><br><span class="line">Could not find platform independent libraries &lt;prefix&gt;</span><br><span class="line">Could not find platform dependent libraries &lt;exec_prefix&gt;</span><br><span class="line">Consider setting $PYTHONHOME to &lt;prefix&gt;[:&lt;exec_prefix&gt;]</span><br><span class="line">ImportError: No module named site</span><br><span class="line"></span><br><span class="line">/tmp/bin # /tmp/bin/python</span><br><span class="line">Python 2.7.11 (default, May 16 2016, 17:11:59) </span><br><span class="line">[GCC 4.3.3] on linux2</span><br><span class="line">Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>通过配置环境变量解决：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export PYTHONHOME=/usr/lib/python2.7</span><br><span class="line">export PYTHONPATH=.:$PYTHONHOME:$PYTHONHOME/site-packages</span><br><span class="line">export PATH=$PATH:$PYTHONHOME:$PYTHONPATH</span><br></pre></td></tr></table></figure></p>
+<h2 id="裁剪考虑"><a href="#裁剪考虑" class="headerlink" title="裁剪考虑"></a>裁剪考虑</h2><ul>
+<li>lib/libpython2.7.a, 16M</li>
+<li>lib/test, 30M</li>
+</ul>
+<h2 id="附一：Python-内建模块功能说明"><a href="#附一：Python-内建模块功能说明" class="headerlink" title="附一：Python 内建模块功能说明"></a>附一：Python 内建模块功能说明</h2><p>直接引自 <a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a>，内容可能已过时，不过有参考价值。</p>
+<ol>
+<li>array (Modules/arraymodule.c) (<a href="http://docs.python.org/library/array.html" target="_blank" rel="noopener">http://docs.python.org/library/array.html</a>) 一个可以存放基本类型的高效数组, 提供了和序列类似的操作. 使用放法类似于 a = array.array(‘b’, [10, 20, 30]), 不常使用, 可以考虑去除. </li>
+<li>_ast (Python/Python-ast.c) (<a href="http://docs.python.org/library/ast.html" target="_blank" rel="noopener">http://docs.python.org/library/ast.html</a>) 抽象语法树, 供 Python 程序解析处理 Python 语法相关的库, 这个模块的源代码是由脚本自动生成的. 由于 Python-ast.c 本身还会被解释器的其它地方引用, 不能删除, 所以, 如果是为了压缩解释器大小, 保留这个库也没关系. 如果是为了定制 python 的功能, 也可以屏蔽这个库, 但是源代码需要保留, 不能从工程中删掉. </li>
+<li>audioop (Modules/audioop.c) (<a href="http://docs.python.org/library/audioop.html" target="_blank" rel="noopener">http://docs.python.org/library/audioop.html</a>) 一个音频处理的库, 仅 Win32 平台有效.</li>
+<li>binascii (Modules/binascii.c) (<a href="http://docs.python.org/library/binascii.html" target="_blank" rel="noopener">http://docs.python.org/library/binascii.html</a>) 提供二进制和 ASCII 码的转换, 会被 uu, base64, binhex 这些库引用. 建议保留.</li>
+<li>cmath (Modules/cmathmodule.c) (<a href="http://docs.python.org/library/cmath.html" target="_blank" rel="noopener">http://docs.python.org/library/cmath.html</a>) 提供复数操作的函数</li>
+<li>errno (Modules/errnomodule.c) (<a href="http://docs.python.org/library/errno.html" target="_blank" rel="noopener">http://docs.python.org/library/errno.html</a>) 提供标准的错误码定义, 在很多地方中都会使用, 需要保留.</li>
+<li>future_builtins (Modules/future_builtins.c) (<a href="http://docs.python.org/library/future_builtins.html" target="_blank" rel="noopener">http://docs.python.org/library/future_builtins.html</a>) 对那些在 Python2.x 和 Python3 中都有但是意义不一样的函数提供的包装. 使用这里面的函数可以保证调用了正确的版本的函数.</li>
+<li>gc (Modules/gcmodule.c) (<a href="http://docs.python.org/library/gc.html" target="_blank" rel="noopener">http://docs.python.org/library/gc.html</a>) Python 的垃圾收集接口. 当然保留.</li>
+<li>imageop (Modules/imageop.c) (<a href="http://docs.python.org/library/imageop.html" target="_blank" rel="noopener">http://docs.python.org/library/imageop.html</a>) 一些图像处理的函数.</li>
+<li>math (Modules/mathmodule.c) (<a href="http://docs.python.org/library/math.html" target="_blank" rel="noopener">http://docs.python.org/library/math.html</a>) 提供了 C 标准库中的那些数学函数.</li>
+<li>_md5 (Modules/md5module.c) 提供了 MD5 算法.</li>
+<li>nt (Modules/posixmodule.c) 一些操作系统习惯的函数, 比如打开文件等等.</li>
+<li>operator (Modules/operator.c) (<a href="http://docs.python.org/library/operator.html" target="_blank" rel="noopener">http://docs.python.org/library/operator.html</a>) 提供了操作符的等价函数</li>
+<li>signal (Modules/signalmodule.c) (<a href="http://docs.python.org/library/signal.html" target="_blank" rel="noopener">http://docs.python.org/library/signal.html</a>) 信号机制, 提供异步事件的回调.</li>
+<li>_sha, _sha256, _sha512 三种 SHA 的加密算法模块.</li>
+<li>strop (Modules/stropmodule.c) 提供了一些优化的字符串操作.<br>17.time (Modules/timemodule.c) (<a href="http://docs.python.org/library/time.html" target="_blank" rel="noopener">http://docs.python.org/library/time.html</a>) 时间操作库.</li>
+<li>thread (Modules/threadmodule.c) Python 线程的底层模块, threading 会使用 thread 库.</li>
+<li>cStringIO (Modules/cStringIO.c) (<a href="http://docs.python.org/library/stringio.html" target="_blank" rel="noopener">http://docs.python.org/library/stringio.html</a>) StringIO 的高效版本.</li>
+<li>cPickle (Modules/cPickle.c) (<a href="http://docs.python.org/library/pickle.html" target="_blank" rel="noopener">http://docs.python.org/library/pickle.html</a>) Python 的序列化模块.</li>
+<li>msvcrt (PC/msvcrtmodule.c) (<a href="http://docs.python.org/library/msvcrt.html" target="_blank" rel="noopener">http://docs.python.org/library/msvcrt.html</a>) VC 运行时库的包装, 包括一些文件和屏幕操作函数.</li>
+<li>_locale (Modules/_localemodule.c) 提供本地化支持的模块.</li>
+<li>_subprocess (PC/_subprocess.c) (<a href="http://docs.python.org/library/subprocess.html" target="_blank" rel="noopener">http://docs.python.org/library/subprocess.html</a>) 操作子进程的库, 平台相关的.</li>
+<li>_codecs (Modules/_codecsmodule.c)  (<a href="http://docs.python.org/library/codecs.html" target="_blank" rel="noopener">http://docs.python.org/library/codecs.html</a>) 定义了 Python 的编码器相关接口.</li>
+<li>_weakref (Modules/_weakref.c) (<a href="http://docs.python.org/library/weakref.html" target="_blank" rel="noopener">http://docs.python.org/library/weakref.html</a>) 创建对象的弱引用.</li>
+<li>_hotshot (Modules/_hotshot.c) (<a href="http://docs.python.org/library/hotshot.html" target="_blank" rel="noopener">http://docs.python.org/library/hotshot.html</a>) 类似于 Profiler 模块, 而且将来可能被移除, 现在把它去掉也不错.</li>
+<li>_random (Modules/_randommodule.c) 随机数模块.</li>
+<li>_bisect (Modules/_bisectmodule.c) (<a href="http://docs.python.org/library/bisect.html" target="_blank" rel="noopener">http://docs.python.org/library/bisect.html</a>)  一个基于二分算法, 可以让插入一个数据岛排序的序列后序列仍然有序的库.</li>
+<li>_heapq (Modules/_heapqmodule.c) (<a href="http://docs.python.org/library/heapq.html" target="_blank" rel="noopener">http://docs.python.org/library/heapq.html</a>) 实现堆栈数据结构算法的库.</li>
+<li>_lsprof (Modules/_lsprof.c) (<a href="http://docs.python.org/library/profile.html" target="_blank" rel="noopener">http://docs.python.org/library/profile.html</a>) Profiler 模块, 统计程序执行的性能.</li>
+<li>itertools (Modules/itertoolsmodule.c) (<a href="http://docs.python.org/library/itertools.html" target="_blank" rel="noopener">http://docs.python.org/library/itertools.html</a>) 一些迭代器操作的模块.</li>
+<li>_collections (Modules/_collectionsmodule.c) (<a href="http://docs.python.org/library/collections.html" target="_blank" rel="noopener">http://docs.python.org/library/collections.html</a>) 提供了几个高级的容器类.</li>
+<li>_symtable (Modules/symtablemodule.c) (<a href="http://docs.python.org/library/symtable.html" target="_blank" rel="noopener">http://docs.python.org/library/symtable.html</a>) 符号表管理模块.</li>
+<li>mmap (Modules/mmapmodule.c) (<a href="http://docs.python.org/library/mmap.html" target="_blank" rel="noopener">http://docs.python.org/library/mmap.html</a>) 文件内存映射支持模块.</li>
+<li>_csv (Modules/_csv.c) (<a href="http://docs.python.org/library/csv.html" target="_blank" rel="noopener">http://docs.python.org/library/csv.html</a>) 为 CSV 模块的内部支持. CSV 模块提供了读写 CSV 文件的功能.</li>
+<li>_sre (Modules/_sre.c)  正则表达式的匹配引擎.</li>
+<li>parser (Modules/parsermodule.c) (<a href="http://docs.python.org/library/parser.html" target="_blank" rel="noopener">http://docs.python.org/library/parser.html</a>) 操作 Python 语法树的模块.</li>
+<li>_winreg (PC/_winreg.c) Windows 注册表操作模块.</li>
+<li>_struct (Modules/_struct.c) 提供在 Python 和 C 之间转换数据类型的功能.</li>
+<li>datetime (Modules/datetimemodule.c) (<a href="http://docs.python.org/library/datetime.html" target="_blank" rel="noopener">http://docs.python.org/library/datetime.html</a>) 日期时间操作函数.</li>
+<li>_functools (Modules/_functoolsmodule.c) (<a href="http://docs.python.org/library/functools.html" target="_blank" rel="noopener">http://docs.python.org/library/functools.html</a>) 函数相关操作模块.</li>
+<li>_json (Modules/_json.c) (<a href="http://docs.python.org/library/json.html" target="_blank" rel="noopener">http://docs.python.org/library/json.html</a>) JSON 数据格式操作模块.</li>
+<li>xxsubtype (Modules/xxsubtype.c)  这是一个测试相关的模块. 运行 test_descr.py 时会用到.</li>
+<li>zipimport (Modules/zipimport.c) 这个模块主要用于从 zip 文件中导入 Python 的模块.</li>
+<li>zlib (Modules/zlibmodule.c) 这个模块提供了 zip 压缩和解压功能, 基于 GNU zip 实现.</li>
+<li>_multibytecodec, _codecs_cn, _codecs_hk, _codecs_iso2022, _codecs_jp, _codecs_kr, _codecs_tw (Modules/cjkcodecs/*) 这些模块提供了 CJK(中日韩统一表意文字) 的编码和解码. 去掉这部分可以减小 python 解释器 600 多 K.</li>
+<li>marshal (Python/marshal.c) (<a href="http://docs.python.org/library/marshal.html" target="_blank" rel="noopener">http://docs.python.org/library/marshal.html</a>) 为 Python 对象提供序列化的模块.</li>
+<li>imp (Python/import.c) (<a href="http://docs.python.org/library/imp.html" target="_blank" rel="noopener">http://docs.python.org/library/imp.html</a>) 这个模块提供了 Python 里的 import 语句的实现.</li>
+<li><strong>main</strong>, <strong>builtin</strong>, sys, exceptions, _warnings 这部分模块在 config.c 设置里只是一个名字占位符.</li>
+<li>_io (Modules/_iomodule.c) (<a href="http://docs.python.org/library/io.html" target="_blank" rel="noopener">http://docs.python.org/library/io.html</a>) 新版本的 Python 输入输出模块, 在 Python 3 中为默认的输入输出处理方法.</li>
+</ol>
+<h2 id="附二：Python-最佳编译依赖"><a href="#附二：Python-最佳编译依赖" class="headerlink" title="附二：Python 最佳编译依赖"></a>附二：Python 最佳编译依赖</h2><p>直接译自 <a href="https://gist.github.com/reorx/4067217" target="_blank" rel="noopener">Python Deployment</a>。</p>
+<p>键入如下命令自动安装一些依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get build-dep python2.7</span><br></pre></td></tr></table></figure></p>
+<p>确认安装如下列下的其他 -dev 包。</p>
+<ul>
+<li>python-dev</li>
+<li>libncurses5-dev</li>
+<li>libsqlite3-dev</li>
+<li>libbz2-dev</li>
+<li>libreadline-dev</li>
+<li>libdb4.8-dev</li>
+<li>tcl8.5-dev,tk8.5-dev</li>
+</ul>
+<p>下面这个包在 ubuntu 早期版本（如 10.04）并没有自动安装，需确认一下。</p>
+<ul>
+<li>libssl-dev</li>
+<li>libexpat1-dev</li>
+<li>libreadline6-dev</li>
+<li>libgtk2.0-dev</li>
+</ul>
+<p>如果想支持 xml 相关：</p>
+<ul>
+<li>libxml2-dev</li>
+<li>libxslt1-dev</li>
+</ul>
+<p>如果想支持 MySQLdb （在 pypi 中实际命令为 MySQL-python）：</p>
+<ul>
+<li>libmysqlclient-dev</li>
+</ul>
+<p>最终的 make 结果（编译结果）如能如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Python build finished, but the necessary bits to build these modules were not found:</span><br><span class="line">_tkinter           bsddb185           dl</span><br><span class="line">gdbm               imageop            sunaudiodev</span><br><span class="line">To find the necessary bits, look in setup.py in detect_modules() for the module&apos;s name.</span><br></pre></td></tr></table></figure>
+<p>这个编译 log 提示哪些模块没有被编译到，注意其中有一些并不是必需的或过时的：</p>
+<ul>
+<li>bsddb185: Older version of Oracle Berkeley DB. Undocumented. Install version 4.8 instead.</li>
+<li>dl: For 32-bit machines. Deprecated. Use ctypes instead.</li>
+<li>imageop: For 32-bit machines. Deprecated. Use PIL instead.</li>
+<li>sunaudiodev: For Sun hardware. Deprecated.</li>
+<li>_tkinter: For tkinter graphy library, unnecessary if you don’t develop tkinter programs.</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a href="http://www.adintr.com/article/blog/249" target="_blank" rel="noopener">定制 Python 嵌入 C++: (四) 定制 Python 内建模块</a></li>
+<li><a href="http://jyhshin.pixnet.net/blog/post/45780376-build-python-2.7.11-for-mips" target="_blank" rel="noopener">build python 2.7.11 for mips</a></li>
+<li><a href="https://gist.github.com/reorx/4067217" target="_blank" rel="noopener">Python Deployment</a></li>
+<li><a href="http://python-mips.blogspot.sg/" target="_blank" rel="noopener">How to cross compile python for MIPS</a></li>
+<li><a href="http://code.openhub.net/file?fid=gbEPeGEYo_iBj7isfd9QeVX7N8A&amp;cid=r3Ocm3qAuhY&amp;s=python&amp;fp=520151&amp;mp=&amp;projSelected=true#L0" target="_blank" rel="noopener">python-2.7-001-support-for-build.patch</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/17/programmer/python/cross_compile/" data-id="cjz95gt5r00lqw5r9ekd0ykwj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/交叉编译/">交叉编译</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/05/22/linux/wine_rtx/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Linux 下使用 RTX
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/05/10/life/talk_about_research/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">关于研究</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

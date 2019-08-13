@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>linux kernel module 依赖相关 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+<meta name="keywords" content="Linux,kernel,module,dependency,依赖,关系,内核,模块">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux kernel module 依赖相关">
+<meta property="og:url" content="http://yoursite.com/2017/06/22/programmer/linux/kernel_module_dep/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.080Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux kernel module 依赖相关">
+<meta name="twitter:description" content="linux 内核模块依赖关系查看方法，及依赖关系相关的问题汇总。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-programmer/linux/kernel_module_dep" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/22/programmer/linux/kernel_module_dep/" class="article-date">
+  <time datetime="2017-06-22T08:58:00.000Z" itemprop="datePublished">2017-06-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/kernel/">kernel</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux kernel module 依赖相关
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="查看依赖关系"><a href="#查看依赖关系" class="headerlink" title="查看依赖关系"></a>查看依赖关系</h2><p>问题背景：从专有系统移植某个特定功能的内核模块到 Linux 发行版，确认该模块的依赖关系。包含“我依赖谁”、“谁依赖我”两种情况。<br>详见<a href="http://xmodulo.com/how-to-check-kernel-module-dependencies-on-linux.html" target="_blank" rel="noopener">How to check kernel module dependencies on Linux</a></p>
+<ul>
+<li>lsmod</li>
+</ul>
+<p>如下，vboxdrv.ko 依赖 vboxnetadp.ko、vboxnetflt.ko、vboxpci.ko。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ lsmod</span><br><span class="line">Module                  Size  Used by</span><br><span class="line">tipc                  127285  0</span><br><span class="line">pci_stub               12622  1</span><br><span class="line">vboxpci                23116  0</span><br><span class="line">vboxnetadp             25813  0</span><br><span class="line">vboxnetflt             27947  0</span><br><span class="line">vboxdrv               455053  3 vboxnetadp,vboxnetflt,vboxpci</span><br><span class="line">xt_CHECKSUM            12549  1</span><br><span class="line">iptable_mangle         12734  1</span><br><span class="line">ipt_REJECT             12541  2</span><br><span class="line">nf_reject_ipv4         13183  1 ipt_REJECT</span><br><span class="line">ebtable_filter         12827  0</span><br><span class="line">ebtables               35359  1 ebtable_filter</span><br><span class="line">ip6table_filter        12815  0</span><br><span class="line">ip6_tables             27504  1 ip6table_filter</span><br><span class="line">kvm_intel             154139  0</span><br><span class="line">binfmt_misc            18163  1</span><br><span class="line">cfg80211              551242  0</span><br><span class="line">sch_netem              17419  0</span><br><span class="line">vxlan                  41123  0</span><br><span class="line">ip6_udp_tunnel         12755  1 vxlan</span><br><span class="line">udp_tunnel             13187  1 vxlan</span><br><span class="line">sch_htb                22429  0</span><br><span class="line">xt_nat                 12726  0</span><br><span class="line">xt_tcpudp              12924  6</span><br><span class="line">btrfs                 968059  0</span><br><span class="line">xor                    21411  1 btrfs</span><br><span class="line">raid6_pq               97812  1 btrfs</span><br><span class="line">ufs                    75315  0</span><br><span class="line">qnx4                   13394  0</span><br><span class="line">hfsplus               103788  0</span><br><span class="line">hfs                    54819  0</span><br><span class="line">minix                  36454  0</span><br><span class="line">ntfs                  101958  0</span><br><span class="line">msdos                  17332  0</span><br><span class="line">jfs                   186807  0</span><br><span class="line">xfs                   937845  0</span><br><span class="line">veth                   13376  0</span><br><span class="line">ipt_MASQUERADE         12678  4</span><br><span class="line">nf_nat_masquerade_ipv4    13412  1 ipt_MASQUERADE</span><br><span class="line">xfrm_user              36115  1</span><br><span class="line">xfrm_algo              15394  1 xfrm_user</span><br><span class="line">iptable_nat            12875  1</span><br><span class="line">nf_conntrack_ipv4      18953  3</span><br><span class="line">nf_defrag_ipv4         12758  1 nf_conntrack_ipv4</span><br><span class="line">nf_nat_ipv4            14267  1 iptable_nat</span><br><span class="line">xt_addrtype            12713  2</span><br><span class="line">iptable_filter         12810  1</span><br><span class="line">ip_tables              27718  3 iptable_filter,iptable_mangle,iptable_nat</span><br><span class="line">xt_conntrack           12760  2</span><br><span class="line">x_tables               34103  13 ip6table_filter,xt_CHECKSUM,ip_tables,xt_tcpudp,ipt_MASQUERADE,xt_conntrack,xt_nat,iptable_filter,ebtables,ipt_REJECT,iptable_mangle,ip6_tables,xt_addrtype</span><br><span class="line">nf_nat                 26308  3 nf_nat_ipv4,xt_nat,nf_nat_masquerade_ipv4</span><br><span class="line">nf_conntrack          105683  5 nf_nat,nf_nat_ipv4,xt_conntrack,nf_nat_masquerade_ipv4,nf_conntrack_ipv4</span><br><span class="line">br_netfilter           18017  0</span><br><span class="line">bridge                114479  1 br_netfilter</span><br><span class="line">stp                    12976  1 bridge</span><br><span class="line">llc                    14441  2 stp,bridge</span><br><span class="line">overlay                42380  0</span><br><span class="line">openvswitch            85378  0</span><br><span class="line">libcrc32c              12644  2 xfs,openvswitch</span><br><span class="line">snd_hda_codec_realtek    80584  1</span><br><span class="line">snd_hda_codec_generic    70069  1 snd_hda_codec_realtek</span><br><span class="line">snd_hda_intel          30775  6</span><br><span class="line">dell_wmi               13132  0</span><br><span class="line">snd_hda_controller     35493  1 snd_hda_intel</span><br><span class="line">sparse_keymap          13890  1 dell_wmi</span><br><span class="line">gpio_ich               13636  0</span><br><span class="line">snd_hda_codec         144641  4 snd_hda_codec_realtek,snd_hda_codec_generic,snd_hda_intel,snd_hda_controller</span><br><span class="line">snd_hwdep              17709  1 snd_hda_codec</span><br><span class="line">coretemp               13638  0</span><br><span class="line">snd_pcm               106401  3 snd_hda_codec,snd_hda_intel,snd_hda_controller</span><br><span class="line">snd_seq_midi           13564  0</span><br><span class="line">snd_seq_midi_event     14899  1 snd_seq_midi</span><br><span class="line">kvm                   480880  1 kvm_intel</span><br><span class="line">snd_rawmidi            31148  1 snd_seq_midi</span><br><span class="line">snd_seq                63540  2 snd_seq_midi_event,snd_seq_midi</span><br><span class="line">snd_seq_device         14875  3 snd_seq,snd_rawmidi,snd_seq_midi</span><br><span class="line">snd_timer              30069  2 snd_pcm,snd_seq</span><br><span class="line">dcdbas                 15017  0</span><br><span class="line">lpc_ich                21176  0</span><br><span class="line">snd                    83976  22 snd_hda_codec_realtek,snd_hwdep,snd_timer,snd_pcm,snd_seq,snd_rawmidi,snd_hda_codec_generic,snd_hda_codec,snd_hda_intel,snd_seq_device</span><br><span class="line">serio_raw              13434  0</span><br><span class="line">soundcore              15091  2 snd,snd_hda_codec</span><br><span class="line">8250_fintek            12924  0</span><br><span class="line">shpchp                 37216  0</span><br><span class="line">mac_hid                13275  0</span><br><span class="line">parport_pc             32909  1</span><br><span class="line">ppdev                  17711  0</span><br><span class="line">lp                     17799  0</span><br><span class="line">parport                42432  3 lp,ppdev,parport_pc</span><br><span class="line">autofs4                39306  2</span><br><span class="line">hid_generic            12559  0</span><br><span class="line">psmouse               118539  0</span><br><span class="line">broadcom               17339  0</span><br><span class="line">i915                 1087204  3</span><br><span class="line">pata_acpi              13053  0</span><br><span class="line">usbhid                 53106  0</span><br><span class="line">hid                   110883  2 hid_generic,usbhid</span><br><span class="line">wmi                    19379  1 dell_wmi</span><br><span class="line">video                  24803  1 i915</span><br><span class="line">i2c_algo_bit           13564  1 i915</span><br><span class="line">drm_kms_helper        123797  1 i915</span><br><span class="line">tg3                   179117  0</span><br><span class="line">ptp                    19534  1 tg3</span><br><span class="line">pps_core               19332  1 ptp</span><br><span class="line">drm                   341489  5 i915,drm_kms_helper</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cat modules.dep，几乎与 lsmod 一样，但是包含未加载的内核模块依赖关系，ubuntu 默认有很多很多！</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ cat /lib/modules/`uname -r`/modules.dep</span><br><span class="line">kernel/arch/x86/kernel/cpu/mcheck/mce-inject.ko:</span><br><span class="line">kernel/arch/x86/kernel/msr.ko:</span><br><span class="line">kernel/arch/x86/kernel/cpuid.ko:</span><br><span class="line">kernel/arch/x86/kernel/iosf_mbi.ko:</span><br><span class="line">kernel/arch/x86/crypto/glue_helper.ko:</span><br><span class="line">kernel/arch/x86/crypto/aes-x86_64.ko:</span><br><span class="line">kernel/arch/x86/crypto/des3_ede-x86_64.ko: kernel/crypto/des_generic.ko</span><br><span class="line">kernel/arch/x86/crypto/camellia-x86_64.ko: kernel/crypto/xts.ko kernel/crypto/lrw.ko kernel/crypto/gf128mul.ko kernel/arch/x86/crypto/glue_helper.ko</span><br><span class="line">kernel/arch/x86/crypto/blowfish-x86_64.ko: kernel/crypto/blowfish_common.ko</span><br><span class="line">kernel/arch/x86/crypto/twofish-x86_64.ko: kernel/crypto/twofish_common.ko</span><br><span class="line">kernel/arch/x86/crypto/twofish-x86_64-3way.ko: kernel/arch/x86/crypto/twofish-x86_64.ko kernel/crypto/twofish_common.ko kernel/crypto/xts.ko kernel/crypto/lrw.ko kernel/crypto/gf128mul.ko kernel/arch/x86/crypto/glue_helper.ko</span><br><span class="line">kernel/arch/x86/crypto/salsa20-x86_64.ko:</span><br><span class="line">kernel/arch/x86/crypto/serpent-sse2-x86_64.ko: kernel/crypto/xts.ko kernel/crypto/serpent_generic.ko kernel/crypto/lrw.ko kernel/crypto/gf128mul.ko kernel/arch/x86/crypto/glue_helper.ko kernel/crypto/ablk_helper.ko kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/aesni-intel.ko: kernel/arch/x86/crypto/aes-x86_64.ko kernel/crypto/lrw.ko kernel/crypto/gf128mul.ko kernel/arch/x86/crypto/glue_helper.ko kernel/crypto/ablk_helper.ko kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/ghash-clmulni-intel.ko: kernel/crypto/cryptd.ko</span><br><span class="line">kernel/arch/x86/crypto/sha1-ssse3.ko:</span><br><span class="line">... 此处省略几千行</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>modprobe --show-dependency xxx.ko</code>，以 lsmod 不同的是，该命令显示谁依赖 xxx.ko。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sunyongfeng@ubuntu:~$ modprobe --show-depends -n iptable_filter</span><br><span class="line">insmod /lib/modules/3.19.8-031908-generic/kernel/net/netfilter/x_tables.ko </span><br><span class="line">insmod /lib/modules/3.19.8-031908-generic/kernel/net/ipv4/netfilter/ip_tables.ko </span><br><span class="line">insmod /lib/modules/3.19.8-031908-generic/kernel/net/ipv4/netfilter/iptable_filter.ko</span><br></pre></td></tr></table></figure>
+<ul>
+<li>depmod，生成 modules.dep 和 map 文件</li>
+</ul>
+<h2 id="依赖相关的问题"><a href="#依赖相关的问题" class="headerlink" title="依赖相关的问题"></a>依赖相关的问题</h2><h3 id="提示-“modprobe-ERROR-libkmod-libkmod-c-5”"><a href="#提示-“modprobe-ERROR-libkmod-libkmod-c-5”" class="headerlink" title="提示 “modprobe: ERROR: ../libkmod/libkmod.c:5”"></a>提示 “modprobe: ERROR: ../libkmod/libkmod.c:5”</h3><p>可能出现的原因:</p>
+<ul>
+<li>内核版本不一致</li>
+<li>modules.dep.bin 受损</li>
+</ul>
+<p>参考:</p>
+<ul>
+<li><a href="https://askubuntu.com/questions/459296/could-not-open-moddep-file-lib-modules-3-xx-generic-modules-dep-bin-when-mo" target="_blank" rel="noopener">“Could not open moddep file ‘/lib/modules/3.XX-generic/modules.dep.bin’” when mounting using a loop</a> </li>
+<li><a href="https://www.helplib.com/ubuntu/article_159091" target="_blank" rel="noopener">使用循环进行挂载时的modprobe”无法打开moddep文件’/lib/modules/3.XX generic/modules.dep.bin’”</a></li>
+</ul>
+<p>解决:（思路，重新生成 modules.dep.bin，或干脆重新替换内核）</p>
+<ul>
+<li><code>depmod</code></li>
+<li>uname -r, <code>apt-get install --reinstall linux-image-&#39;uname -r 的结果&#39;</code></li>
+</ul>
+<p>一个样例，发现 docker 服务起不来，通过 systemd 的 log 查看（<code>sudo journalctl -u systemd-modules-load.service -b</code>）是 modprobe 其他模块失败，导致 docker 服务退出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Nov 09 11:07:18 hostnamexxx systemd[1]: Starting Docker Application Container Engine...</span><br><span class="line">Nov 09 11:07:18 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:18.725826063+08:00&quot; level=info msg=&quot;New containerd process, pid: 1024\n&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.800079405+08:00&quot; level=info msg=&quot;Graph migration to content-addressability took 0.00 seconds&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.801535791+08:00&quot; level=warning msg=&quot;Running modprobe bridge br_netfilter failed with message: modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file &apos;/lib/modules/3.16.0-5-amd64/modules.dep.bin&apos;\nmodprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file &apos;/lib/modules/3.16.0-5-amd64/modules.dep.bin&apos;\n, error: exit status 1&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.802736912+08:00&quot; level=warning msg=&quot;Running modprobe nf_nat failed with message: `modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file &apos;/lib/modules/3.16.0-5-amd64/modules.dep.bin&apos;`, error: exit status 1&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.803828391+08:00&quot; level=warning msg=&quot;Running modprobe xt_conntrack failed with message: `modprobe: ERROR: ../libkmod/libkmod.c:557 kmod_search_moddep() could not open moddep file &apos;/lib/modules/3.16.0-5-amd64/modules.dep.bin&apos;`, error: exit status 1&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.805611702+08:00&quot; level=info msg=&quot;Firewalld running: false&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19.904012372+08:00&quot; level=fatal msg=&quot;Error starting daemon: Error initializing network controller: Error creating default \&quot;bridge\&quot; network: package not installed&quot;</span><br><span class="line">Nov 09 11:07:19 hostnamexxx systemd[1]: docker.service: main process exited, code=exited, status=1/FAILURE</span><br><span class="line">Nov 09 11:07:19 hostnamexxx docker[1019]: time=&quot;2018-11-09T11:07:19+08:00&quot; level=info msg=&quot;stopping containerd after receiving terminated&quot;</span><br><span class="line">Nov 09 11:07:20 hostnamexxx systemd[1]: Failed to start Docker Application Container Engine.</span><br><span class="line">Nov 09 11:07:20 hostnamexxx systemd[1]: Unit docker.service entered failed state.</span><br></pre></td></tr></table></figure>
+<p>运行一下 <code>sudo depmod</code>，pass。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/22/programmer/linux/kernel_module_dep/" data-id="cjz95gt5k00kzw5r9aeqow4gp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kernel/">kernel</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/28/linux/deb_dependency/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          包管理工具依赖关系管理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/16/networks/switch/three_panel/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">交换机的三个平面简介——管理平面、控制平面、数据平面</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/administrator/">administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dokuwiki/">dokuwiki</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/kernel/">kernel</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/life/">life</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/misc/">misc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/networks/">networks</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/newTech/">newTech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/p4/">p4</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/programmer/">programmer</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell/">shell</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools-administrator/">tools, administrator</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/yocto/">yocto</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/思考/">思考</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARP/">ARP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CPU/">CPU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GDB/">GDB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/L2/">L2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MTU/">MTU</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NOS/">NOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/administrator/">administrator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app/">app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apt/">apt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arm/">arm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arp/">arp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/">c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cable/">cable</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clock/">clock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/compile/">compile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/configure/">configure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coredump/">coredump</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/debian/">debian</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discourse/">discourse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dokuwiki/">dokuwiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dos/">dos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elementary/">elementary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fcitx/">fcitx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gnome-terminal/">gnome-terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/int/">int</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kconfig/">kconfig</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lib/">lib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libteam/">libteam</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/makefile/">makefile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mirror/">mirror</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/moinmoin/">moinmoin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nat/">nat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/networks/">networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openswitch/">openswitch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/p4/">p4</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/packet/">packet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/paper/">paper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ppp/">ppp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pppoe-networks/">pppoe networks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/profiling/">profiling</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/programmer/">programmer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quagga/">quagga</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redhat/">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpc/">rpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scp/">scp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/serialport/">serialport</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server/">server</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/software/">software</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sshd/">sshd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/svn/">svn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/telnet/">telnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/terminal/">terminal</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tuntap/">tuntap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/veth/">veth</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/virtualBox/">virtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlc/">vlc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vnc/">vnc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wine/">wine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireshark/">wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wps/">wps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xterm/">xterm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/yocto/">yocto</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/串口/">串口</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交叉编译/">交叉编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/交换机/">交换机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/外面的世界/">外面的世界</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符流操作/">字符流操作</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/思考/">思考</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据结构/">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件共享/">文件共享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件系统/">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/新技术点/">新技术点</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/版本控制/">版本控制</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/磁盘管理/">磁盘管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络测试/">网络测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/虚拟机/">虚拟机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/调试/">调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/路由协议/">路由协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进程/">进程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程登录/">远程登录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARP/" style="font-size: 10px;">ARP</a> <a href="/tags/CPU/" style="font-size: 10px;">CPU</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GDB/" style="font-size: 10px;">GDB</a> <a href="/tags/L2/" style="font-size: 10px;">L2</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/MTU/" style="font-size: 10px;">MTU</a> <a href="/tags/NOS/" style="font-size: 10px;">NOS</a> <a href="/tags/SecureCRT/" style="font-size: 11.82px;">SecureCRT</a> <a href="/tags/administrator/" style="font-size: 17.27px;">administrator</a> <a href="/tags/app/" style="font-size: 10px;">app</a> <a href="/tags/apt/" style="font-size: 10.91px;">apt</a> <a href="/tags/arm/" style="font-size: 10px;">arm</a> <a href="/tags/arp/" style="font-size: 10px;">arp</a> <a href="/tags/c/" style="font-size: 16.36px;">c</a> <a href="/tags/cable/" style="font-size: 10px;">cable</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/clock/" style="font-size: 10px;">clock</a> <a href="/tags/compile/" style="font-size: 10.91px;">compile</a> <a href="/tags/configure/" style="font-size: 10px;">configure</a> <a href="/tags/coredump/" style="font-size: 10px;">coredump</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 13.64px;">deb</a> <a href="/tags/debian/" style="font-size: 10.91px;">debian</a> <a href="/tags/discourse/" style="font-size: 10px;">discourse</a> <a href="/tags/docker/" style="font-size: 10.91px;">docker</a> <a href="/tags/dokuwiki/" style="font-size: 12.73px;">dokuwiki</a> <a href="/tags/dos/" style="font-size: 10px;">dos</a> <a href="/tags/elementary/" style="font-size: 10px;">elementary</a> <a href="/tags/fcitx/" style="font-size: 10px;">fcitx</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/git/" style="font-size: 15.45px;">git</a> <a href="/tags/gnome-terminal/" style="font-size: 10px;">gnome-terminal</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/int/" style="font-size: 10.91px;">int</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/kconfig/" style="font-size: 10px;">kconfig</a> <a href="/tags/kernel/" style="font-size: 11.82px;">kernel</a> <a href="/tags/lib/" style="font-size: 10px;">lib</a> <a href="/tags/libteam/" style="font-size: 10px;">libteam</a> <a href="/tags/linux/" style="font-size: 13.64px;">linux</a> <a href="/tags/makefile/" style="font-size: 10px;">makefile</a> <a href="/tags/mirror/" style="font-size: 10px;">mirror</a> <a href="/tags/misc/" style="font-size: 11.82px;">misc</a> <a href="/tags/moinmoin/" style="font-size: 10px;">moinmoin</a> <a href="/tags/nat/" style="font-size: 10px;">nat</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/networks/" style="font-size: 14.55px;">networks</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openswitch/" style="font-size: 10.91px;">openswitch</a> <a href="/tags/p4/" style="font-size: 14.55px;">p4</a> <a href="/tags/packet/" style="font-size: 10.91px;">packet</a> <a href="/tags/paper/" style="font-size: 10px;">paper</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/ppp/" style="font-size: 10px;">ppp</a> <a href="/tags/pppoe-networks/" style="font-size: 10px;">pppoe networks</a> <a href="/tags/profiling/" style="font-size: 10px;">profiling</a> <a href="/tags/programmer/" style="font-size: 10px;">programmer</a> <a href="/tags/python/" style="font-size: 13.64px;">python</a> <a href="/tags/quagga/" style="font-size: 10px;">quagga</a> <a href="/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/tags/redis/" style="font-size: 10.91px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/scp/" style="font-size: 10px;">scp</a> <a href="/tags/serialport/" style="font-size: 10.91px;">serialport</a> <a href="/tags/server/" style="font-size: 10px;">server</a> <a href="/tags/software/" style="font-size: 10px;">software</a> <a href="/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/tags/sshd/" style="font-size: 10px;">sshd</a> <a href="/tags/svn/" style="font-size: 10.91px;">svn</a> <a href="/tags/telnet/" style="font-size: 10px;">telnet</a> <a href="/tags/terminal/" style="font-size: 10px;">terminal</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/tuntap/" style="font-size: 10px;">tuntap</a> <a href="/tags/ubuntu/" style="font-size: 19.09px;">ubuntu</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/veth/" style="font-size: 10px;">veth</a> <a href="/tags/vim/" style="font-size: 11.82px;">vim</a> <a href="/tags/virtualBox/" style="font-size: 10px;">virtualBox</a> <a href="/tags/vlc/" style="font-size: 10px;">vlc</a> <a href="/tags/vnc/" style="font-size: 10px;">vnc</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/windows/" style="font-size: 12.73px;">windows</a> <a href="/tags/wine/" style="font-size: 10px;">wine</a> <a href="/tags/wireshark/" style="font-size: 10px;">wireshark</a> <a href="/tags/wps/" style="font-size: 10px;">wps</a> <a href="/tags/xterm/" style="font-size: 10px;">xterm</a> <a href="/tags/yocto/" style="font-size: 10.91px;">yocto</a> <a href="/tags/串口/" style="font-size: 10.91px;">串口</a> <a href="/tags/交叉编译/" style="font-size: 10px;">交叉编译</a> <a href="/tags/交换机/" style="font-size: 10px;">交换机</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/外面的世界/" style="font-size: 10px;">外面的世界</a> <a href="/tags/字符流操作/" style="font-size: 10.91px;">字符流操作</a> <a href="/tags/思考/" style="font-size: 10.91px;">思考</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/文件共享/" style="font-size: 10px;">文件共享</a> <a href="/tags/文件系统/" style="font-size: 18.18px;">文件系统</a> <a href="/tags/新技术点/" style="font-size: 10px;">新技术点</a> <a href="/tags/版本控制/" style="font-size: 15.45px;">版本控制</a> <a href="/tags/磁盘管理/" style="font-size: 10px;">磁盘管理</a> <a href="/tags/网络测试/" style="font-size: 12.73px;">网络测试</a> <a href="/tags/虚拟机/" style="font-size: 10px;">虚拟机</a> <a href="/tags/调试/" style="font-size: 10px;">调试</a> <a href="/tags/路由协议/" style="font-size: 10px;">路由协议</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/远程登录/" style="font-size: 12.73px;">远程登录</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/23/misc/screen_too_bright/">屏幕太“亮”看不清灰色部分</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/25/linux/elementaryos/">elementary OS 使用记录</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/31/tools/git_cmd/">一些常见的 git 命令备忘</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/24/networks/rpc.rpc_poll.rpc_streaming/">图解 rpc rpc_poll 和 rpc_streaming 的差异</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/01/programmer/tools/kconfig-frontends/">kconfig-frontends 简介</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

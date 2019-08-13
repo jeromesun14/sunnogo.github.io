@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+<meta name="keywords" content="ubuntu,linux,deb,apt,package,control,dependency,dependencies,build dependency,source.list,build-dep,backports,编译依赖,查看,&#x2F;boot,full,满">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apt-deb 相关问题记录">
+<meta property="og:url" content="http://sunyongfeng.com/201712/linux/apt_deb_issues.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.060Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="apt-deb 相关问题记录">
+<meta name="twitter:description" content="记录 apt / deb 使用过程中的各种问题及解决方法。">
+  <link rel="canonical" href="http://sunyongfeng.com/201712/linux/apt_deb_issues">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>apt-deb 相关问题记录 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201712/linux/apt_deb_issues.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">apt-deb 相关问题记录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-12-14 10:42:00" itemprop="dateCreated datePublished" datetime="2017-12-14T10:42:00+08:00">2017-12-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201712/linux/apt_deb_issues.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201712/linux/apt_deb_issues.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">记录 apt / deb 使用过程中的各种问题及解决方法。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="修改源"><a href="#修改源" class="headerlink" title="修改源"></a>修改源</h2><h2 id="查看依赖关系"><a href="#查看依赖关系" class="headerlink" title="查看依赖关系"></a>查看依赖关系</h2><ul>
+<li>编译依赖，<code>apt-rdepends --build-depends package_name</code></li>
+</ul>
+<h2 id="问题记录"><a href="#问题记录" class="headerlink" title="问题记录"></a>问题记录</h2><h3 id="apt-get-y-build-dep-linux-失败"><a href="#apt-get-y-build-dep-linux-失败" class="headerlink" title="apt-get -y build-dep linux 失败"></a>apt-get -y build-dep linux 失败</h3><p>log：</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/<span class="comment"># apt-get -y build-dep linux</span></span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading <span class="keyword">state</span> information... Done</span><br><span class="line">E: Build-Depends dependency <span class="keyword">for</span> linux cannot be satisfied because candidate version of package debhelper can't satisfy version requirements</span><br></pre></td></tr></table></figure>
+<p>分析：debhelper 的版本满足不了编译 linux 的依赖。</p>
+<ul>
+<li>通过 <code>apt-rdepends --build-depends linux &gt; linux.build-depends.txt</code> 查看 linux 的编译依赖。linux 的编译依赖好多，要等很长时间。</li>
+<li>通过 <code>cat linux.build-depends.txt | grep debhelper</code> 确认对 debhelper 的版本依赖发现有软件对其的版本依赖 &gt;= 10，而 debian jessie 的默认 debhelper 版本为 9.20xxx，在 repo 中可以看到 debhelper 当前最新版本为 10.10.9。</li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/# <span class="keyword">cat</span> linux.build-depends.txt | <span class="keyword">grep</span> <span class="string">"&gt;= 10"</span>  </span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>~)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>~)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>~)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br><span class="line">  Build-Depend<span class="variable">s:</span> debhelper (&gt;= <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 debhelper 所有版本</li>
+</ul>
+<p>通过 <code>apt-cache madison debhelper</code> 查看 debhelper 的所有版本</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76<span class="symbol">:/</span><span class="comment"># apt-cache madison debhelper</span></span><br><span class="line"> debhelper <span class="params">| 10.2.5~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> amd64 Packages</span><br><span class="line"> debhelper <span class="params">| 9.20150101+deb8u2 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> amd64 Packages</span><br><span class="line"> debhelper <span class="params">| 9.20150101+deb8u2 |</span> <span class="symbol">http:</span>/<span class="regexp">/security.debian.org/</span> jessie/updates/main amd64 Packages</span><br><span class="line"> debhelper <span class="params">| 9.20150101+deb8u2 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> Sources</span><br><span class="line"> debhelper <span class="params">| 10.2.5~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> Sources</span><br><span class="line"> debhelper <span class="params">| 9.20150101+deb8u2 |</span> <span class="symbol">http:</span>/<span class="regexp">/security.debian.org/</span> jessie/updates/main Sources</span><br></pre></td></tr></table></figure>
+<p>尝试安装 debhelper 版本 10.2.5~bp08+1，发现有新的依赖关系问题：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76:/<span class="comment"># apt-get install debhelper=10.2.5~bpo8+1</span></span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Some packages could <span class="keyword">not</span> be installed. This may mean <span class="keyword">that</span> you have</span><br><span class="line">requested an impossible situation <span class="keyword">or</span> <span class="keyword">if</span> you are using <span class="keyword">the</span> unstable</span><br><span class="line">distribution <span class="keyword">that</span> <span class="keyword">some</span> required packages have <span class="keyword">not</span> yet been created</span><br><span class="line"><span class="keyword">or</span> been moved <span class="keyword">out of</span> Incoming.</span><br><span class="line">The following information may help <span class="keyword">to</span> resolve <span class="keyword">the</span> situation:</span><br><span class="line"></span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> debhelper : Depends: dh-autoreconf (&gt;= <span class="number">12</span>~) <span class="keyword">but</span> <span class="number">10</span> <span class="keyword">is</span> <span class="keyword">to</span> be installed</span><br><span class="line">             Depends: dh-strip-nondeterminism (&gt;= <span class="number">0.028</span>~) <span class="keyword">but</span> <span class="number">0.003</span><span class="number">-1</span> <span class="keyword">is</span> <span class="keyword">to</span> be installed</span><br><span class="line">E: Unable <span class="keyword">to</span> correct problems, you have held broken packages.</span><br><span class="line">root@c60c282d2d76:/<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<p>发现比较高版本的包都是来自 jessie-backports:</p>
+<blockquote>
+<p><a href="https://wiki.debian.org/Backports" target="_blank" rel="noopener">Backports</a>: Backports are recompiled packages from testing (mostly) and unstable (in a few cases only, e.g. security updates), so they will run without new libraries (wherever it is possible) on a stable Debian distribution. It is recommended to pick out single backports which fit your needs, and not to use all backports available.</p>
+</blockquote>
+<p>即，Backports 存放的软件为不稳定或仅用于测试目的的编译结果。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@c60c282d2d76<span class="symbol">:/</span><span class="comment"># apt-cache madison dh-autoreconf        </span></span><br><span class="line">dh-autoreconf <span class="params">|  12~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> amd64 Packages</span><br><span class="line">dh-autoreconf <span class="params">|         10 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> amd64 Packages</span><br><span class="line">dh-autoreconf <span class="params">|         10 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> Sources</span><br><span class="line">dh-autoreconf <span class="params">|  12~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> Sources</span><br><span class="line">root@c60c282d2d76<span class="symbol">:/</span><span class="comment"># apt-cache madison dh-strip-nondeterminism </span></span><br><span class="line">dh-strip-nondeterminism <span class="params">| 0.034-1~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> amd64 Packages</span><br><span class="line">dh-strip-nondeterminism <span class="params">|    0.003-1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> amd64 Packages</span><br><span class="line">strip-nondeterminism <span class="params">|    0.003-1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie/main</span> Sources</span><br><span class="line">strip-nondeterminism <span class="params">| 0.034-1~bpo8+1 |</span> <span class="symbol">http:</span>/<span class="regexp">/ftp.cn.debian.org/debian</span><span class="regexp">/ jessie-backports/main</span> Sources</span><br><span class="line">root@c60c282d2d76<span class="symbol">:/</span><span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<p>OK，是时候把 Backports 的源踢掉了。</p>
+<p>故障时的源，被 <a href="http://mirrors.163.com/.help/debian.html" target="_blank" rel="noopener">163 的 Debian镜像使用帮助</a>误导了。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">deb <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie main non-free contrib</span></span><br><span class="line">deb <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie-updates main non-free contrib</span></span><br><span class="line">deb <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie-backports main non-free contrib</span></span><br><span class="line">deb-src <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie main non-free contrib</span></span><br><span class="line">deb-src <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie-updates main non-free contrib</span></span><br><span class="line">deb-src <span class="string">http:</span><span class="comment">//mirrors.163.com/debian/ jessie-backports main non-free contrib</span></span><br><span class="line">deb <span class="string">http:</span><span class="comment">//mirrors.163.com/debian-security/ jessie/updates main non-free contrib</span></span><br><span class="line">deb-src <span class="string">http:</span><span class="comment">//mirrors.163.com/debian-security/ jessie/updates main non-free contrib</span></span><br></pre></td></tr></table></figure>
+<p>在调试的时候，一开始已注意到可能是源的问题，但是还是一遍一遍傻逼式地试不同的源，比如上面的 debian 官方中国源 ftp.cn.debian.org。</p>
+<p><strong>烂习惯。。。。。调东西还是乱试一通，没去找根本原因。。。</strong><br>教训是一个下午没了，正常已经半个小时就可以发现根本原因了。</p>
+<h3 id="boot-目录满了，无法增删内核-image"><a href="#boot-目录满了，无法增删内核-image" class="headerlink" title="/boot 目录满了，无法增删内核 image"></a>/boot 目录满了，无法增删内核 image</h3><p>如果 /boot 目录满了，无法正常地 apt-get intall / remove / purge 等操作。解决方法如下，来自：</p>
+<ul>
+<li><a href="https://gist.github.com/ipbastola/2760cfc28be62a5ee10036851c654600" target="_blank" rel="noopener">https://gist.github.com/ipbastola/2760cfc28be62a5ee10036851c654600</a></li>
+<li><a href="https://askubuntu.com/questions/585736/cant-clean-a-full-boot-because-of-unmet-dependencies" target="_blank" rel="noopener">https://askubuntu.com/questions/585736/cant-clean-a-full-boot-because-of-unmet-dependencies</a>, msa 的回答</li>
+</ul>
+<p>解决步骤:</p>
+<ul>
+<li>sudo apt autoremove –purge</li>
+<li>sudo apt autoremove</li>
+<li>sudo apt-get -f install</li>
+</ul>
+<p>异常 log：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">jeromesun@km:~$ df -h</span><br><span class="line">Filesystem                   Size  Used Avail Use% Mounted on</span><br><span class="line">...</span><br><span class="line">/dev/sda1                    472M  468M     0 100% /boot</span><br><span class="line">...</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@kmc-b0232:~$ sudo apt-get autoremove </span><br><span class="line">[sudo] password for jeromesun: </span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">You might want to run 'apt-get -f install' to correct these.</span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> linux-image-extra<span class="string">-4</span>.13.0<span class="string">-37</span>-generic : Depends: linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic but it is not installed</span><br><span class="line"> linux-image-generic-hwe<span class="string">-16</span>.04 : Depends: linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic but it is not installed</span><br><span class="line">E: Unmet dependencies. Try using -f.</span><br><span class="line">jeromesun@km:~$ sudo apt-get -f</span><br><span class="line">E: Command line option 'f' [from -f] is not understood in combination with the other options.</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ sudo apt-get -f install</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Correcting dependencies... Done</span><br><span class="line">The following packages were automatically installed and are no longer required:</span><br><span class="line">...</span><br><span class="line">  linux-headers<span class="string">-4</span>.10.0<span class="string">-37</span> linux-headers<span class="string">-4</span>.10.0<span class="string">-37</span>-generic linux-headers<span class="string">-4</span>.10.0<span class="string">-40</span> linux-headers<span class="string">-4</span>.10.0<span class="string">-40</span>-generic linux-headers<span class="string">-4</span>.10.0<span class="string">-42</span> linux-headers<span class="string">-4</span>.10.0<span class="string">-42</span>-generic linux-headers<span class="string">-4</span>.13.0<span class="string">-26</span></span><br><span class="line">  linux-headers<span class="string">-4</span>.13.0<span class="string">-26</span>-generic linux-headers<span class="string">-4</span>.13.0<span class="string">-31</span> linux-headers<span class="string">-4</span>.13.0<span class="string">-31</span>-generic linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic linux-image<span class="string">-4</span>.10.0<span class="string">-40</span>-generic linux-image<span class="string">-4</span>.10.0<span class="string">-42</span>-generic</span><br><span class="line">  linux-image<span class="string">-4</span>.13.0<span class="string">-26</span>-generic linux-image<span class="string">-4</span>.13.0<span class="string">-31</span>-generic linux-image-extra<span class="string">-4</span>.10.0<span class="string">-37</span>-generic linux-image-extra<span class="string">-4</span>.10.0<span class="string">-40</span>-generic linux-image-extra<span class="string">-4</span>.10.0<span class="string">-42</span>-generic linux-image-extra<span class="string">-4</span>.13.0<span class="string">-26</span>-generic linux-image-extra<span class="string">-4</span>.13.0<span class="string">-31</span>-generic </span><br><span class="line">...  </span><br><span class="line">Use 'sudo apt autoremove' to remove them.</span><br><span class="line">The following additional packages will be installed:</span><br><span class="line">  linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic</span><br><span class="line">Suggested packages:</span><br><span class="line">  fdutils linux-tools</span><br><span class="line">The following NEW packages will be installed:</span><br><span class="line">  linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic</span><br><span class="line">0 upgraded, 1 newly installed, 0 to remove and 205 not upgraded.</span><br><span class="line">9 not fully installed or removed.</span><br><span class="line">Need to get 0 B/20.9 MB of archives.</span><br><span class="line">After this operation, 72.6 MB of additional disk space will be used.</span><br><span class="line">Do you want to continue? [Y/n] y</span><br><span class="line">(Reading database ... 574107 files and directories currently installed.)</span><br><span class="line">Preparing to unpack .../linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic_4.13.0<span class="string">-37</span>.42~16.04.1_amd64.deb ...</span><br><span class="line">Done.</span><br><span class="line">Unpacking linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic (4.13.0<span class="string">-37</span>.42~16.04.1) ...</span><br><span class="line">dpkg: error processing archive /var/cache/apt/archives/linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic_4.13.0<span class="string">-37</span>.42~16.04.1_amd64.deb (--unpack):</span><br><span class="line"> cannot copy extracted data for './boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-37</span>-generic' to '/boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-37</span>-generic.dpkg-new': failed to write (No space left on device)</span><br><span class="line">No apport report written because the error message indicates a disk full error</span><br><span class="line">                                                                              dpkg-deb: error: subprocess paste was killed by signal (Broken pipe)</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.13.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-37</span>-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.13.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-37</span>-generic</span><br><span class="line">Errors were encountered while processing:</span><br><span class="line"> /var/cache/apt/archives/linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic_4.13.0<span class="string">-37</span>.42~16.04.1_amd64.deb</span><br><span class="line">E: Sub-process /usr/bin/dpkg returned an error code (1)</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ uname -a</span><br><span class="line">Linux km 4.10.0<span class="string">-38</span>-generic #42~16.04.1-Ubuntu SMP Tue Oct 10 16:32:20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux</span><br><span class="line">jeromesun@km:~$ sudo dpkg --list 'linux-image*'|awk '&#123; if ($1=="ii") print $2&#125;'|grep -v `uname -r`</span><br><span class="line">linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.10.0<span class="string">-40</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.10.0<span class="string">-42</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.13.0<span class="string">-26</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.13.0<span class="string">-31</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.13.0<span class="string">-32</span>-generic</span><br><span class="line">linux-image<span class="string">-4</span>.13.0<span class="string">-36</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.10.0<span class="string">-40</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.10.0<span class="string">-42</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.13.0<span class="string">-26</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.13.0<span class="string">-31</span>-generic</span><br><span class="line">linux-image-extra<span class="string">-4</span>.13.0<span class="string">-32</span>-generic</span><br><span class="line">jeromesun@km:~$ </span><br><span class="line">jeromesun@km:~$ sudo apt-get purge linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">You might want to run 'apt-get -f install' to correct these:</span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> linux-image-extra<span class="string">-4</span>.10.0<span class="string">-37</span>-generic : Depends: linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic but it is not going to be installed</span><br><span class="line"> linux-image-extra<span class="string">-4</span>.13.0<span class="string">-37</span>-generic : Depends: linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic but it is not going to be installed</span><br><span class="line"> linux-image-generic-hwe<span class="string">-16</span>.04 : Depends: linux-image<span class="string">-4</span>.13.0<span class="string">-37</span>-generic but it is not going to be installed</span><br><span class="line">E: Unmet dependencies. Try 'apt-get -f install' with no packages (or specify a solution).</span><br><span class="line">jeromesun@km:~$ sudo dpkg --force-all -P linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">dpkg: linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic: dependency problems, but removing anyway as you requested:</span><br><span class="line"> linux-image-extra<span class="string">-4</span>.10.0<span class="string">-37</span>-generic depends on linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic.</span><br><span class="line"></span><br><span class="line">(Reading database ... 574105 files and directories currently installed.)</span><br><span class="line">Removing linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic (4.10.0<span class="string">-37</span>.41~16.04.1) ...</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.10.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">update-initramfs: Deleting /boot/initrd.img<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.10.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">Generating grub configuration file ...</span><br><span class="line">Warning: Setting GRUB_TIMEOUT to a non-zero value when GRUB_HIDDEN_TIMEOUT is set is no longer supported.</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-36</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.13.0<span class="string">-36</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-32</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.13.0<span class="string">-32</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-31</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.13.0<span class="string">-31</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.13.0<span class="string">-26</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.13.0<span class="string">-26</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-42</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.10.0<span class="string">-42</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-40</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.10.0<span class="string">-40</span>-generic</span><br><span class="line">Found linux image: /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-38</span>-generic</span><br><span class="line">Found initrd image: /boot/initrd.img<span class="string">-4</span>.10.0<span class="string">-38</span>-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">done</span><br><span class="line">Purging configuration files for linux-image<span class="string">-4</span>.10.0<span class="string">-37</span>-generic (4.10.0<span class="string">-37</span>.41~16.04.1) ...</span><br><span class="line">Examining /etc/kernel/postrm.d .</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/initramfs-tools 4.10.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">run-parts: executing /etc/kernel/postrm.d/zz-update-grub 4.10.0<span class="string">-37</span>-generic /boot/vmlinuz<span class="string">-4</span>.10.0<span class="string">-37</span>-generic</span><br><span class="line">jeromesun@km:~$</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/deb/" rel="tag"># deb</a>
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+            <a href="/tags/apt/" rel="tag"># apt</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201712/shell/sed.html" rel="next" title="Linux命令行 - sed">
+                <i class="fa fa-chevron-left"></i> Linux命令行 - sed
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201712/tools/git_mirror_to_new_repo.html" rel="prev" title="Mirror 旧 git 仓库到新的 git 仓库（保留所有提交 / 分支 / tags）">
+                Mirror 旧 git 仓库到新的 git 仓库（保留所有提交 / 分支 / tags） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改源"><span class="nav-number">1.</span> <span class="nav-text">修改源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看依赖关系"><span class="nav-number">2.</span> <span class="nav-text">查看依赖关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题记录"><span class="nav-number">3.</span> <span class="nav-text">问题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apt-get-y-build-dep-linux-失败"><span class="nav-number">3.1.</span> <span class="nav-text">apt-get -y build-dep linux 失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#boot-目录满了，无法增删内核-image"><span class="nav-number">3.2.</span> <span class="nav-text">/boot 目录满了，无法增删内核 image</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201712/linux/apt_deb_issues.html";
+    this.page.identifier = "201712/linux/apt_deb_issues.html";
+    this.page.title = 'apt-deb 相关问题记录';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

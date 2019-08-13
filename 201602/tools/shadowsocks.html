@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.8.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="到外面的世界看看。">
+<meta name="keywords" content="shadowsocks,linux,chrome,switchyOmega,proxychains">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shadowsocks 记录">
+<meta property="og:url" content="http://sunyongfeng.com/201602/tools/shadowsocks.html">
+<meta property="og:site_name" content="孙勇峰的部落格">
+<meta property="og:description" content="到外面的世界看看。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-17T09:58:07.095Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="shadowsocks 记录">
+<meta name="twitter:description" content="到外面的世界看看。">
+  <link rel="canonical" href="http://sunyongfeng.com/201602/tools/shadowsocks">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>shadowsocks 记录 | 孙勇峰的部落格</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?20ef80920f0a54cb0bbdbe9ba6c4f83f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孙勇峰的部落格</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Keep it simple, stupid</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sunyongfeng.com/201602/tools/shadowsocks.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sunnogo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/default_avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孙勇峰的部落格">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">shadowsocks 记录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-02-28 20:48:18" itemprop="dateCreated datePublished" datetime="2016-02-28T20:48:18+08:00">2016-02-28</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tools-administrator/" itemprop="url" rel="index"><span itemprop="name">tools, administrator</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Comments: </span>
+    
+  
+    <a href="/201602/tools/shadowsocks.html#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="201602/tools/shadowsocks.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <div class="post-description">到外面的世界看看。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="shadowsocks-in-linux"><a href="#shadowsocks-in-linux" class="headerlink" title="shadowsocks in linux"></a>shadowsocks in linux</h2><ul>
+<li>install, <code>pip install shadowsocks</code></li>
+<li>start shadowsocks, <code>sslocal -d start -p server_port -k your_password -s server_url(or server_ip) -m aes-256-cfb -l local_port</code></li>
+</ul>
+<h2 id="proxychains"><a href="#proxychains" class="headerlink" title="proxychains"></a>proxychains</h2><ul>
+<li>install, <code>sudo apt-get install proxychains</code></li>
+<li>configure, <code>sudo vi /etc/proxychains.conf</code>, add line <code>socks5  127.0.0.1 1080</code> to tail</li>
+<li>use proxy for app, <code>sudo proxychains your_app</code></li>
+</ul>
+<p>chromium 无法使用 proxychains，有个 <a href="https://github.com/rofl0r/proxychains-ng/issues/45" target="_blank" rel="noopener">issue</a>。</p>
+<h2 id="switchyOmega"><a href="#switchyOmega" class="headerlink" title="switchyOmega"></a>switchyOmega</h2><p>可在 Profiles 下的 auto switch 以 rule list 的形式加入自动切换的列表，在 <code>Rule List Config</code> 下填入 rule list 的链接即可。<br>这是一个 <a href="https://github.com/calfzhou/autoproxy-gfwlist" target="_blank" rel="noopener">gfwlist</a>。</p>
+<h2 id="socks5-转-http-代理"><a href="#socks5-转-http-代理" class="headerlink" title="socks5 转 http 代理"></a>socks5 转 http 代理</h2><p>详见 <a href="http://xuhehuan.com/2119.html。" target="_blank" rel="noopener">http://xuhehuan.com/2119.html。</a></p>
+<p>使用 <code>polipo</code>，用 <code>apt-get</code> 可安装，配置如下：<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># This file only needs to list configuration variables that deviate</span></span><br><span class="line"><span class="comment"># from the default values.  See /usr/share/doc/polipo/examples/config.sample</span></span><br><span class="line"><span class="comment"># and "polipo -v" for variables you can tweak and further information.</span></span><br><span class="line"><span class="attr">logSyslog</span> = <span class="literal">false</span></span><br><span class="line"><span class="attr">logFile</span> = <span class="string">"/var/log/polipo/polipo.log"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">socksParentProxy</span> = <span class="string">"127.0.0.1:1080"</span></span><br><span class="line"><span class="attr">socksProxyType</span> = socks5</span><br><span class="line"></span><br><span class="line"><span class="attr">chunkHighMark</span> = <span class="number">50331648</span></span><br><span class="line"><span class="attr">objectHighMark</span> = <span class="number">16384</span></span><br><span class="line"></span><br><span class="line"><span class="attr">serverMaxSlots</span> = <span class="number">64</span></span><br><span class="line"><span class="attr">serverSlots</span> = <span class="number">16</span></span><br><span class="line"><span class="attr">serverSlots1</span> = <span class="number">32</span></span><br><span class="line"></span><br><span class="line"><span class="attr">proxyAddress</span> = <span class="string">"0.0.0.0"</span></span><br><span class="line"><span class="attr">proxyPort</span> = <span class="number">8123</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>重启 polipo，<code>sudo service polipo restart</code></li>
+<li>验证 sock5 转 http 是否 ok：</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">http_proxy</span>=<span class="string">"http://127.0.0.1:8123/"</span></span><br><span class="line">curl www.google.com</span><br></pre></td></tr></table></figure>
+<p>ok 的话返回网页抓取结果：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">~$ curl www.google.com.hk                    </span><br><span class="line"><span class="meta">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">title</span>&gt;</span>Proxy error: 502 Read from server failed: Connection reset by peer.<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>502 Read from server failed: Connection reset by peer<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>The following error occurred while trying to access <span class="tag">&lt;<span class="name">strong</span>&gt;</span>http://www.google.com.hk/<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>:<span class="tag">&lt;<span class="name">br</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">strong</span>&gt;</span>502 Read from server failed: Connection reset by peer<span class="tag">&lt;/<span class="name">strong</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span>Generated Tue, 08 Nov 2016 15:53:18 CST by Polipo on <span class="tag">&lt;<span class="name">em</span>&gt;</span>openswitch-OptiPlex-380:10080<span class="tag">&lt;/<span class="name">em</span>&gt;</span>.</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ </span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ curl www.google.com.hk</span><br><span class="line"><span class="meta">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">title</span>&gt;</span>Proxy error: 502 Read from server failed: Connection reset by peer.<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>502 Read from server failed: Connection reset by peer<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>The following error occurred while trying to access <span class="tag">&lt;<span class="name">strong</span>&gt;</span>http://www.google.com.hk/<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>:<span class="tag">&lt;<span class="name">br</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">strong</span>&gt;</span>502 Read from server failed: Connection reset by peer<span class="tag">&lt;/<span class="name">strong</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span>Generated Tue, 08 Nov 2016 15:55:03 CST by Polipo on <span class="tag">&lt;<span class="name">em</span>&gt;</span>openswitch-OptiPlex-380:10080<span class="tag">&lt;/<span class="name">em</span>&gt;</span>.</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line">sunyongfeng@openswitch-OptiPlex-380:~$ curl www.google.com.hk</span><br><span class="line"><span class="meta">&lt;!doctype html&gt;</span><span class="tag">&lt;<span class="name">html</span> <span class="attr">itemscope</span>=<span class="string">""</span> <span class="attr">itemtype</span>=<span class="string">"http://schema.org/WebPage"</span> <span class="attr">lang</span>=<span class="string">"zh-HK"</span>&gt;</span><span class="tag">&lt;<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">meta</span> <span class="attr">content</span>=<span class="string">"text/html; charset=UTF-8"</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span>&gt;</span><span class="tag">&lt;<span class="name">meta</span> <span class="attr">content</span>=<span class="string">"/images/branding/googleg/1x/googleg_standard_color_128dp.png"</span> <span class="attr">itemprop</span>=<span class="string">"image"</span>&gt;</span><span class="tag">&lt;<span class="name">title</span>&gt;</span>Google<span class="tag">&lt;/<span class="name">title</span>&gt;</span><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">window</span>.google=&#123;<span class="attr">kEI</span>:<span class="string">'PoUhWJLcI4nW0gLCrrCoCQ'</span>,<span class="attr">kEXPI</span>:<span class="string">'750722,1351828,1351903,1352148,3700062,3700245,4026241,4028875,4029815,4031109,4032677,4036527,4038012,4039268,4043491,4045841,4048347,4065786,4067860,4068550,4069839,4069841,4071842,4072289,4072364,4072602,4072705,4072775,4073405,4073415,4073486,4073498,4073959,4074684,4076095,4076542,4076931,4076999,4078241,4078407,4078430,4078438,4078454,4078456,4078607,4079105,4079553,4079624,4079870,4080115,4080161,4080165,4080815,4081037,4081038,4081128,4081263,4081278,4081497,4082112,4082219,4082290,4082310,4082441,4082618,4082638,4082778,4083064,4083115,4083281,4083353,4084066,4084258,4084259,4084277,4084325,4084343,4084366,4084402,4084676,4084691,4084956,4085014,4085057,4085066,4085181,4085628,4085917,8300272,8502184,8503585,8504846,8504935,8505150,8505152,8505259,8506255,8506340,8506477,8506615,8507098,8507361,8507381,8507842,8507846,8508176,8508241,8508317,10200083'</span>,<span class="attr">authuser</span>:<span class="number">0</span>,<span class="attr">kscs</span>:<span class="string">'c9c918f0_24'</span>&#125;;google.kHL=<span class="string">'zh-HK'</span>;&#125;)();(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;google.lc=[];google.li=<span class="number">0</span>;google.getEI=<span class="function"><span class="keyword">function</span>(<span class="params">a</span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> b;a&amp;&amp;(!a.getAttribute||!(b=a.getAttribute(<span class="string">"eid"</span>)));)a=a.parentNode;<span class="keyword">return</span> b||google.kEI&#125;;google.getLEI=<span class="function"><span class="keyword">function</span>(<span class="params">a</span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> b=<span class="literal">null</span>;a&amp;&amp;(!a.getAttribute||!(b=a.getAttribute(<span class="string">"leid"</span>)));)a=a.parentNode;<span class="keyword">return</span> b&#125;;google.https=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span><span class="string">"https:"</span>==<span class="built_in">window</span>.location.protocol&#125;;google.ml=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span> <span class="literal">null</span>&#125;;google.wl=<span class="function"><span class="keyword">function</span>(<span class="params">a,b</span>)</span>&#123;<span class="keyword">try</span>&#123;google.ml(<span class="built_in">Error</span>(a),!<span class="number">1</span>,b)&#125;<span class="keyword">catch</span>(c)&#123;&#125;&#125;;google.time=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span>(<span class="keyword">new</span> <span class="built_in">Date</span>).getTime()&#125;;google.log=<span class="function"><span class="keyword">function</span>(<span class="params">a,b,c,e,g</span>)</span>&#123;a=google.logUrl(a,b,c,e,g);<span class="keyword">if</span>(<span class="string">""</span>!=a)&#123;b=<span class="keyword">new</span> Image;<span class="keyword">var</span> d=google.lc,f=google.li;d[f]=b;b.onerror=b.onload=b.onabort=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">delete</span> d[f]&#125;;<span class="built_in">window</span>.google&amp;&amp;<span class="built_in">window</span>.google.vel&amp;&amp;<span class="built_in">window</span>.google.vel.lu&amp;&amp;<span class="built_in">window</span>.google.vel.lu(a);b.src=a;google.li=f+<span class="number">1</span>&#125;&#125;;google.logUrl=<span class="function"><span class="keyword">function</span>(<span class="params">a,b,c,e,g</span>)</span>&#123;<span class="keyword">var</span> d=<span class="string">""</span>,f=google.ls||<span class="string">""</span>;<span class="keyword">if</span>(!c&amp;&amp;<span class="number">-1</span>==b.search(<span class="string">"&amp;ei="</span>))&#123;<span class="keyword">var</span> h=google.getEI(e),d=<span class="string">"&amp;ei="</span>+h;<span class="number">-1</span>==b.search(<span class="string">"&amp;lei="</span>)&amp;&amp;((e=google.getLEI(e))?d+=<span class="string">"&amp;lei="</span>+e:h!=google.kEI&amp;&amp;(d+=<span class="string">"&amp;lei="</span>+google.kEI))&#125;a=c||<span class="string">"/"</span>+(g||<span class="string">"gen_204"</span>)+<span class="string">"?atyp=i&amp;ct="</span>+a+<span class="string">"&amp;cad="</span>+b+d+f+<span class="string">"&amp;zx="</span>+google.time();<span class="regexp">/^http:/i</span>.test(a)&amp;&amp;google.https()&amp;&amp;(google.ml(<span class="built_in">Error</span>(<span class="string">"a"</span>),!<span class="number">1</span>,&#123;<span class="attr">src</span>:a,<span class="attr">glmm</span>:<span class="number">1</span>&#125;),a=<span class="string">""</span>);<span class="keyword">return</span> a&#125;;google.y=&#123;&#125;;google.x=<span class="function"><span class="keyword">function</span>(<span class="params">a,b</span>)</span>&#123;google.y[a.id]=[a,b];<span class="keyword">return</span>!<span class="number">1</span>&#125;;google.lq=[];google.load=<span class="function"><span class="keyword">function</span>(<span class="params">a,b,c</span>)</span>&#123;google.lq.push([[a],b,c])&#125;;google.loadAll=<span class="function"><span class="keyword">function</span>(<span class="params">a,b</span>)</span>&#123;google.lq.push([a,b])&#125;;&#125;)();<span class="keyword">var</span> a=<span class="built_in">window</span>.location,b=a.href.indexOf(<span class="string">"#"</span>);<span class="keyword">if</span>(<span class="number">0</span>&lt;=b)&#123;<span class="keyword">var</span> c=a.href.substring(b+<span class="number">1</span>);<span class="regexp">/(^|&amp;)q=/</span>.test(c)&amp;&amp;<span class="number">-1</span>==c.indexOf(<span class="string">"#"</span>)&amp;&amp;a.replace(<span class="string">"/search?"</span>+c.replace(<span class="regexp">/(^|&amp;)fp=[^&amp;]*/g</span>,<span class="string">""</span>)+<span class="string">"&amp;cad=h"</span>)&#125;;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"><span class="selector-id">#gbar</span>,<span class="selector-id">#guser</span>&#123;<span class="attribute">font-size</span>:<span class="number">13px</span>;<span class="attribute">padding-top</span>:<span class="number">1px</span> <span class="meta">!important</span>;&#125;<span class="selector-id">#gbar</span>&#123;<span class="attribute">height</span>:<span class="number">22px</span>&#125;<span class="selector-id">#guser</span>&#123;<span class="attribute">padding-bottom</span>:<span class="number">7px</span> <span class="meta">!important</span>;<span class="attribute">text-align</span>:right&#125;<span class="selector-class">.gbh</span>,<span class="selector-class">.gbd</span>&#123;<span class="attribute">border-top</span>:<span class="number">1px</span> solid <span class="number">#c9d7f1</span>;<span class="attribute">font-size</span>:<span class="number">1px</span>&#125;<span class="selector-class">.gbh</span>&#123;<span class="attribute">height</span>:<span class="number">0</span>;<span class="attribute">position</span>:absolute;<span class="attribute">top</span>:<span class="number">24px</span>;<span class="attribute">width</span>:<span class="number">100%</span>&#125;@<span class="keyword">media</span> all&#123;<span class="selector-class">.gb1</span>&#123;<span class="attribute">height</span>:<span class="number">22px</span>;<span class="attribute">margin-right</span>:.<span class="number">5em</span>;<span class="attribute">vertical-align</span>:top&#125;<span class="selector-id">#gbar</span>&#123;<span class="attribute">float</span>:left&#125;&#125;<span class="selector-tag">a</span><span class="selector-class">.gb1</span>,<span class="selector-tag">a</span><span class="selector-class">.gb4</span>&#123;<span class="attribute">text-decoration</span>:underline <span class="meta">!important</span>&#125;<span class="selector-tag">a</span><span class="selector-class">.gb1</span>,<span class="selector-tag">a</span><span class="selector-class">.gb4</span>&#123;<span class="attribute">color</span>:<span class="number">#00c</span> <span class="meta">!important</span>&#125;<span class="selector-class">.gbi</span> <span class="selector-class">.gb4</span>&#123;<span class="attribute">color</span>:<span class="number">#dd8e27</span> <span class="meta">!important</span>&#125;<span class="selector-class">.gbf</span> <span class="selector-class">.gb4</span>&#123;<span class="attribute">color</span>:<span class="number">#900</span> <span class="meta">!important</span>&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"><span class="selector-tag">body</span>,<span class="selector-tag">td</span>,<span class="selector-tag">a</span>,<span class="selector-tag">p</span>,<span class="selector-class">.h</span>&#123;<span class="attribute">font-family</span>:arial,sans-serif&#125;<span class="selector-tag">body</span>&#123;<span class="attribute">margin</span>:<span class="number">0</span>;<span class="attribute">overflow-y</span>:scroll&#125;<span class="selector-id">#gog</span>&#123;<span class="attribute">padding</span>:<span class="number">3px</span> <span class="number">8px</span> <span class="number">0</span>&#125;<span class="selector-tag">td</span>&#123;<span class="attribute">line-height</span>:.<span class="number">8em</span>&#125;<span class="selector-class">.gac_m</span> <span class="selector-tag">td</span>&#123;<span class="attribute">line-height</span>:<span class="number">17px</span>&#125;<span class="selector-tag">form</span>&#123;<span class="attribute">margin-bottom</span>:<span class="number">20px</span>&#125;<span class="selector-class">.h</span>&#123;<span class="attribute">color</span>:<span class="number">#36c</span>&#125;<span class="selector-class">.q</span>&#123;<span class="attribute">color</span>:<span class="number">#00c</span>&#125;<span class="selector-class">.ts</span> <span class="selector-tag">td</span>&#123;<span class="attribute">padding</span>:<span class="number">0</span>&#125;<span class="selector-class">.ts</span>&#123;<span class="attribute">border-collapse</span>:collapse&#125;<span class="selector-tag">em</span>&#123;<span class="attribute">color</span>:<span class="number">#c03</span>;<span class="attribute">font-style</span>:normal;<span class="attribute">font-weight</span>:normal&#125;<span class="selector-tag">a</span> <span class="selector-tag">em</span>&#123;<span class="attribute">text-decoration</span>:underline&#125;<span class="selector-class">.lst</span>&#123;<span class="attribute">height</span>:<span class="number">25px</span>;<span class="attribute">width</span>:<span class="number">496px</span>&#125;<span class="selector-class">.gsfi</span>,<span class="selector-class">.lst</span>&#123;<span class="attribute">font</span>:<span class="number">18px</span> arial,sans-serif&#125;<span class="selector-class">.gsfs</span>&#123;<span class="attribute">font</span>:<span class="number">17px</span> arial,sans-serif&#125;<span class="selector-class">.ds</span>&#123;<span class="attribute">display</span>:inline-box;<span class="attribute">display</span>:inline-block;<span class="attribute">margin</span>:<span class="number">3px</span> <span class="number">0</span> <span class="number">4px</span>;<span class="attribute">margin-left</span>:<span class="number">4px</span>&#125;<span class="selector-tag">input</span>&#123;<span class="attribute">font-family</span>:inherit&#125;<span class="selector-tag">a</span><span class="selector-class">.gb1</span>,<span class="selector-tag">a</span><span class="selector-class">.gb2</span>,<span class="selector-tag">a</span><span class="selector-class">.gb3</span>,<span class="selector-tag">a</span><span class="selector-class">.gb4</span>&#123;<span class="attribute">color</span>:<span class="number">#11c</span> <span class="meta">!important</span>&#125;<span class="selector-tag">body</span>&#123;<span class="attribute">background</span>:<span class="number">#fff</span>;<span class="attribute">color</span>:black&#125;<span class="selector-tag">a</span>&#123;<span class="attribute">color</span>:<span class="number">#11c</span>;<span class="attribute">text-decoration</span>:none&#125;<span class="selector-tag">a</span><span class="selector-pseudo">:hover</span>,<span class="selector-tag">a</span><span class="selector-pseudo">:active</span>&#123;<span class="attribute">text-decoration</span>:underline&#125;<span class="selector-class">.fl</span> <span class="selector-tag">a</span>&#123;<span class="attribute">color</span>:<span class="number">#36c</span>&#125;<span class="selector-tag">a</span><span class="selector-pseudo">:visited</span>&#123;<span class="attribute">color</span>:<span class="number">#551a8b</span>&#125;<span class="selector-tag">a</span><span class="selector-class">.gb1</span>,<span class="selector-tag">a</span><span class="selector-class">.gb4</span>&#123;<span class="attribute">text-decoration</span>:underline&#125;<span class="selector-tag">a</span><span class="selector-class">.gb3</span><span class="selector-pseudo">:hover</span>&#123;<span class="attribute">text-decoration</span>:none&#125;<span class="selector-id">#ghead</span> <span class="selector-tag">a</span><span class="selector-class">.gb2</span><span class="selector-pseudo">:hover</span>&#123;<span class="attribute">color</span>:<span class="number">#fff</span> <span class="meta">!important</span>&#125;<span class="selector-class">.sblc</span>&#123;<span class="attribute">padding-top</span>:<span class="number">5px</span>&#125;<span class="selector-class">.sblc</span> <span class="selector-tag">a</span>&#123;<span class="attribute">display</span>:block;<span class="attribute">margin</span>:<span class="number">2px</span> <span class="number">0</span>;<span class="attribute">margin-left</span>:<span class="number">13px</span>;<span class="attribute">font-size</span>:<span class="number">11px</span>&#125;<span class="selector-class">.lsbb</span>&#123;<span class="attribute">background</span>:<span class="number">#eee</span>;<span class="attribute">border</span>:solid <span class="number">1px</span>;<span class="attribute">border-color</span>:<span class="number">#ccc</span> <span class="number">#999</span> <span class="number">#999</span> <span class="number">#ccc</span>;<span class="attribute">height</span>:<span class="number">30px</span>&#125;<span class="selector-class">.lsbb</span>&#123;<span class="attribute">display</span>:block&#125;<span class="selector-class">.ftl</span>,<span class="selector-id">#fll</span> <span class="selector-tag">a</span>&#123;<span class="attribute">display</span>:inline-block;<span class="attribute">margin</span>:<span class="number">0</span> <span class="number">12px</span>&#125;<span class="selector-class">.lsb</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(/images/nav_logo229.png) <span class="number">0</span> -<span class="number">261px</span> repeat-x;<span class="attribute">border</span>:none;<span class="attribute">color</span>:<span class="number">#000</span>;<span class="attribute">cursor</span>:pointer;<span class="attribute">height</span>:<span class="number">30px</span>;<span class="attribute">margin</span>:<span class="number">0</span>;<span class="attribute">outline</span>:<span class="number">0</span>;<span class="attribute">font</span>:<span class="number">15px</span> arial,sans-serif;<span class="attribute">vertical-align</span>:top&#125;<span class="selector-class">.lsb</span><span class="selector-pseudo">:active</span>&#123;<span class="attribute">background</span>:<span class="number">#ccc</span>&#125;<span class="selector-class">.lst</span><span class="selector-pseudo">:focus</span>&#123;<span class="attribute">outline</span>:none&#125;</span><span class="tag">&lt;/<span class="name">style</span>&gt;</span><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span><span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/images/branding/product/ico/googleg_lodp.ico"</span> <span class="attr">rel</span>=<span class="string">"shortcut icon"</span>&gt;</span><span class="tag">&lt;/<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">body</span> <span class="attr">bgcolor</span>=<span class="string">"#fff"</span>&gt;</span><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> src=<span class="string">'/images/nav_logo229.png'</span>;<span class="keyword">var</span> iesg=<span class="literal">false</span>;<span class="built_in">document</span>.body.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">window</span>.n &amp;&amp; <span class="built_in">window</span>.n();<span class="keyword">if</span> (<span class="built_in">document</span>.images)&#123;<span class="keyword">new</span> Image().src=src;&#125;</span></span><br><span class="line"><span class="javascript"><span class="keyword">if</span> (!iesg)&#123;<span class="built_in">document</span>.f&amp;&amp;<span class="built_in">document</span>.f.q.focus();<span class="built_in">document</span>.gbqf&amp;&amp;<span class="built_in">document</span>.gbqf.q.focus();&#125;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">&#125;)();</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"mngb"</span>&gt;</span> <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">gbar</span>&gt;</span><span class="tag">&lt;<span class="name">nobr</span>&gt;</span><span class="tag">&lt;<span class="name">b</span> <span class="attr">class</span>=<span class="string">gb1</span>&gt;</span><span class="tag">&lt;/<span class="name">b</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"http://www.google.com.hk/imghp?hl=zh-TW&amp;tab=wi"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"http://maps.google.com.hk/maps?hl=zh-TW&amp;tab=wl"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"https://play.google.com/?hl=zh-TW&amp;tab=w8"</span>&gt;</span>Play<span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"http://www.youtube.com/?gl=HK&amp;tab=w1"</span>&gt;</span>YouTube<span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"http://news.google.com.hk/nwshp?hl=zh-TW&amp;tab=wn"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"https://mail.google.com/mail/?tab=wm"</span>&gt;</span>Gmail<span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">href</span>=<span class="string">"https://drive.google.com/?tab=wo"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">gb1</span> <span class="attr">style</span>=<span class="string">"text-decoration:none"</span> <span class="attr">href</span>=<span class="string">"https://www.google.com.hk/intl/zh-TW/options/"</span>&gt;</span><span class="tag">&lt;<span class="name">u</span>&gt;</span><span class="tag">&lt;/<span class="name">u</span>&gt;</span> &amp;raquo;<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">nobr</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">guser</span> <span class="attr">width</span>=<span class="string">100%</span>&gt;</span><span class="tag">&lt;<span class="name">nobr</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">gbn</span> <span class="attr">class</span>=<span class="string">gbi</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">gbf</span> <span class="attr">class</span>=<span class="string">gbf</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">gbe</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.google.com.hk/history/optout?hl=zh-TW"</span> <span class="attr">class</span>=<span class="string">gb4</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> | <span class="tag">&lt;<span class="name">a</span>  <span class="attr">href</span>=<span class="string">"/preferences?hl=zh-TW"</span> <span class="attr">class</span>=<span class="string">gb4</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span> | <span class="tag">&lt;<span class="name">a</span> <span class="attr">target</span>=<span class="string">_top</span> <span class="attr">id</span>=<span class="string">gb_70</span> <span class="attr">href</span>=<span class="string">"https://accounts.google.com/ServiceLogin?hl=zh-TW&amp;passive=true&amp;continue=http://www.google.com.hk/"</span> <span class="attr">class</span>=<span class="string">gb4</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">nobr</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">gbh</span> <span class="attr">style</span>=<span class="string">left:0</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">gbh</span> <span class="attr">style</span>=<span class="string">right:0</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span> <span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">center</span>&gt;</span><span class="tag">&lt;<span class="name">br</span> <span class="attr">clear</span>=<span class="string">"all"</span> <span class="attr">id</span>=<span class="string">"lgpd"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"lga"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"padding:28px 0 3px"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"height:110px;width:276px;background:url(/images/branding/googlelogo/1x/googlelogo_white_background_color_272x92dp.png) no-repeat"</span> <span class="attr">title</span>=<span class="string">"Google"</span> <span class="attr">align</span>=<span class="string">"left"</span> <span class="attr">id</span>=<span class="string">"hplogo"</span> <span class="attr">onload</span>=<span class="string">"window.lol&amp;&amp;lol()"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"color:#777;font-size:16px;font-weight:bold;position:relative;top:70px;left:218px"</span> <span class="attr">nowrap</span>=<span class="string">""</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/search"</span> <span class="attr">name</span>=<span class="string">"f"</span>&gt;</span><span class="tag">&lt;<span class="name">table</span> <span class="attr">cellpadding</span>=<span class="string">"0"</span> <span class="attr">cellspacing</span>=<span class="string">"0"</span>&gt;</span><span class="tag">&lt;<span class="name">tr</span> <span class="attr">valign</span>=<span class="string">"top"</span>&gt;</span><span class="tag">&lt;<span class="name">td</span> <span class="attr">width</span>=<span class="string">"25%"</span>&gt;</span>&amp;nbsp;<span class="tag">&lt;/<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">td</span> <span class="attr">align</span>=<span class="string">"center"</span> <span class="attr">nowrap</span>=<span class="string">""</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"ie"</span> <span class="attr">value</span>=<span class="string">"Big5"</span> <span class="attr">type</span>=<span class="string">"hidden"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">value</span>=<span class="string">"zh-HK"</span> <span class="attr">name</span>=<span class="string">"hl"</span> <span class="attr">type</span>=<span class="string">"hidden"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"source"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">value</span>=<span class="string">"hp"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"biw"</span> <span class="attr">type</span>=<span class="string">"hidden"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"bih"</span> <span class="attr">type</span>=<span class="string">"hidden"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"ds"</span> <span class="attr">style</span>=<span class="string">"height:32px;margin:4px 0"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">style</span>=<span class="string">"color:#000;margin:0;padding:5px 8px 0 6px;vertical-align:top"</span> <span class="attr">autocomplete</span>=<span class="string">"off"</span> <span class="attr">class</span>=<span class="string">"lst"</span> <span class="attr">value</span>=<span class="string">""</span> <span class="attr">title</span>=<span class="string">"Google "</span> <span class="attr">maxlength</span>=<span class="string">"2048"</span> <span class="attr">name</span>=<span class="string">"q"</span> <span class="attr">size</span>=<span class="string">"57"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">br</span> <span class="attr">style</span>=<span class="string">"line-height:0"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"ds"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"lsbb"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">"lsb"</span> <span class="attr">value</span>=<span class="string">"Google "</span> <span class="attr">name</span>=<span class="string">"btnG"</span> <span class="attr">type</span>=<span class="string">"submit"</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"ds"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"lsbb"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">"lsb"</span> <span class="attr">value</span>=<span class="string">"name="</span><span class="attr">btnI</span>" <span class="attr">onclick</span>=<span class="string">"if(this.form.q.value)this.checked=1; else top.location='/doodles/'"</span> <span class="attr">type</span>=<span class="string">"submit"</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">td</span> <span class="attr">class</span>=<span class="string">"fl sblc"</span> <span class="attr">align</span>=<span class="string">"left"</span> <span class="attr">nowrap</span>=<span class="string">""</span> <span class="attr">width</span>=<span class="string">"25%"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/advanced_search?hl=zh-HK&amp;amp;authuser=0"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/language_tools?hl=zh-HK&amp;amp;authuser=0"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span><span class="tag">&lt;/<span class="name">tr</span>&gt;</span><span class="tag">&lt;/<span class="name">table</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"gbv"</span> <span class="attr">name</span>=<span class="string">"gbv"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">value</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"gac_scont"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"font-size:83%;min-height:3.5em"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"als"</span>&gt;</span><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"><span class="selector-id">#als</span>&#123;<span class="attribute">font-size</span>:small;<span class="attribute">margin-bottom</span>:<span class="number">24px</span>&#125;<span class="selector-id">#_eEe</span>&#123;<span class="attribute">display</span>:inline-block;<span class="attribute">line-height</span>:<span class="number">28px</span>;&#125;<span class="selector-id">#_eEe</span> <span class="selector-tag">a</span>&#123;<span class="attribute">padding</span>:<span class="number">0</span> <span class="number">3px</span>;&#125;<span class="selector-class">._lEe</span>&#123;<span class="attribute">display</span>:inline-block;<span class="attribute">margin</span>:<span class="number">0</span> <span class="number">2px</span>;<span class="attribute">white-space</span>:nowrap&#125;<span class="selector-class">._PEe</span>&#123;<span class="attribute">display</span>:inline-block;<span class="attribute">margin</span>:<span class="number">0</span> <span class="number">2px</span>&#125;</span><span class="tag">&lt;/<span class="name">style</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"_eEe"</span>&gt;</span>Google.com.hk <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.google.com.hk/setprefs?sig=0_rRVcKKfvrZgCB_A43UF1XQ9TPmw%3D&amp;amp;hl=zh-CN&amp;amp;source=homepage"</span> <span class="attr">data-ved</span>=<span class="string">"0ahUKEwiS85jb15jQAhUJq1QKHUIXDJUQ2ZgBCAU"</span>&gt;</span>(&amp;#31616;/a&gt;  <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.google.com.hk/setprefs?sig=0_rRVcKKfvrZgCB_A43UF1XQ9TPmw%3D&amp;amp;hl=en&amp;amp;source=homepage"</span> <span class="attr">data-ved</span>=<span class="string">"0ahUKEwiS85jb15jQAhUJq1QKHUIXDJUQ2ZgBCAY"</span>&gt;</span>English<span class="tag">&lt;/<span class="name">a</span>&gt;</span> <span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">"footer"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"font-size:10pt"</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"margin:19px auto;text-align:center"</span> <span class="attr">id</span>=<span class="string">"fll"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/intl/zh-TW/ads/"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/intl/zh-TW/about.html"</span>&gt;</span>Google <span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.google.com.hk/setprefdomain?prefdom=US&amp;amp;sig=__A6fXbQceC3SkqMu_FRt85xzWjWI%3D"</span> <span class="attr">id</span>=<span class="string">"fehl"</span>&gt;</span>Google.com<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">p</span> <span class="attr">style</span>=<span class="string">"color:#767676;font-size:8pt"</span>&gt;</span>&amp;copy; 2016 - <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/intl/zh-TW/policies/privacy/"</span>&gt;</span>a&gt; - <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/intl/zh-TW/policies/terms/"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">center</span>&gt;</span><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">window</span>.google.cdo=&#123;<span class="attr">height</span>:<span class="number">0</span>,<span class="attr">width</span>:<span class="number">0</span>&#125;;(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> a=<span class="built_in">window</span>.innerWidth,b=<span class="built_in">window</span>.innerHeight;<span class="keyword">if</span>(!a||!b)<span class="keyword">var</span> c=<span class="built_in">window</span>.document,d=<span class="string">"CSS1Compat"</span>==c.compatMode?c.documentElement:c.body,a=d.clientWidth,b=d.clientHeight;a&amp;&amp;b&amp;&amp;(a!=google.cdo.width||b!=google.cdo.height)&amp;&amp;google.log(<span class="string">""</span>,<span class="string">""</span>,<span class="string">"/client_204?&amp;atyp=i&amp;biw="</span>+a+<span class="string">"&amp;bih="</span>+b+<span class="string">"&amp;ei="</span>+google.kEI);&#125;)();&#125;)();</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"xjsd"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"xjsi"</span>&gt;</span><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params">b</span>)</span>&#123;<span class="built_in">window</span>.setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> a=<span class="built_in">document</span>.createElement(<span class="string">"script"</span>);a.src=b;<span class="built_in">document</span>.getElementById(<span class="string">"xjsd"</span>).appendChild(a)&#125;,<span class="number">0</span>)&#125;google.dljp=<span class="function"><span class="keyword">function</span>(<span class="params">b,a</span>)</span>&#123;google.xjsu=b;c(a)&#125;;google.dlj=c;&#125;)();(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">window</span>.google.xjsrm=[];&#125;)();<span class="keyword">if</span>(google.y)google.y.first=[];<span class="keyword">if</span>(!google.xjs)&#123;<span class="built_in">window</span>._=<span class="built_in">window</span>._||&#123;&#125;;<span class="built_in">window</span>._._DumpException=<span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;<span class="keyword">throw</span> e&#125;;<span class="keyword">if</span>(google.timers&amp;&amp;google.timers.load.t)&#123;google.timers.load.t.xjsls=<span class="keyword">new</span> <span class="built_in">Date</span>().getTime();&#125;google.dljp(<span class="string">'/xjs/_/js/k\x3dxjs.hp.en_US.HHTiPh8WO1g.O/m\x3dsb_he,d/rt\x3dj/d\x3d1/t\x3dzcms/rs\x3dACT90oFyHK2p3Cq9BefJNT1WLwsFHb2Nvg'</span>,<span class="string">'/xjs/_/js/k\x3dxjs.hp.en_US.HHTiPh8WO1g.O/m\x3dsb_he,d/rt\x3dj/d\x3d1/t\x3dzcms/rs\x3dACT90oFyHK2p3Cq9BefJNT1WLwsFHb2Nvg'</span>);google.xjs=<span class="number">1</span>;&#125;google.pmc=&#123;<span class="string">"sb_he"</span>:&#123;<span class="string">"agen"</span>:<span class="literal">true</span>,<span class="string">"cgen"</span>:<span class="literal">true</span>,<span class="string">"client"</span>:<span class="string">"heirloom-hp"</span>,<span class="string">"dh"</span>:<span class="literal">true</span>,<span class="string">"dhqt"</span>:<span class="literal">true</span>,<span class="string">"ds"</span>:<span class="string">""</span>,<span class="string">"fl"</span>:<span class="literal">true</span>,<span class="string">"host"</span>:<span class="string">"google.com.hk"</span>,<span class="string">"isbh"</span>:<span class="number">28</span>,<span class="string">"jam"</span>:<span class="number">0</span>,<span class="string">"msgs"</span>:&#123;<span class="string">"cibl"</span>:<span class="string">""</span>,<span class="string">"dym"</span>:<span class="string">""</span>lcky<span class="string">":"</span><span class="string">"lml"</span>:<span class="string">""</span>,<span class="string">"oskt"</span>:<span class="string">""</span>,<span class="string">"psrc"</span>:<span class="string">"003Ca href=\"/history\"\u003E\u003C/a\u003E"</span>,<span class="string">"psrl"</span>:<span class="string">""</span>,<span class="string">"sbit"</span>:<span class="string">""</span>,<span class="string">"srch"</span>:<span class="string">"Google "</span>&#125;,<span class="string">"nds"</span>:<span class="literal">true</span>,<span class="string">"ovr"</span>:&#123;&#125;,<span class="string">"pq"</span>:<span class="string">""</span>,<span class="string">"refpd"</span>:<span class="literal">true</span>,<span class="string">"refspre"</span>:<span class="literal">true</span>,<span class="string">"rfs"</span>:[],<span class="string">"scd"</span>:<span class="number">10</span>,<span class="string">"sce"</span>:<span class="number">5</span>,<span class="string">"stok"</span>:<span class="string">"ahSc6O6Rc51lCmCOKZYjJdw8hyI"</span>&#125;,<span class="string">"d"</span>:&#123;&#125;&#125;;google.y.first.push(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">if</span>(google.med)&#123;google.med(<span class="string">'init'</span>);google.initHistory();google.med(<span class="string">'history'</span>);&#125;&#125;);<span class="keyword">if</span>(google.j&amp;&amp;google.j.en&amp;&amp;google.j.xi)&#123;<span class="built_in">window</span>.setTimeout(google.j.xi,<span class="number">0</span>);&#125;</span></span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/administrator/" rel="tag"># administrator</a>
+          
+            <a href="/tags/外面的世界/" rel="tag"># 外面的世界</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/201602/programmer/tools/gcc_issues.html" rel="next" title="GCC 问题记录">
+                <i class="fa fa-chevron-left"></i> GCC 问题记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/201603/tools/app.html" rel="prev" title="常用软件备忘">
+                常用软件备忘 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    
+  <div class="comments" id="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" src="/images/default_avatar.jpg" alt="sunnogo">
+  <p class="site-author-name" itemprop="name">sunnogo</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#shadowsocks-in-linux"><span class="nav-number">1.</span> <span class="nav-text">shadowsocks in linux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proxychains"><span class="nav-number">2.</span> <span class="nav-text">proxychains</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#switchyOmega"><span class="nav-number">3.</span> <span class="nav-text">switchyOmega</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socks5-转-http-代理"><span class="nav-number">4.</span> <span class="nav-text">socks5 转 http 代理</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sunnogo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://sunyongfeng.com/201602/tools/shadowsocks.html";
+    this.page.identifier = "201602/tools/shadowsocks.html";
+    this.page.title = 'shadowsocks 记录';};
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://sunyongfeng-com.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+</body>
+</html>

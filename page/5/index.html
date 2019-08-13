@@ -4,7 +4,7 @@
 
 
 
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html class="theme-next mist use-motion" lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="generator" content="Hexo 3.8.0">
@@ -20,6 +20,7 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
 
 
 <script id="hexo.configurations">
@@ -31,7 +32,7 @@
     sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
     back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
     copycode: {"enable":false,"show_result":false,"style":null},
-    fancybox: false,
+    fancybox: true,
     mediumzoom: false,
     lazyload: false,
     pangu: false,
@@ -50,9 +51,9 @@
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
-      copy_button: 'Copy',
-      copy_success: 'Copied',
-      copy_failure: 'Copy failed'
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
     }
   };
 </script>
@@ -61,7 +62,7 @@
 <meta property="og:title" content="孙勇峰的部落格">
 <meta property="og:url" content="http://sunyongfeng.com/page/5/index.html">
 <meta property="og:site_name" content="孙勇峰的部落格">
-<meta property="og:locale" content="zh-Hans">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="孙勇峰的部落格">
   <link rel="canonical" href="http://sunyongfeng.com/page/5/">
@@ -119,7 +120,7 @@
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
   <div class="container sidebar-position-right page-home">
     <div class="headband"></div>
@@ -140,7 +141,7 @@
   </div>
 
   <div class="site-nav-toggle">
-    <button aria-label="Toggle navigation bar">
+    <button aria-label="切换导航栏">
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
@@ -160,18 +161,7 @@
       
     
 
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
-
-  </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
-      
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
 
   </li>
         
@@ -182,7 +172,7 @@
       
     
 
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
 
   </li>
         
@@ -193,7 +183,7 @@
       
     
 
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
 
   </li>
         
@@ -204,7 +194,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
 
   </li>
         
@@ -215,13 +205,24 @@
       
     
 
-    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+    <a href="/404.html" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
 
   </li>
         <li class="menu-item menu-item-search">
           <a href="javascript:;" class="popup-trigger">
           
-            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
         </li>
       
     </ul>
@@ -239,7 +240,7 @@
     </span>
     <div class="local-search-input-wrapper">
       <input autocomplete="off"
-             placeholder="Searching..." spellcheck="false"
+             placeholder="搜索..." spellcheck="false"
              type="text" id="local-search-input">
     </div>
   </div>
@@ -298,14 +299,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-06-16 17:28:00" itemprop="dateCreated datePublished" datetime="2017-06-16T17:28:00+08:00">2017-06-16</time>
+              <time title="创建时间：2017-06-16 17:28:00" itemprop="dateCreated datePublished" datetime="2017-06-16T17:28:00+08:00">2017-06-16</time>
             </span>
           
             
@@ -316,9 +317,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -327,7 +328,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
@@ -347,7 +348,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201706/networks/switch/three_panel.html#comments" itemprop="discussionUrl">
@@ -372,7 +373,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201706/networks/switch/three_panel.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -431,14 +432,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-06-08 23:34:00" itemprop="dateCreated datePublished" datetime="2017-06-08T23:34:00+08:00">2017-06-08</time>
+              <time title="创建时间：2017-06-08 23:34:00" itemprop="dateCreated datePublished" datetime="2017-06-08T23:34:00+08:00">2017-06-08</time>
             </span>
           
             
@@ -449,9 +450,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -460,7 +461,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
@@ -480,7 +481,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201706/programmer/tools/gprof_mips64.html#comments" itemprop="discussionUrl">
@@ -505,7 +506,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201706/programmer/tools/gprof_mips64.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -564,14 +565,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-06-06 09:28:24" itemprop="dateCreated datePublished" datetime="2017-06-06T09:28:24+08:00">2017-06-06</time>
+              <time title="创建时间：2017-06-06 09:28:24" itemprop="dateCreated datePublished" datetime="2017-06-06T09:28:24+08:00">2017-06-06</time>
             </span>
           
             
@@ -582,9 +583,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -593,7 +594,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c</span></a></span>
@@ -613,7 +614,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201706/programmer/c/get_rss.html#comments" itemprop="discussionUrl">
@@ -638,7 +639,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201706/programmer/c/get_rss.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -697,14 +698,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-06-03 13:05:18" itemprop="dateCreated datePublished" datetime="2017-06-03T13:05:18+08:00">2017-06-03</time>
+              <time title="创建时间：2017-06-03 13:05:18" itemprop="dateCreated datePublished" datetime="2017-06-03T13:05:18+08:00">2017-06-03</time>
             </span>
           
             
@@ -715,9 +716,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -726,7 +727,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/shell/" itemprop="url" rel="index"><span itemprop="name">shell</span></a></span>
@@ -746,7 +747,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201706/shell/process.html#comments" itemprop="discussionUrl">
@@ -771,7 +772,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201706/shell/process.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -830,14 +831,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-12 11:00:00" itemprop="dateCreated datePublished" datetime="2017-05-12T11:00:00+08:00">2017-05-12</time>
+              <time title="创建时间：2017-05-12 11:00:00" itemprop="dateCreated datePublished" datetime="2017-05-12T11:00:00+08:00">2017-05-12</time>
             </span>
           
             
@@ -848,9 +849,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -859,7 +860,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/p4/" itemprop="url" rel="index"><span itemprop="name">p4</span></a></span>
@@ -879,7 +880,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/networks/p4/simple_switch_CLI.html#comments" itemprop="discussionUrl">
@@ -904,7 +905,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/networks/p4/simple_switch_CLI.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -963,14 +964,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-11 13:57:30" itemprop="dateCreated datePublished" datetime="2017-05-11T13:57:30+08:00">2017-05-11</time>
+              <time title="创建时间：2017-05-11 13:57:30" itemprop="dateCreated datePublished" datetime="2017-05-11T13:57:30+08:00">2017-05-11</time>
             </span>
           
             
@@ -981,9 +982,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -992,7 +993,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
@@ -1012,7 +1013,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/networks/nat.html#comments" itemprop="discussionUrl">
@@ -1037,7 +1038,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/networks/nat.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -1096,14 +1097,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-10 16:41:00" itemprop="dateCreated datePublished" datetime="2017-05-10T16:41:00+08:00">2017-05-10</time>
+              <time title="创建时间：2017-05-10 16:41:00" itemprop="dateCreated datePublished" datetime="2017-05-10T16:41:00+08:00">2017-05-10</time>
             </span>
           
             
@@ -1114,9 +1115,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -1125,7 +1126,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/p4/" itemprop="url" rel="index"><span itemprop="name">p4</span></a></span>
@@ -1145,7 +1146,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/networks/p4/repo_p4app.html#comments" itemprop="discussionUrl">
@@ -1170,7 +1171,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/networks/p4/repo_p4app.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -1229,14 +1230,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-09 16:32:30" itemprop="dateCreated datePublished" datetime="2017-05-09T16:32:30+08:00">2017-05-09</time>
+              <time title="创建时间：2017-05-09 16:32:30" itemprop="dateCreated datePublished" datetime="2017-05-09T16:32:30+08:00">2017-05-09</time>
             </span>
           
             
@@ -1247,9 +1248,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -1258,7 +1259,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
@@ -1278,7 +1279,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/networks/quagga/quickstart.html#comments" itemprop="discussionUrl">
@@ -1303,7 +1304,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/networks/quagga/quickstart.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -1362,14 +1363,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-09 11:08:20" itemprop="dateCreated datePublished" datetime="2017-05-09T11:08:20+08:00">2017-05-09</time>
+              <time title="创建时间：2017-05-09 11:08:20" itemprop="dateCreated datePublished" datetime="2017-05-09T11:08:20+08:00">2017-05-09</time>
             </span>
           
             
@@ -1380,9 +1381,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -1391,7 +1392,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/networks/" itemprop="url" rel="index"><span itemprop="name">networks</span></a></span>
@@ -1411,7 +1412,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/networks/pppoe.html#comments" itemprop="discussionUrl">
@@ -1436,7 +1437,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/networks/pppoe.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -1495,14 +1496,14 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
 
               
                 
               
 
-              <time title="Created: 2017-05-02 16:11:24" itemprop="dateCreated datePublished" datetime="2017-05-02T16:11:24+08:00">2017-05-02</time>
+              <time title="创建时间：2017-05-02 16:11:24" itemprop="dateCreated datePublished" datetime="2017-05-02T16:11:24+08:00">2017-05-02</time>
             </span>
           
             
@@ -1513,9 +1514,9 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 
-                  <span class="post-meta-item-text">Edited on</span>
+                  <span class="post-meta-item-text">更新于</span>
                 
-                <time title="Modified: 2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
+                <time title="修改时间：2019-04-17 17:58:07" itemprop="dateModified" datetime="2019-04-17T17:58:07+08:00">2019-04-17</time>
               </span>
             
           
@@ -1524,7 +1525,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/programmer/" itemprop="url" rel="index"><span itemprop="name">programmer</span></a></span>
@@ -1544,7 +1545,7 @@
       <i class="fa fa-comment-o"></i>
     </span>
     
-      <span class="post-meta-item-text">Comments: </span>
+      <span class="post-meta-item-text">评论数：</span>
     
   
     <a href="/201705/programmer/tools/scrt_config.html#comments" itemprop="discussionUrl">
@@ -1569,7 +1570,7 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/201705/programmer/tools/scrt_config.html">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           
@@ -1596,7 +1597,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1631,7 +1632,7 @@
           <a href="/archives/">
         
           <span class="site-state-item-count">148</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
     
@@ -1690,7 +1691,7 @@
           
         
         <span class="site-state-item-count">22</span>
-        <span class="site-state-item-name">categories</span>
+        <span class="site-state-item-name">分类</span>
         </a>
       </div>
     
@@ -1925,7 +1926,7 @@
           
         
         <span class="site-state-item-count">110</span>
-        <span class="site-state-item-name">tags</span>
+        <span class="site-state-item-name">标签</span>
         </a>
       </div>
     
@@ -1987,9 +1988,9 @@
   </span>
   <span class="author" itemprop="copyrightHolder">sunnogo</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.3.0</div>
 
         
 
@@ -2013,6 +2014,7 @@
 
   
   <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
   <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
   <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
